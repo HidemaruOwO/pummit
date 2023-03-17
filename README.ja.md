@@ -12,7 +12,9 @@
 
 ## なんだこれは
 
-綺麗な形のコミットメッセージを簡単に作成出来ます
+このような綺麗な形のコミットメッセージを簡単に作成出来ます
+  
+![image](https://user-images.githubusercontent.com/82384920/225978215-9ac68cd4-cdb0-44c9-bca3-4d2cff1896cf.png)
 
 </div>
 
@@ -30,6 +32,11 @@
 pummitは２つの方法で使用することができます
 
 ```bash
+pummit emojiprefix 'subject'
+# or
+pummit 'emojiprefix subject'
+
+# Example
 pummit sparkles 'I am unko man'
 # Run: git commit -m ':sparkles: I am unko man (path/to/added/file, path/to/added/file)'
 
