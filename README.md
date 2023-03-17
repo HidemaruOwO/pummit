@@ -11,8 +11,11 @@
 ![image](https://user-images.githubusercontent.com/82384920/225959857-76495875-c426-4669-a8d4-372ebf3acfad.png)
 
 ## What is this
+  
+Easily create a clean formatted commit message like this.
+  
+![image](https://user-images.githubusercontent.com/82384920/225978215-9ac68cd4-cdb0-44c9-bca3-4d2cff1896cf.png)
 
-Easily create nicely formatted commit messages
 
 </div>
 
@@ -30,6 +33,11 @@ Easily create nicely formatted commit messages
 pummit can be used in two ways
 
 ```bash
+pummit emojiprefix 'subject'
+# or
+pummit 'emojiprefix subject'
+
+# Example
 pummit sparkles 'I am unko man'
 # Run: git commit -m ':sparkles: I am unko man (path/to/added/file, path/to/added/file)'
 
