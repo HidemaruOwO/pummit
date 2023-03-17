@@ -1,2 +1,2 @@
 builds:
-- skip: true
+- main: ./src/pummit.go
