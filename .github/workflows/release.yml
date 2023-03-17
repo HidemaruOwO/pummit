@@ -24,13 +24,6 @@ jobs:
           exit 1
       - name: Checkout Sources
         uses: actions/checkout@v2
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: Bump-up Semantic Version
-        uses: kyoh86/git-vertag-action@v1.1
-        with:
-          # method: "major", "minor" or "patch" to update tag with semver
-          method: "${{ github.event.inputs.method }}"
       - name: Setup Go
         uses: actions/setup-go@v2
         with:
