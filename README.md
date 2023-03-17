@@ -30,7 +30,7 @@ Easily create a clean formatted commit message like this.
 
 ## Usage 💨
 
-pummit can be used in two ways
+You can use pummit in these two ways
 
 ```bash
 pummit emojiprefix 'subject'
