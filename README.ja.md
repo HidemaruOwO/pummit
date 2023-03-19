@@ -44,6 +44,32 @@ pummit 'sparkles I am unko man'
 # Run: git commit -m ':sparkles: I am unko man (path/to/added/file, path/to/added/file)'
 ```
 
+### 絵文字プレフィックスのサンプル 🌟
+
+```
+# ==================== Emojis ====================
+# 🎉  :tada: 初めてのコミット（Initial Commit）
+# ♻️   :recycle: マージ(Merge)
+# 🔖  :bookmark: バージョンタグ（Version Tag）
+# ✨  :sparkles: 新機能（New Feature）
+# 🐛  :bug: バグ修正（Bagfix）
+# 👀  :eyes: リファクタリング(Refactoring)
+# 📚  :books: ドキュメント（Documentation）
+# 🎨  :art: デザインUI/UX(Accessibility)
+# 🐎  :horse: パフォーマンス（Performance）
+# 🔧  :wrench: ツール（Tooling）
+# 🚨  :rotating_light: テスト（Tests）
+# 💩  :hankey: 非推奨追加（Deprecation）
+# 🗑️  :wastebasket: 削除（Removal）
+# 🚧  :construction: WIP(Work In Progress)
+# ☃️  :snowman: 仕様変更
+
+# ==================== Format ====================
+# :emoji: Subject (Dir/AddedFile Dir/AddedFile)
+#
+# Commit body...
+```
+
 ## ビルド 🔨
 
 ```bash
@@ -73,3 +99,6 @@ customCommands:
   context: 'files'
   description: 'commit changes(Custom Command)'
  ```
+
+## スペシャルサンクス ✨
+- [Qiita - GitHubのコミットメッセージに絵文字を入れて開発効率をあげる](https://qiita.com/Jung0/items/0a9a7a97a2c17f92d3c5)
