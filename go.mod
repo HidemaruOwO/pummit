@@ -1,4 +1,4 @@
-module HidemaruOwO/pummit
+module github.com/HidemaruOwO/pummit
 
 go 1.20
 
