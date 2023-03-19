@@ -13,7 +13,7 @@ func HelpCmd() {
 func help() string {
 	return fmt.Sprintf(`pummit - %s
 Usage:
-chuno [PATH] [Option]
+pummit [emoji prefix] [subject]
 PATH Preview file path
 - Option
 --help Show help
