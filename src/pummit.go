@@ -1,58 +1,53 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"os"
-	"os/exec"
-	"strings"
+	"strconv"
+
+	"github.com/HidemaruOwO/nuts/log"
+	"github.com/HidemaruOwO/pummit/src/cmd"
 )
 
-func gitCommit() {
-	var emoji string
-	var subject string
-	gitChangeCmd := exec.Command("git", "diff", "--name-only", "--cached", "HEAD")
-	gitChangeOutput, err := gitChangeCmd.Output()
-	if err != nil {
-		fmt.Println("Error:", err)
-		os.Exit(1)
-	}
-	gitChange := strings.TrimSpace(string(gitChangeOutput))
-
-	if gitChange == "" {
-		fmt.Println("No change")
-		return
-	}
-	if len(os.Args) == 1 {
-		fmt.Println("No args")
-		return
-	}
-
-	args := os.Args[1:]
-
-	if len(os.Args) == 2 {
-		arr := strings.Split(args[0], " ")
-		if len(arr) == 1 {
-			fmt.Println("No emoji prefix")
-			return
-		}
-		emoji = arr[0]
-		subject = strings.Join(arr[1:], "")
-	} else {
-		emoji = args[0]
-		subject = args[1]
-	}
-
-	gitChange = strings.ReplaceAll(gitChange, "\n", ", ")
-
-	commitMsg := fmt.Sprintf(":%s: %s (%s)", emoji, subject, gitChange)
-	cmd := exec.Command("git", "commit", "-m", commitMsg)
-	_, err = cmd.Output()
-	if err != nil {
-		fmt.Println("Error:", err)
-		os.Exit(1)
-	}
-}
+var isDebug bool = false
 
 func main() {
-	gitCommit()
+	envDebug := os.Getenv("DEBUG")
+
+	if envDebug != "" {
+		var err error
+		isDebug, err = strconv.ParseBool(envDebug)
+		if err != nil {
+			log.ErrorExit(err)
+		}
+	}
+
+	//set flags
+	version := flag.Bool("version", false, "Print version information")
+	help := flag.Bool("help", false, "Print help")
+	flag.Parse()
+
+	args := flag.Args()
+
+	log.Debugf(isDebug, "args: %s\n", args)
+
+	// use flags
+	if *help {
+		cmd.HelpCmd()
+		os.Exit(0)
+	}
+	if *version {
+		cmd.VersionCmd()
+		os.Exit(0)
+	}
+
+	if len(args) == 0 {
+		cmd.HelpCmd()
+		fmt.Printf("\n")
+		log.Warnf("Not enough arguments")
+		os.Exit(0)
+	}
+
+	cmd.RootCmd()
 }
