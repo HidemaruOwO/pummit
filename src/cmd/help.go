@@ -14,7 +14,7 @@ func help() string {
 	return fmt.Sprintf(`pummit - %s
 Usage:
 pummit [emoji prefix] [subject]
-PATH Preview file path
+Create prettier commit message
 - Option
 --help Show help
 --version Show version`, config.Version)
