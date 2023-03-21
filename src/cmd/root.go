@@ -2,10 +2,12 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/HidemaruOwO/nuts/log"
 	"os"
 	"os/exec"
 	"strings"
+
+	"github.com/HidemaruOwO/nuts/log"
+	"github.com/HidemaruOwO/pummit/src/lib"
 )
 
 func RootCmd() {
@@ -42,6 +44,15 @@ func gitCommit() {
 		emoji = args[0]
 		subject = args[1]
 	}
+
+	array := lib.GetAliasList()
+	var num int
+	for index, value := range array {
+		if value[0] == emoji {
+			num = index
+		}
+	}
+	emoji = array[num][1]
 
 	gitChange = strings.ReplaceAll(gitChange, "\n", ", ")
 
