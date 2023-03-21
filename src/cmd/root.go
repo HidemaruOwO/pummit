@@ -46,12 +46,27 @@ func gitCommit() {
 	}
 
 	array := lib.GetAliasList()
+	ch := make(chan int)
+	for i, value := range array {
+		go func(index int, value []string) {
+			if value[0][0] == emoji[0] {
+				ch <- index
+			} else {
+				ch <- -1
+			}
+		}(i, value)
+	}
+
+	// 結果の収集
 	var num int
-	for index, value := range array {
-		if value[0] == emoji {
-			num = index
+	for i := 0; i < len(array); i++ {
+		res := <-ch
+		if res >= 0 {
+			num = res
+			break
 		}
 	}
+
 	emoji = array[num][1]
 
 	gitChange = strings.ReplaceAll(gitChange, "\n", ", ")
