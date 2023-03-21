@@ -11,11 +11,13 @@ func HelpCmd() {
 }
 
 func help() string {
-	return fmt.Sprintf(`pummit - %s
+	return fmt.Sprintf(`🚛 pummit - %s
+
 Usage:
-pummit [emoji prefix] [subject]
-Create prettier commit message
-- Option
---help Show help
---version Show version`, config.Version)
+  pummit [emoji prefix] [subject]
+  Create prettier commit message
+
+Flags:
+  --help Show help
+  --version Show version`, config.Version)
 }
