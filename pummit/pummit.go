@@ -7,7 +7,7 @@ import (
 	"strconv"
 
 	"github.com/HidemaruOwO/nuts/log"
-	"github.com/HidemaruOwO/pummit/src/cmd"
+	"github.com/HidemaruOwO/pummit/pummit/cmd"
 )
 
 var isDebug bool = false

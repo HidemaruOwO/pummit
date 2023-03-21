@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/HidemaruOwO/nuts/log"
-	"github.com/HidemaruOwO/pummit/src/lib"
+	"github.com/HidemaruOwO/pummit/pummit/lib"
 )
 
 func RootCmd() {
