@@ -33,7 +33,7 @@ func gitCommit() {
 	if len(os.Args) == 2 {
 		arr := strings.Split(args[0], " ")
 		if len(arr) == 1 {
-			log.Infof("The emoji prefix is missing. Please add it as the first argument.\n")
+			log.Infof("The emoji prefix is missing. Please add it as the first argument\n")
 			return
 		}
 		emoji = arr[0]
