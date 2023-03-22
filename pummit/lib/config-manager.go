@@ -14,6 +14,8 @@ import (
 	"github.com/tucnak/store"
 )
 
+var isDebug bool = config.IsDebug()
+
 type Gitmoji struct {
 	Schema   string `json:"$schema"`
 	Gitmojis []struct {
@@ -32,7 +34,7 @@ type Alias struct {
 	Alias            [][]string `json:"alias"`
 }
 
-func Init(path string, isDebug bool) {
+func Init(path string) {
 	path = filepath.Join(path)
 
 	_, err := os.Stat(path)

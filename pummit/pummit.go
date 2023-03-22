@@ -9,10 +9,11 @@ import (
 	"github.com/HidemaruOwO/nuts/log"
 	"github.com/HidemaruOwO/pummit/pummit/cmd"
 	"github.com/HidemaruOwO/pummit/pummit/cmd/alias"
+	"github.com/HidemaruOwO/pummit/pummit/config"
 	"github.com/HidemaruOwO/pummit/pummit/lib"
 )
 
-var isDebug bool = false
+var isDebug bool = config.IsDebug()
 
 func main() {
 	envDebug := os.Getenv("DEBUG")
@@ -34,7 +35,7 @@ func main() {
 
 	log.Debugf(isDebug, "args: %s\n", args)
 
-	lib.Init(lib.PlatformPath("pummit"), isDebug)
+	lib.Init(lib.PlatformPath("pummit"))
 
 	// use flags
 	if *help {

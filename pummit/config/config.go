@@ -1,5 +1,12 @@
 package config
 
+import (
+	"os"
+	"strconv"
+
+	"github.com/HidemaruOwO/nuts/log"
+)
+
 const Version string = "v1.1.0"
 const BaseJsonData string = `{
 	"writeEmojiPrefix": true,
@@ -21,3 +28,18 @@ const BaseJsonData string = `{
   ["sm", "snowman", "☃️"]
 ]
 }`
+
+func IsDebug() bool {
+	isDebug := false
+
+	envDebug := os.Getenv("DEBUG")
+	if envDebug != "" {
+		var err error
+		isDebug, err = strconv.ParseBool(envDebug)
+		if err != nil {
+			log.ErrorExit(err)
+		}
+	}
+
+	return isDebug
+}
