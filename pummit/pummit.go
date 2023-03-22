@@ -67,6 +67,8 @@ func main() {
 				alias_cmd.AliasDeleteCmd()
 			} else if args[1] == "list" {
 				alias_cmd.AliasListCmd()
+			} else if args[1] == "reset" {
+				alias_cmd.AliasResetCmd()
 			} else {
 				cmd.HelpCmd()
 				fmt.Printf("\n")
