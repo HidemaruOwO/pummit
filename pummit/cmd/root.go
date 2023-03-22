@@ -5,6 +5,7 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+	"sync"
 
 	"github.com/HidemaruOwO/nuts/log"
 	"github.com/HidemaruOwO/pummit/pummit/config"
@@ -51,11 +52,21 @@ func gitCommit() {
 
 	array := lib.GetAliasList()
 
+	var wg sync.WaitGroup
+	var mu sync.Mutex
 	for index, value := range array {
-		if value[0] == prefix {
-			prefix = array[index][1]
-		}
+		wg.Add(1)
+		go func(index int, value []string) {
+			defer wg.Done()
+			if value[0] == prefix {
+				log.Debugf(isDebug, "Found prefix %s\n", array[index][1])
+				mu.Lock()
+				prefix = array[index][1]
+				mu.Unlock()
+			}
+		}(index, value)
 	}
+	wg.Wait()
 
 	gitChange = strings.ReplaceAll(gitChange, "\n", ", ")
 
