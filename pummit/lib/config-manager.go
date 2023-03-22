@@ -70,6 +70,26 @@ func Init(path string, isDebug bool) {
 	}
 }
 
+func GetGitmoji() Gitmoji {
+	var gitimoji Gitmoji
+	store.SetApplicationName("pummit")
+	if err := store.Load("gitimoji.json", &gitimoji); err != nil {
+		log.Criticalf("Loading gitimoji list failed\n")
+		log.ErrorExit(err)
+	}
+	return gitimoji
+}
+
+func GetAlias() Alias {
+	var alias Alias
+	store.SetApplicationName("pummit")
+	if err := store.Load("config.json", &alias); err != nil {
+		log.Criticalf("Loading alias list failed\n")
+		log.ErrorExit(err)
+	}
+	return alias
+}
+
 func GetAliasList() [][]string {
 	var alias Alias
 	store.SetApplicationName("pummit")
@@ -78,6 +98,13 @@ func GetAliasList() [][]string {
 		log.ErrorExit(err)
 	}
 	return alias.Alias
+}
+
+func WriteConfig(configData Alias) {
+	store.SetApplicationName("pummit")
+	if err := store.Save("config.json", configData); err != nil {
+		log.ErrorExit(err)
+	}
 }
 
 func PlatformPath(path string) string {
