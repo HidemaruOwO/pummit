@@ -7,8 +7,11 @@ import (
 	"strings"
 
 	"github.com/HidemaruOwO/nuts/log"
+	"github.com/HidemaruOwO/pummit/pummit/config"
 	"github.com/HidemaruOwO/pummit/pummit/lib"
 )
+
+var isDebug bool = config.IsDebug()
 
 func RootCmd() {
 	gitCommit()
@@ -18,8 +21,9 @@ func gitCommit() {
 	var prefix string
 	var subject string
 
-	gitChangeCmd := exec.Command("git", "diff", "--name-only", "--cached", "HEAD")
+	gitChangeCmd := exec.Command("git", "diff", "--name-only", "--cached")
 	gitChangeOutput, err := gitChangeCmd.Output()
+	log.Debugf(isDebug, "%s", gitChangeOutput)
 	if err != nil {
 		log.ErrorExit(err)
 	}
