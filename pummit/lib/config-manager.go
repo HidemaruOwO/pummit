@@ -72,9 +72,9 @@ func Init(path string, isDebug bool) {
 
 func GetAliasList() [][]string {
 	var alias Alias
-	if err := json.Unmarshal([]byte(config.BaseJsonData), &alias); err != nil {
-		log.Criticalf("JSON encoding failed\n")
-		log.ErrorExit(fmt.Errorf("JSON encoding failed\n"))
+	if err := store.Load("config.json", &alias); err != nil {
+		log.Criticalf("Loading alias list failed\n")
+		log.ErrorExit(err)
 	}
 	return alias.Alias
 }
