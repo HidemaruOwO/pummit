@@ -17,17 +17,17 @@ import (
 var isDebug bool = config.IsDebug()
 
 type Gitmoji struct {
-	Schema   string `json:"$schema"`
-	Gitmojis []struct {
-		Emoji       string `json:"emoji"`
-		Entity      string `json:"entity"`
-		Code        string `json:"code"`
-		Description string `json:"description"`
-		Name        string `json:"name"`
-		Semver      string `json:"semver"`
-	} `json:"gitmojis"`
+	Schema   string     `json:"$schema"`
+	Gitmojis []Gitmojis `json:"gitmojis"`
 }
-
+type Gitmojis struct {
+	Emoji       string `json:"emoji"`
+	Entity      string `json:"entity"`
+	Code        string `json:"code"`
+	Description string `json:"description"`
+	Name        string `json:"name"`
+	Semver      string `json:"semver"`
+}
 type Alias struct {
 	WriteEmojiPrefix bool       `json:"writeEmojiPrefix"`
 	UseAlias         bool       `json:"useAlias"`
