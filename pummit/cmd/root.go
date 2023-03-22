@@ -39,7 +39,7 @@ func gitCommit() {
 			return
 		}
 		emoji = arr[0]
-		subject = strings.Join(arr[1:], "")
+		subject = strings.Join(arr[1:], " ")
 	} else {
 		emoji = args[0]
 		subject = args[1]
