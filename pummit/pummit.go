@@ -8,6 +8,7 @@ import (
 
 	"github.com/HidemaruOwO/nuts/log"
 	"github.com/HidemaruOwO/pummit/pummit/cmd"
+	"github.com/HidemaruOwO/pummit/pummit/lib"
 )
 
 var isDebug bool = false
@@ -31,6 +32,8 @@ func main() {
 	args := flag.Args()
 
 	log.Debugf(isDebug, "args: %s\n", args)
+
+	lib.Init(lib.PlatformPath("pummit"), isDebug)
 
 	// use flags
 	if *help {
