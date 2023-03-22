@@ -4,8 +4,11 @@ import (
 	"os"
 
 	"github.com/HidemaruOwO/nuts/log"
+	"github.com/HidemaruOwO/pummit/pummit/config"
 	"github.com/HidemaruOwO/pummit/pummit/lib"
 )
+
+var isDebug bool = config.IsDebug()
 
 func AliasAddCmd(args []string) {
 	aliasAdd(args)
@@ -22,6 +25,7 @@ func aliasAdd(args []string) {
 		log.Warnf("Missing emoji prefix\n")
 		os.Exit(0)
 	}
+
 	alias := args[2]
 	prefix := args[3]
 	var emoji string
@@ -30,11 +34,14 @@ func aliasAdd(args []string) {
 
 	for index, value := range gitimojis.Gitmojis {
 		if value.Name == prefix {
+			log.Debugf(isDebug, "found prefix from gitimoji\n")
 			emoji = gitimojis.Gitmojis[index].Emoji
-		} else {
-			log.Warnf("The prefix '%s' was not found in gitiemoji.\n", prefix)
-			os.Exit(0)
 		}
+	}
+
+	if emoji == "" {
+		log.Warnf("The prefix '%s' was not found in gitiemoji.\n", prefix)
+		os.Exit(0)
 	}
 
 	aliases.Alias = append(aliases.Alias, []string{alias, prefix, emoji})
