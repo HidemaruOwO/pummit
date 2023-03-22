@@ -2,6 +2,7 @@ package alias_cmd
 
 import (
 	"os"
+	"sync"
 
 	"github.com/HidemaruOwO/nuts/log"
 	"github.com/HidemaruOwO/pummit/pummit/config"
@@ -30,14 +31,20 @@ func aliasAdd(args []string) {
 	prefix := args[3]
 	var emoji string
 
-	gitimojis := lib.GetGitmoji()
+	var gitimoji lib.Gitmoji = lib.GetGitmoji()
 
-	for index, value := range gitimojis.Gitmojis {
-		if value.Name == prefix {
-			log.Debugf(isDebug, "found prefix from gitimoji\n")
-			emoji = gitimojis.Gitmojis[index].Emoji
-		}
+	var wg sync.WaitGroup
+	for index, value := range gitimoji.Gitmojis {
+		wg.Add(1)
+		go func(index int, value lib.Gitmojis) {
+			defer wg.Done()
+			if value.Name == prefix {
+				log.Debugf(isDebug, "found prefix from gitmoji\n")
+				emoji = gitimoji.Gitmojis[index].Emoji
+			}
+		}(index, value)
 	}
+	wg.Wait()
 
 	if emoji == "" {
 		log.Warnf("The prefix '%s' was not found in gitiemoji.\n", prefix)
