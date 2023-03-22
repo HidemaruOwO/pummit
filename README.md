@@ -21,8 +21,8 @@ You can easily create a nicely shaped committed message like this one
 <table>
   <thead>
     <tr>
-      <th style="text-align:center"><a href="README.md">🤡English</a></th>
-      <th style="text-align:center">🎌日本語</a></th>
+      <th style="text-align:center">🤡English</a></th>
+      <th style="text-align:center"><a href="README.ja.md">🎌日本語</a></th>
     </tr>
   </thead>
 </table>
