@@ -17,6 +17,18 @@ Usage:
   pummit [emoji prefix] [subject]
   Create prettier commit message
 
+Subcommand:
+  pummit alias [add|del|delete|list]
+  
+  add: Add alias
+    pummit alias add [alias name] [emoji prefix]
+
+  delete: Delete alias
+    pummit alias delete [alias name]
+
+  list: Show alias list
+    pummit alias list
+
 Flags:
   --help Show help
   --version Show version`, config.Version)
