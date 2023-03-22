@@ -61,7 +61,7 @@ func main() {
 			os.Exit(0)
 		} else {
 			if args[1] == "add" {
-				alias_cmd.AliasAddCmd()
+				alias_cmd.AliasAddCmd(args)
 			} else if args[1] == "delete" || args[1] == "del" {
 				alias_cmd.AliasDeleteCmd()
 			} else if args[1] == "list" {
