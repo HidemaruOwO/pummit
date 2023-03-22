@@ -75,8 +75,8 @@ pummit 'sparkles I am unko man'
 
 ```bash
 git clone https://github.com/HidemaruOwO/pummit.git
-cd pummit
-go build src/pummit.go
+mkdir build && cd build
+go build ../pummit/pummit.go
 ```
 
 ## Dependencies 🪡
