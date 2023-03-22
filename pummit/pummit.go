@@ -54,7 +54,7 @@ func main() {
 	}
 
 	if args[0] == "alias" {
-		if len(args[0:]) == 0 {
+		if len(args) == 1 {
 			cmd.HelpCmd()
 			fmt.Printf("\n")
 			log.Warnf("The alias command requires a second argument\n")
