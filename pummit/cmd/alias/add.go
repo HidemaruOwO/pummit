@@ -2,6 +2,7 @@ package alias_cmd
 
 import (
 	"os"
+	"strings"
 	"sync"
 
 	"github.com/HidemaruOwO/nuts/log"
@@ -29,6 +30,12 @@ func aliasAdd(args []string) {
 
 	alias := args[2]
 	prefix := args[3]
+
+	if alias != strings.TrimSpace(alias) || prefix != strings.TrimSpace(prefix) {
+		log.Warnf("Please do not include spaces in alias and emoji prefixes\n")
+		os.Exit(0)
+	}
+
 	var emoji string
 
 	var gitimoji lib.Gitmoji = lib.GetGitmoji()
