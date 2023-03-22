@@ -1,6 +1,6 @@
 package config
 
-const Version string = "v1.0.2"
+const Version string = "v1.1.0"
 const BaseJsonData string = `{
 	"writeEmojiPrefix": true,
 	"useAlias": true,

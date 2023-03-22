@@ -15,7 +15,7 @@ func RootCmd() {
 }
 
 func gitCommit() {
-	var emoji string
+	var prefix string
 	var subject string
 
 	gitChangeCmd := exec.Command("git", "diff", "--name-only", "--cached", "HEAD")
@@ -38,40 +38,24 @@ func gitCommit() {
 			log.Infof("The emoji prefix is missing. Please add it as the first argument\n")
 			return
 		}
-		emoji = arr[0]
+		prefix = arr[0]
 		subject = strings.Join(arr[1:], " ")
 	} else {
-		emoji = args[0]
+		prefix = args[0]
 		subject = args[1]
 	}
 
 	array := lib.GetAliasList()
-	ch := make(chan int)
-	for i, value := range array {
-		go func(index int, value []string) {
-			if value[0][0] == emoji[0] {
-				ch <- index
-			} else {
-				ch <- -1
-			}
-		}(i, value)
-	}
 
-	// 結果の収集
-	var num int
-	for i := 0; i < len(array); i++ {
-		res := <-ch
-		if res >= 0 {
-			num = res
-			break
+	for index, value := range array {
+		if value[0] == prefix {
+			prefix = array[index][1]
 		}
 	}
 
-	emoji = array[num][1]
-
 	gitChange = strings.ReplaceAll(gitChange, "\n", ", ")
 
-	commitMsg := fmt.Sprintf(":%s: %s (%s)", emoji, subject, gitChange)
+	commitMsg := fmt.Sprintf(":%s: %s (%s)", prefix, subject, gitChange)
 	cmd := exec.Command("git", "commit", "-m", commitMsg)
 	_, err = cmd.Output()
 	if err != nil {
