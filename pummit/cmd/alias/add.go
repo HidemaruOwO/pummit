@@ -37,14 +37,29 @@ func aliasAdd(args []string) {
 	for index, value := range gitimoji.Gitmojis {
 		wg.Add(1)
 		go func(index int, value lib.Gitmojis) {
-			defer wg.Done()
 			if value.Name == prefix {
 				log.Debugf(isDebug, "found prefix from gitmoji\n")
 				emoji = gitimoji.Gitmojis[index].Emoji
 			}
+			wg.Done()
 		}(index, value)
 	}
 	wg.Wait()
+
+	aliasList := lib.GetAliasList()
+
+	var wg2 sync.WaitGroup
+	for index, value := range aliasList {
+		wg2.Add(1)
+		go func(index int, value []string) {
+			if value[0] == alias {
+				log.Warnf("An alias with the same name already exists\n")
+				os.Exit(0)
+			}
+			wg2.Done()
+		}(index, value)
+	}
+	wg2.Wait()
 
 	if emoji == "" {
 		log.Warnf("The prefix '%s' was not found in gitiemoji.\n", prefix)
