@@ -45,7 +45,7 @@ func main() {
 	if len(args) == 0 {
 		cmd.HelpCmd()
 		fmt.Printf("\n")
-		log.Warnf("Not enough arguments")
+		log.Warnf("Not enough arguments\n")
 		os.Exit(0)
 	}
 
