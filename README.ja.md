@@ -45,7 +45,7 @@ pummit 'sparkles I am unko man'
 ```
 
 ## インストール 😊
-Goが入っている場合はこちらを実行してください。
+Goがインストールされている場合はこちらを実行してください。
 ```bash
 go install github.com/HidemaruOwO/pummit/pummit@latest
 ```
@@ -69,7 +69,7 @@ go build ../pummit/pummit.go
 
 ## 依存関係 🪡
 
-pummitを使うには以下のコマンドをパスに通してください
+pummitを使うには以下のコマンドをパスに登録してください
 
 - git
 
