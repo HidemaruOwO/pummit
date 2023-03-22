@@ -29,6 +29,9 @@ Subcommand:
   list: Show alias list
     pummit alias list
 
+  reset: Reset aliases
+    pummit alias reset
+
 Flags:
   --help Show help
   --version Show version`, config.Version)
