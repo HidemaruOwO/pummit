@@ -15,9 +15,16 @@ func aliasList() string {
 Alias : Prefix : Emoji
 ----------------------
 `
+	ch := make(chan string)
 	for _, value := range lib.GetAliasList() {
-		emojiList := fmt.Sprintf("  %s : %s : %s\n", value[0], value[1], value[2])
-		result = result + emojiList
+		go func(value []string) {
+			emojiList := fmt.Sprintf("  %s : %s : %s\n", value[0], value[1], value[2])
+			ch <- emojiList
+		}(value)
+	}
+
+	for range lib.GetAliasList() {
+		result = result + <-ch
 	}
 
 	return result
