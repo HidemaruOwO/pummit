@@ -37,7 +37,7 @@ func Init(path string, isDebug bool) {
 
 	_, err := os.Stat(path)
 	if !os.IsNotExist(err) {
-		log.Debugf(isDebug, "File is exists")
+		log.Debugf(isDebug, "File is exists\n")
 	} else {
 		store.Init("pummit")
 		url := "https://raw.githubusercontent.com/carloscuesta/gitmoji/master/packages/gitmojis/src/gitmojis.json"
