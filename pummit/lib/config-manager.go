@@ -72,6 +72,7 @@ func Init(path string, isDebug bool) {
 
 func GetAliasList() [][]string {
 	var alias Alias
+	store.SetApplicationName("pummit")
 	if err := store.Load("config.json", &alias); err != nil {
 		log.Criticalf("Loading alias list failed\n")
 		log.ErrorExit(err)
