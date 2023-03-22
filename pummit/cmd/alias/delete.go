@@ -7,5 +7,5 @@ func AliasDeleteCmd() {
 }
 
 func aliasDelete() {
-	log.Infof("alias delete\n")
+	log.Infof("Currently being implemented.\n")
 }
