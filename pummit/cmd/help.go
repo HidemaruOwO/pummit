@@ -18,13 +18,16 @@ Usage:
   Create prettier commit message
 
 Subcommand:
-  pummit alias [add|del|delete|list]
+  pummit alias [add|del|delete|list|reset]
   
   add: Add alias
     pummit alias add [alias name] [emoji prefix]
 
   delete: Delete alias
-    pummit alias delete [alias name]
+    pummit alias delete [...alias name]
+    Flag:
+      --all : Delete all aliases
+      pummit alias delete --all
 
   list: Show alias list
     pummit alias list
