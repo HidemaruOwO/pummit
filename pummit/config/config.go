@@ -7,7 +7,7 @@ import (
 	"github.com/HidemaruOwO/nuts/log"
 )
 
-const Version string = "v1.1.0"
+const Version string = "v1.0.4"
 const BaseJsonData string = `{
 	"writeEmojiPrefix": true,
 	"useAlias": true,
