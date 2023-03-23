@@ -21,7 +21,7 @@ You can easily create a nicely shaped committed message like this one
 <table>
   <thead>
     <tr>
-      <th style="text-align:center">🤡English (Powered by ChatGPT)</a></th>
+      <th style="text-align:center">🤡English (Translated by ChatGPT)</a></th>
       <th style="text-align:center"><a href="README.ja.md">🎌日本語</a></th>
     </tr>
   </thead>
