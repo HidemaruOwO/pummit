@@ -20,6 +20,7 @@ type Gitmoji struct {
 	Schema   string     `json:"$schema"`
 	Gitmojis []Gitmojis `json:"gitmojis"`
 }
+
 type Gitmojis struct {
 	Emoji       string `json:"emoji"`
 	Entity      string `json:"entity"`
