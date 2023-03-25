@@ -16,16 +16,6 @@ import (
 var isDebug bool = config.IsDebug()
 
 func main() {
-	envDebug := os.Getenv("DEBUG")
-
-	if envDebug != "" {
-		var err error
-		isDebug, err = strconv.ParseBool(envDebug)
-		if err != nil {
-			log.ErrorExit(err)
-		}
-	}
-
 	// set flags
 	version := flag.Bool("version", false, "Print version information")
 	help := flag.Bool("help", false, "Print help")
