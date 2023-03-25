@@ -8,7 +8,7 @@ import (
 
 	"github.com/HidemaruOwO/nuts/log"
 	"github.com/HidemaruOwO/pummit/pummit/cmd"
-	"github.com/HidemaruOwO/pummit/pummit/cmd/alias"
+	alias_cmd "github.com/HidemaruOwO/pummit/pummit/cmd/alias"
 	"github.com/HidemaruOwO/pummit/pummit/config"
 	"github.com/HidemaruOwO/pummit/pummit/lib"
 )
@@ -26,7 +26,7 @@ func main() {
 		}
 	}
 
-	//set flags
+	// set flags
 	version := flag.Bool("version", false, "Print version information")
 	help := flag.Bool("help", false, "Print help")
 	flag.Parse()
@@ -60,7 +60,9 @@ func main() {
 			fmt.Printf("\n")
 			log.Warnf("The alias command requires a second argument\n")
 			os.Exit(0)
-		} else {
+		}
+
+		if len(args) != 1 {
 			if args[1] == "add" {
 				alias_cmd.AliasAddCmd(args)
 			} else if args[1] == "delete" || args[1] == "del" {
@@ -78,6 +80,5 @@ func main() {
 		}
 		os.Exit(0)
 	}
-
 	cmd.RootCmd()
 }
