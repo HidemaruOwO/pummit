@@ -4,7 +4,6 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	"strconv"
 
 	"github.com/HidemaruOwO/nuts/log"
 	"github.com/HidemaruOwO/pummit/pummit/cmd"
