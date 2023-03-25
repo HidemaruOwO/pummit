@@ -1,73 +1,80 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"os"
+	"strconv"
 
 	"github.com/HidemaruOwO/nuts/log"
-	"github.com/HidemaruOwO/pummit/pummit/cmd"
 	alias_cmd "github.com/HidemaruOwO/pummit/pummit/cmd/alias"
 	"github.com/HidemaruOwO/pummit/pummit/config"
-	"github.com/HidemaruOwO/pummit/pummit/lib"
+	"github.com/urfave/cli/v2"
 )
 
 var isDebug bool = config.IsDebug()
 
+var version bool
+
 func main() {
-	// set flags
-	version := flag.Bool("version", false, "Print version information")
-	help := flag.Bool("help", false, "Print help")
-	flag.Parse()
+	envDebug := os.Getenv("DEBUG")
 
-	args := flag.Args()
-
-	log.Debugf(isDebug, "args: %s\n", args)
-
-	lib.Init(lib.PlatformPath("pummit"))
-
-	// use flags
-	if *help {
-		cmd.HelpCmd()
-		os.Exit(0)
-	}
-	if *version {
-		cmd.VersionCmd()
-		os.Exit(0)
-	}
-
-	if len(args) == 0 {
-		cmd.HelpCmd()
-		fmt.Printf("\n")
-		log.Warnf("Not enough arguments\n")
-		os.Exit(0)
-	}
-
-	if args[0] == "alias" {
-		if len(args) == 1 {
-			cmd.HelpCmd()
-			fmt.Printf("\n")
-			log.Warnf("The alias command requires a second argument\n")
-			os.Exit(0)
+	if envDebug != "" {
+		var err error
+		isDebug, err = strconv.ParseBool(envDebug)
+		if err != nil {
+			log.ErrorExit(err)
 		}
-
-		if len(args) != 1 {
-			if args[1] == "add" {
-				alias_cmd.AliasAddCmd(args)
-			} else if args[1] == "delete" || args[1] == "del" {
-				alias_cmd.AliasDeleteCmd(args)
-			} else if args[1] == "list" {
-				alias_cmd.AliasListCmd()
-			} else if args[1] == "reset" {
-				alias_cmd.AliasResetCmd()
-			} else {
-				cmd.HelpCmd()
-				fmt.Printf("\n")
-				log.Warnf("The second argument of the alias command is wrong. Please check the help command\n")
-				os.Exit(0)
-			}
-		}
-		os.Exit(0)
 	}
-	cmd.RootCmd()
+
+	app := &cli.App{}
+
+	app.Name = "pummit"
+	app.Usage = "pummit <emoji prefix> <subject>"
+	app.Description = "Easily create nicely formatted commit messages "
+	app.Version = "v1.1.0 linux/amd64"
+
+	app.Commands = []*cli.Command{
+		{
+			Name:  "alias",
+			Usage: "Subcommand to manage aliases for git characters.",
+			Subcommands: []*cli.Command{
+				{
+					Name:  "add",
+					Usage: "Add an alias for the git character.",
+					Action: func(ctx *cli.Context) error {
+						alias_cmd.AliasAddCmd(ctx.Args().Slice())
+						return nil
+					},
+				},
+				{
+					Name:  "delete",
+					Usage: "Remove aliases for git characters.",
+					Action: func(ctx *cli.Context) error {
+						alias_cmd.AliasDeleteCmd(ctx.Args().Slice())
+						return nil
+					},
+				},
+				{
+					Name:  "list",
+					Usage: "Displays a list of aliases for git characters.",
+					Action: func(ctx *cli.Context) error {
+						alias_cmd.AliasListCmd()
+						return nil
+					},
+				},
+				{
+					Name:  "reset",
+					Usage: "Reset the list of aliases for git characters.",
+					Action: func(ctx *cli.Context) error {
+						alias_cmd.AliasResetCmd()
+						return nil
+					},
+				},
+			},
+		},
+	}
+
+	if err := app.Run(os.Args); err != nil {
+		fmt.Println(err)
+	}
 }
