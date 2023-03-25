@@ -1,6 +1,7 @@
 <div align="center">
 
 # pummit 🚛
+
 [![Test CLI](https://github.com/HidemaruOwO/pummit/actions/workflows/build-test.yml/badge.svg)](https://github.com/HidemaruOwO/pummit/actions/workflows/build-test.yml)
 ![最終コミット](https://img.shields.io/github/last-commit/HidemaruOwO/pummit?style=flat-square)
 ![リポジトリのスター](https://img.shields.io/github/stars/HidemaruOwO/pummit?style=flat-square)
@@ -13,7 +14,7 @@
 ## what on Earth is this?
 
 You can easily create a nicely shaped committed message like this one
-  
+
 ![image](https://user-images.githubusercontent.com/82384920/225978215-9ac68cd4-cdb0-44c9-bca3-4d2cff1896cf.png)
 
 </div>
@@ -45,14 +46,18 @@ pummit 'sparkles I am unko man'
 ```
 
 ## Install 😊
+
 If Go is installed, please run this.
+
 ```bash
 go install github.com/HidemaruOwO/pummit/pummit@latest
 ```
 
 https://github.com/HidemaruOwO/pummit/releases
- 
-If Go is not installed, download the appropriate file for your environment from Release and execute the following command.
+
+If Go is not installed, download the appropriate file for your environment from
+Release and execute the following command.
+
 ```bash
 tar xzvf pummit**.tar.gz
 sudo mv pummit /usr/local/bin
@@ -87,7 +92,7 @@ customCommands:
   command: "pummit '{{index .PromptResponses 0}}'"
   context: 'files'
   description: 'commit changes(Custom Command)'
- ```
+```
 
 ### Sample emoji prefixes 🌟
 
@@ -116,12 +121,17 @@ customCommands:
 ```
 
 ## About Alias Function 📎
-For example, typing `wastebasket` is a bit of a challenge, but the alias feature makes it easy to type `wb`.
+
+For example, typing `wastebasket` is a bit of a challenge, but the alias feature
+makes it easy to type `wb`.
+
 ```bash
 $ pummit wb 'Delete module'
 # Result: :wastebasket: Delete module (path/to/added/file)
 ```
+
 The aliases set by default are as follows
+
 ```
  📎 There is aliases
 Alias : Prefix : Emoji
@@ -141,54 +151,83 @@ Alias : Prefix : Emoji
   d : books : 📚
   a : art : 🎨
 ```
+
 ### Add command
+
 This command allows aliases to be added.
+
 ```bash
 $ pummit alias add 's' 'sparkles'
 ```
-In this case, by simply entering the alias `s`, you can assign `sparkles` to the Emoji prefix of the commit message.
+
+In this case, by simply entering the alias `s`, you can assign `sparkles` to the
+Emoji prefix of the commit message.
+
 ```bash
 $ pummit s 'Add new feature'
 # Run: git commit -m ':sparkles: Add new feature (path/to/added/file)'
 ```
+
 ### Delete command
+
 This command allows you to delete an alias.
+
 ```bash
 $ pummit alias delete s
 ```
-In this case, if the `s=spakles` alias is registered and this command is executed, the association between `s` and `sparkles` will be lost. Therefore, if you run the following command, only `s` will be assigned to the Emoji prefix.
+
+In this case, if the `s=spakles` alias is registered and this command is
+executed, the association between `s` and `sparkles` will be lost. Therefore, if
+you run the following command, only `s` will be assigned to the Emoji prefix.
+
 ```bash
 $ pummit s 'Add new feature'
 # Run: git commmit -m ':s: Add new feature (path/to/added/file)'
 ```
+
 You can also specify multiple aliases to delete as arguments.
+
 ```bash
 $ pummit alias delete s sm c h
 ```
 
 ### Delete --all command
+
 This command deletes all registered aliases.
+
 ```bash
 $ pummit alias delete --all
 ```
+
 ### List command
+
 This command displays all registered aliases.
+
 ```bash
 $ pummit alias list
 ```
-f aliases such as `s=sparkles` and `t=tada` are registered, the output will be as follows:
+
+f aliases such as `s=sparkles` and `t=tada` are registered, the output will be
+as follows:
+
 ```bash
 📎 There is aliases
 Alias : Prefix : Emoji
   s : sparkles : ✨ 
-  t : tada : 🎉 
+  t : tada : 🎉
 ```
+
 ### Reset command
+
 This command resets the aliases.
+
 ```bash
 $ pummit alias reset
 ```
-It can be used for recovery when there are too many confusing aliases or when you have directly tampered with `~/.config/pummit/config.json` and caused a bug.
+
+It can be used for recovery when there are too many confusing aliases or when
+you have directly tampered with `~/.config/pummit/config.json` and caused a bug.
+
 ```bash
 $ pummit alias list
  📎 There is aliases
@@ -213,8 +252,10 @@ Alias : Prefix : Emoji
   b : bug : 🐛
   e : eyes : 👀
   d : books : 📚
- ```
-  Even when there are confusingly many aliases like this one
+```
+
+Even when there are confusingly many aliases like this one
+
 ```bash
 $ pummit alias reset
 > May I reset the aliases? :(Y/n) y
@@ -238,8 +279,9 @@ Alias : Prefix : Emoji
   d : books : 📚
   a : art : 🎨
 ```
+
 With a single command, it can be returned to this beautiful state.
 
-
 ## Special Thanks ✨
+
 - [Qiita - GitHubのコミットメッセージに絵文字を入れて開発効率をあげる](https://qiita.com/Jung0/items/0a9a7a97a2c17f92d3c5)
