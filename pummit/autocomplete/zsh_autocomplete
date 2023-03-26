@@ -1,0 +1,22 @@
+#compdef pummit
+
+_pummit_zsh_autocomplete() {
+  local -a val
+  subcmd=("alias")
+
+  local -a fruits
+  subcmd2=(add delete list reset)
+
+  _arguments '1: :->arg1' '2: :->arg2'
+
+  case "$state" in
+    arg1)
+      _values $state $subcmd
+      ;;
+    arg2)
+      _values $state $subcmd2
+      ;;
+  esac
+}
+
+compdef _pummit_zsh_autocomplete pummit

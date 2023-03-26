@@ -14,8 +14,6 @@ import (
 
 var isDebug bool = config.IsDebug()
 
-var version bool
-
 func main() {
 	envDebug := os.Getenv("DEBUG")
 
@@ -27,7 +25,9 @@ func main() {
 		}
 	}
 
-	app := &cli.App{}
+	app := &cli.App{
+		EnableBashCompletion: true,
+	}
 
 	app.Name = "pummit"
 	app.Usage = "pummit <emoji prefix> <subject>"
