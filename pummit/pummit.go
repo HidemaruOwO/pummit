@@ -32,6 +32,7 @@ func main() {
 	app.Name = "pummit"
 	app.Usage = "pummit <emoji prefix> <subject>"
 	app.Description = "Easily create nicely formatted commit messages "
+
 	app.Version = fmt.Sprintf("%s %s", config.Version, runtime.GOARCH)
 	app.Commands = []*cli.Command{
 		{
