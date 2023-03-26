@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	"github.com/HidemaruOwO/nuts/log"
+	"github.com/HidemaruOwO/pummit/pummit/cmd"
 	alias_cmd "github.com/HidemaruOwO/pummit/pummit/cmd/alias"
 	"github.com/HidemaruOwO/pummit/pummit/config"
 	"github.com/urfave/cli/v2"
@@ -27,6 +28,11 @@ func main() {
 
 	app := &cli.App{
 		EnableBashCompletion: true,
+		Action: func(ctx *cli.Context) error {
+			cmd.RootCmd(ctx.Args().Get(0), ctx.Args().Get(1))
+
+			return nil
+		},
 	}
 
 	app.Name = "pummit"
