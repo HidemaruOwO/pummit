@@ -19,30 +19,23 @@ func aliasDelete(args []string) {
 		log.Warnf("The alias name to be deleted must be added as the third argument\n")
 		os.Exit(0)
 	} else {
-		if len(args) == 3 && args[2] == "--all" {
-			alias.Alias = nil
-			lib.WriteConfig(alias)
-			log.Infof("All aliases have been removed\n")
-			os.Exit(0)
-		} else {
-			slice := alias.Alias
-			targets := args[2:]
-			log.Debugf(isDebug, "Removing %v\n", targets)
+		slice := alias.Alias
+		targets := args[2:]
+		log.Debugf(isDebug, "Removing %v\n", targets)
 
-			var wg sync.WaitGroup
-			wg.Add(len(targets))
-			for _, t := range targets {
-				go func(target string) {
-					defer wg.Done()
-					slice = removeSlice(slice, target)
-					log.Infof("Removed %s alias\n", target)
-				}(t)
-			}
-			wg.Wait()
-
-			alias.Alias = slice
-			lib.WriteConfig(alias)
+		var wg sync.WaitGroup
+		wg.Add(len(targets))
+		for _, t := range targets {
+			go func(target string) {
+				defer wg.Done()
+				slice = removeSlice(slice, target)
+				log.Infof("Removed %s alias\n", target)
+			}(t)
 		}
+		wg.Wait()
+
+		alias.Alias = slice
+		lib.WriteConfig(alias)
 	}
 }
 
