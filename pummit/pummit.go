@@ -73,6 +73,39 @@ func main() {
 				},
 			},
 		},
+		{
+			Name:  "complete",
+			Usage: "Outputs a completion script.",
+			Flags: []cli.Flag{
+				&cli.BoolFlag{
+					Name:  "bash",
+					Usage: "Outputs a completion script for bash.",
+				},
+				&cli.BoolFlag{
+					Name:  "zsh",
+					Usage: "Outputs a completion script for zsh.",
+				},
+				&cli.BoolFlag{
+					Name:  "fish",
+					Usage: "Outputs a completion script for fish.",
+				},
+			},
+			Action: func(ctx *cli.Context) error {
+				if ctx.Bool("bash") {
+					bashComplete()
+				}
+
+				if ctx.Bool("zsh") {
+					zshComplete()
+				}
+
+				if ctx.Bool("fish") {
+					fishComplete()
+				}
+
+				return nil
+			},
+		},
 	}
 
 	if err := app.Run(os.Args); err != nil {
