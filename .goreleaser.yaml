@@ -1,2 +1,2 @@
 builds:
-- main: ./pummit/pummit.go
+- main: ./pummit/
