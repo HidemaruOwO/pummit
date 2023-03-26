@@ -64,7 +64,7 @@ sudo mv pummit /usr/local/bin
 git clone https://github.com/HidemaruOwO/pummit.git
 cd pummit
 mkdir build && cd build
-go build ../pummit/pummit.go
+go build ../pummit/
 ```
 
 ## 依存関係 🪡
