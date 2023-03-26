@@ -32,8 +32,7 @@ func main() {
 			if ctx.Args().Present() {
 				cmd.RootCmd(ctx.Args().Get(0), ctx.Args().Get(1))
 			} else {
-				return fmt.Errorf("Error: %s",
-					"Arguments must have both a prefix and an emoji")
+				cli.ShowAppHelp(ctx)
 			}
 
 			return nil
