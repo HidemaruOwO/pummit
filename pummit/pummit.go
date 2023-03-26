@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"runtime"
 	"strconv"
 
 	"github.com/HidemaruOwO/nuts/log"
@@ -31,8 +32,7 @@ func main() {
 	app.Name = "pummit"
 	app.Usage = "pummit <emoji prefix> <subject>"
 	app.Description = "Easily create nicely formatted commit messages "
-	app.Version = "v1.1.0 linux/amd64"
-
+	app.Version = fmt.Sprintf("%s %s", config.Version, runtime.GOARCH)
 	app.Commands = []*cli.Command{
 		{
 			Name:  "alias",
