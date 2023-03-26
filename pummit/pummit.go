@@ -14,8 +14,6 @@ import (
 
 var isDebug bool = config.IsDebug()
 
-var version bool
-
 func main() {
 	envDebug := os.Getenv("DEBUG")
 
@@ -27,11 +25,14 @@ func main() {
 		}
 	}
 
-	app := &cli.App{}
+	app := &cli.App{
+		EnableBashCompletion: true,
+	}
 
 	app.Name = "pummit"
 	app.Usage = "pummit <emoji prefix> <subject>"
 	app.Description = "Easily create nicely formatted commit messages "
+
 	app.Version = fmt.Sprintf("%s %s", config.Version, runtime.GOARCH)
 	app.Commands = []*cli.Command{
 		{
@@ -70,6 +71,39 @@ func main() {
 						return nil
 					},
 				},
+			},
+		},
+		{
+			Name:  "complete",
+			Usage: "Outputs a completion script.",
+			Flags: []cli.Flag{
+				&cli.BoolFlag{
+					Name:  "bash",
+					Usage: "Outputs a completion script for bash.",
+				},
+				&cli.BoolFlag{
+					Name:  "zsh",
+					Usage: "Outputs a completion script for zsh.",
+				},
+				&cli.BoolFlag{
+					Name:  "fish",
+					Usage: "Outputs a completion script for fish.",
+				},
+			},
+			Action: func(ctx *cli.Context) error {
+				if ctx.Bool("bash") {
+					bashComplete()
+				}
+
+				if ctx.Bool("zsh") {
+					zshComplete()
+				}
+
+				if ctx.Bool("fish") {
+					fishComplete()
+				}
+
+				return nil
 			},
 		},
 	}

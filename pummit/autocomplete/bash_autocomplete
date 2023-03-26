@@ -1,0 +1,12 @@
+#! /bin/bash
+
+__pummit_bash_completion()
+{
+    case "$3" in
+        pummit) message="alias";;
+	alias) message=$(compgen -W "add delete list reset" ${COMP_WORDS[COMP_CWORD]});;
+    esac
+    # echo $3
+    COMPREPLY=(${message})
+}
+complete -F __pummit_bash_completion pummit
