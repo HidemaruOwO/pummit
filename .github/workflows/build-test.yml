@@ -24,7 +24,7 @@ jobs:
         run: |
           mkdir build 
           cd build
-          go build ../pummit/pummit.go
+          go build ../pummit/
           ./pummit
           
 
