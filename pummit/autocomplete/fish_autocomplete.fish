@@ -1,6 +1,5 @@
 #! /bin/env fish
 
-# 2. completeとヘルパ関数で作る作り方
 function __pummit_auto_complete
     printf '%s\t%s\n' 'alias'   ''
 end
