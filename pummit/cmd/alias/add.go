@@ -12,24 +12,12 @@ import (
 
 var isDebug bool = config.IsDebug()
 
-func AliasAddCmd(args []string) {
-	aliasAdd(args)
+func AliasAddCmd(alias string, prefix string) {
+	aliasAdd(alias, prefix)
 }
 
-func aliasAdd(args []string) {
+func aliasAdd(alias string, prefix string) {
 	aliases := lib.GetAlias()
-
-	if len(args) == 2 {
-		log.Warnf("Missing alias\n")
-		os.Exit(0)
-	}
-	if len(args) == 3 {
-		log.Warnf("Missing emoji prefix\n")
-		os.Exit(0)
-	}
-
-	alias := args[2]
-	prefix := args[3]
 
 	if alias != strings.TrimSpace(alias) || prefix != strings.TrimSpace(prefix) {
 		log.Warnf("Please do not include spaces in alias and emoji prefixes\n")
@@ -76,5 +64,10 @@ func aliasAdd(args []string) {
 	aliases.Alias = append(aliases.Alias, []string{alias, prefix, emoji})
 
 	lib.WriteConfig(aliases)
-	log.Infof("The following has been added to the custom alias\n  %s : %s : %s\n", alias, prefix, emoji)
+	log.Infof(
+		"The following has been added to the custom alias\n  %s : %s : %s\n",
+		alias,
+		prefix,
+		emoji,
+	)
 }

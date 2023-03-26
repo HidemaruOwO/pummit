@@ -29,7 +29,12 @@ func main() {
 	app := &cli.App{
 		EnableBashCompletion: true,
 		Action: func(ctx *cli.Context) error {
-			cmd.RootCmd(ctx.Args().Get(0), ctx.Args().Get(1))
+			if ctx.Args().Present() {
+				cmd.RootCmd(ctx.Args().Get(0), ctx.Args().Get(1))
+			} else {
+				return fmt.Errorf("Error: %s",
+					"Arguments must have both a prefix and an emoji")
+			}
 
 			return nil
 		},
@@ -49,7 +54,14 @@ func main() {
 					Name:  "add",
 					Usage: "Add an alias for the git character.",
 					Action: func(ctx *cli.Context) error {
-						alias_cmd.AliasAddCmd(ctx.Args().Slice())
+						if ctx.Args().Present() {
+							alias_cmd.AliasAddCmd(ctx.Args().Get(0), ctx.Args().Get(1))
+						} else {
+							return fmt.Errorf(
+								"Error: %s",
+								"Arguments must have both a prefix and an emoji",
+							)
+						}
 						return nil
 					},
 				},
@@ -57,7 +69,13 @@ func main() {
 					Name:  "delete",
 					Usage: "Remove aliases for git characters.",
 					Action: func(ctx *cli.Context) error {
-						alias_cmd.AliasDeleteCmd(ctx.Args().Slice())
+						if ctx.Args().Present() {
+							alias_cmd.AliasDeleteCmd(ctx.Args().Slice())
+						} else {
+							return fmt.Errorf("Error: %s",
+								"delete requires one or more pairs of prefix and emoji in arguments")
+						}
+
 						return nil
 					},
 				},
