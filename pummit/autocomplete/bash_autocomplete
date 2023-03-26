@@ -1,5 +1,3 @@
-#! /bin/bash
-
 __pummit_bash_completion()
 {
     case "$3" in

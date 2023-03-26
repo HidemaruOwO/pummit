@@ -14,14 +14,11 @@ import (
 
 var isDebug bool = config.IsDebug()
 
-func RootCmd() {
-	gitCommit()
+func RootCmd(prefix string, subject string) {
+	gitCommit(prefix, subject)
 }
 
-func gitCommit() {
-	var prefix string
-	var subject string
-
+func gitCommit(prefix string, subject string) {
 	gitChangeCmd := exec.Command("git", "diff", "--name-only", "--cached")
 	gitChangeOutput, err := gitChangeCmd.Output()
 	log.Debugf(isDebug, "%s", gitChangeOutput)
