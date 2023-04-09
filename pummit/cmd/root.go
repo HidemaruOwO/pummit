@@ -69,14 +69,17 @@ func gitCommit(prefix string, subject string) {
 	_, emoji := lib.IncludeGitimoji(prefix)
 
 	aliases := lib.GetAlias()
+	gitChange = strings.ReplaceAll(gitChange, "\n", ", ")
+
+	var commitMsg string
 
 	if aliases.WriteEmojiPrefix == true {
 		prefix = emoji
+		commitMsg = fmt.Sprintf("%s %s (%s)", prefix, subject, gitChange)
+	} else {
+		commitMsg = fmt.Sprintf(":%s: %s (%s)", prefix, subject, gitChange)
 	}
 
-	gitChange = strings.ReplaceAll(gitChange, "\n", ", ")
-
-	commitMsg := fmt.Sprintf(":%s: %s (%s)", prefix, subject, gitChange)
 	cmd := exec.Command("git", "commit", "-m", commitMsg)
 	_, err = cmd.Output()
 	if err != nil {
