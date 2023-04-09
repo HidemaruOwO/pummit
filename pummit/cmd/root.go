@@ -47,14 +47,6 @@ func gitCommit(prefix string, subject string) {
 		subject = args[1]
 	}
 
-	_, emoji := lib.IncludeGitimoji(prefix)
-
-	aliases := lib.GetAlias()
-
-	if aliases.WriteEmojiPrefix == true {
-		prefix = emoji
-	}
-
 	aliasList := lib.GetAliasList()
 
 	var wg sync.WaitGroup
@@ -73,6 +65,14 @@ func gitCommit(prefix string, subject string) {
 		}(index, value)
 	}
 	wg.Wait()
+
+	_, emoji := lib.IncludeGitimoji(prefix)
+
+	aliases := lib.GetAlias()
+
+	if aliases.WriteEmojiPrefix == true {
+		prefix = emoji
+	}
 
 	gitChange = strings.ReplaceAll(gitChange, "\n", ", ")
 
