@@ -47,18 +47,27 @@ func gitCommit(prefix string, subject string) {
 		subject = args[1]
 	}
 
-	array := lib.GetAliasList()
+	_, emoji := lib.IncludeGitimoji(prefix)
+
+	aliases := lib.GetAlias()
+
+	if aliases.WriteEmojiPrefix == true {
+		prefix = emoji
+	}
+
+	aliasList := lib.GetAliasList()
 
 	var wg sync.WaitGroup
 	var mu sync.Mutex
-	for index, value := range array {
+
+	for index, value := range aliasList {
 		wg.Add(1)
 		go func(index int, value []string) {
 			defer wg.Done()
 			if value[0] == prefix {
-				log.Debugf(isDebug, "Found prefix %s\n", array[index][1])
+				log.Debugf(isDebug, "Found prefix %s\n", aliasList[index][1])
 				mu.Lock()
-				prefix = array[index][1]
+				prefix = aliasList[index][1]
 				mu.Unlock()
 			}
 		}(index, value)
