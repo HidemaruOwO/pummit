@@ -191,14 +191,6 @@ You can also specify multiple aliases to delete as arguments.
 $ pummit alias delete s sm c h
 ```
 
-### Delete --all command
-
-This command deletes all registered aliases.
-
-```bash
-$ pummit alias delete --all
-```
-
 ### List command
 
 This command displays all registered aliases.
