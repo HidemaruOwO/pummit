@@ -10,6 +10,8 @@ func IncludeGitimoji(prefix string) (bool, string) {
 	var emoji string
 	var gitimoji Gitmoji = GetGitmoji()
 
+	log.Debugf(isDebug, "prefix: %s\n", prefix)
+
 	var wg sync.WaitGroup
 
 	for index, value := range gitimoji.Gitmojis {
@@ -23,6 +25,8 @@ func IncludeGitimoji(prefix string) (bool, string) {
 		}(index, value)
 	}
 	wg.Wait()
+
+	log.Debugf(isDebug, "gitimoji: %s\n", emoji)
 
 	if emoji == "" {
 		return false, ""
