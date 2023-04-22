@@ -30,9 +30,9 @@ type Gitmojis struct {
 	Semver      string `json:"semver"`
 }
 type Alias struct {
-	WriteEmojiPrefix bool       `json:"writeEmojiPrefix"`
-	UseAlias         bool       `json:"useAlias"`
-	Alias            [][]string `json:"alias"`
+	WriteEmoji bool       `json:"writeEmoji"`
+	UseAlias   bool       `json:"useAlias"`
+	Alias      [][]string `json:"alias"`
 }
 
 func Init(path string) {

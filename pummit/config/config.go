@@ -9,7 +9,7 @@ import (
 
 const Version string = "v1.1.2"
 const BaseJsonData string = `{
-	"writeEmojiPrefix": true,
+	"writeEmoji": true,
 	"useAlias": true,
   "alias": [  
   ["s", "sparkles", "✨"],
