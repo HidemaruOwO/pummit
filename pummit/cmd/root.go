@@ -77,11 +77,11 @@ func gitCommit(prefix string, subject string) {
 
 		if emoji != "" {
 			prefix = emoji
+			commitMsg = fmt.Sprintf("%s %s (%s)", prefix, subject, gitChange)
 		} else {
-			prefix = fmt.Sprintf(":%s:", emoji)
+			commitMsg = fmt.Sprintf(":%s: %s (%s)", prefix, subject, gitChange)
 		}
-		log.Debugf(isDebug, "prefix: %s, emoji: %s", prefix, emoji)
-		commitMsg = fmt.Sprintf("%s %s (%s)", prefix, subject, gitChange)
+
 	} else {
 		commitMsg = fmt.Sprintf(":%s: %s (%s)", prefix, subject, gitChange)
 	}
