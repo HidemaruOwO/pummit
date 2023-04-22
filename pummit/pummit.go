@@ -10,6 +10,7 @@ import (
 	"github.com/HidemaruOwO/pummit/pummit/cmd"
 	alias_cmd "github.com/HidemaruOwO/pummit/pummit/cmd/alias"
 	"github.com/HidemaruOwO/pummit/pummit/config"
+	"github.com/HidemaruOwO/pummit/pummit/lib"
 	"github.com/urfave/cli/v2"
 )
 
@@ -25,6 +26,8 @@ func main() {
 			log.ErrorExit(err)
 		}
 	}
+
+	lib.Init(lib.PlatformPath("pummit"))
 
 	app := &cli.App{
 		EnableBashCompletion: true,
