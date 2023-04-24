@@ -13,7 +13,7 @@
 
 ## what on Earth is this?
 
-You can easily create a nicely shaped committed message like this one
+It allows you to lovely create a nicely commit message like this
 
 ![image](https://user-images.githubusercontent.com/82384920/225978215-9ac68cd4-cdb0-44c9-bca3-4d2cff1896cf.png)
 
