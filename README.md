@@ -11,7 +11,7 @@
 
 ![image](https://user-images.githubusercontent.com/82384920/225959857-76495875-c426-4669-a8d4-372ebf3acfad.png)
 
-## what on Earth is this?
+## what is this?
 
 It allows you to lovely create a nicely commit message like this
 
