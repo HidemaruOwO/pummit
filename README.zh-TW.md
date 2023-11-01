@@ -2,7 +2,7 @@
 
 # 普米特🚛
 
-[![Test CLI](https://github.com/HidemaruOwO/pummit/actions/workflows/build-test.yml/badge.svg)](https://github.com/HidemaruOwO/pummit/actions/workflows/build-test.yml)![最終コミット](https://img.shields.io/github/last-commit/HidemaruOwO/pummit?style=flat-square)![リポジトリのスター](https://img.shields.io/github/stars/HidemaruOwO/pummit?style=flat-square)![問題](https://img.shields.io/github/issues/HidemaruOwO/pummit?style=flat-square)![オープンな問題](https://img.shields.io/github/issues-raw/HidemaruOwO/pummit?style=flat-square)![バグの問題](https://img.shields.io/github/issues/HidemaruOwO/pummit/bug?style=flat-square)
+[![Test CLI](https://github.com/HidemaruOwO/pummit/actions/workflows/test.yml/badge.svg)](https://github.com/HidemaruOwO/pummit/actions/workflows/test.yml)![最終コミット](https://img.shields.io/github/last-commit/HidemaruOwO/pummit?style=flat-square)![リポジトリのスター](https://img.shields.io/github/stars/HidemaruOwO/pummit?style=flat-square)![問題](https://img.shields.io/github/issues/HidemaruOwO/pummit?style=flat-square)![オープンな問題](https://img.shields.io/github/issues-raw/HidemaruOwO/pummit?style=flat-square)![バグの問題](https://img.shields.io/github/issues/HidemaruOwO/pummit/bug?style=flat-square)
 
 ![image](https://user-images.githubusercontent.com/82384920/225959857-76495875-c426-4669-a8d4-372ebf3acfad.png)
 
@@ -169,7 +169,7 @@ $ pummit s 新機能の追加
 $ pummit alias delete s
 ```
 
-在這種情況下，`s=spakles`如果您執行此命令並假設別名已註冊`s`和`sparkles`由於 Emoji 前綴的關聯將會遺失，因此即使執行以下命令，Emoji 前綴也不會被關聯`s`しか代入されません。
+在這種情況下，`s=spakles`如果您執行此命令並假設別名已註冊`s`和`sparkles`由於 Emoji 前綴的關聯將會遺失，因此即使執行以下命令，Emoji 前綴也不會被關聯`s`僅被分配。
 
 ```bash
 $ pummit s 新機能の追加

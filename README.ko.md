@@ -2,7 +2,7 @@
 
 # 푸읭 🚛
 
-[![Test CLI](https://github.com/HidemaruOwO/pummit/actions/workflows/build-test.yml/badge.svg)](https://github.com/HidemaruOwO/pummit/actions/workflows/build-test.yml)![最終コミット](https://img.shields.io/github/last-commit/HidemaruOwO/pummit?style=flat-square)![リポジトリのスター](https://img.shields.io/github/stars/HidemaruOwO/pummit?style=flat-square)![問題](https://img.shields.io/github/issues/HidemaruOwO/pummit?style=flat-square)![オープンな問題](https://img.shields.io/github/issues-raw/HidemaruOwO/pummit?style=flat-square)![バグの問題](https://img.shields.io/github/issues/HidemaruOwO/pummit/bug?style=flat-square)
+[![Test CLI](https://github.com/HidemaruOwO/pummit/actions/workflows/test.yml/badge.svg)](https://github.com/HidemaruOwO/pummit/actions/workflows/test.yml)![最終コミット](https://img.shields.io/github/last-commit/HidemaruOwO/pummit?style=flat-square)![リポジトリのスター](https://img.shields.io/github/stars/HidemaruOwO/pummit?style=flat-square)![問題](https://img.shields.io/github/issues/HidemaruOwO/pummit?style=flat-square)![オープンな問題](https://img.shields.io/github/issues-raw/HidemaruOwO/pummit?style=flat-square)![バグの問題](https://img.shields.io/github/issues/HidemaruOwO/pummit/bug?style=flat-square)
 
 ![image](https://user-images.githubusercontent.com/82384920/225959857-76495875-c426-4669-a8d4-372ebf3acfad.png)
 
@@ -169,7 +169,7 @@ $ pummit s 新機能の追加
 $ pummit alias delete s
 ```
 
-이 경우에는`s=spakles`별칭이 등록되어 있는 전제로 이 명령을 실행한 경우`s`그리고`sparkles`연결이 없기 때문에 다음 명령을 실행해도 Emoji prefix`s`しか代入されません。
+이 경우에는`s=spakles`별칭이 등록되어 있는 전제로 이 명령을 실행한 경우`s`그리고`sparkles`연결이 없기 때문에 다음 명령을 실행해도 Emoji prefix`s`밖에 대입되지 않습니다.
 
 ```bash
 $ pummit s 新機能の追加

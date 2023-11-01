@@ -13,7 +13,7 @@ checksum:
   name_template: "checksums.txt"
 
 builds:
-  - id: "virtualslime"
+  - id: "pummit"
     main: ./src/
     env:
       - CGO_ENABLED=0
@@ -34,13 +34,11 @@ builds:
         goarch: arm
       - goos: freebsd
         goarch: arm64
-    asmflags:
-      - all=-trimpath={{.Env.GOPATH}}
-    gcflags:
-      - all=-trimpath={{.Env.GOPATH}}
+    flags:
+      - -trimpath
 
 brews:
-  - name: virtualslime-api
+  - name: pummit
     repository:
       owner: HidemaruOwO
       name: homebrew-tap
