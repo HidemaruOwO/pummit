@@ -33,9 +33,9 @@
 pummit 有两种使用方式
 
 ```bash
-pummit emojiprefix 'subject'
+pummit <emojiprefix> '<subject>'
 # or
-pummit 'emojiprefix subject'
+pummit '<emojiprefix> <subject>'
 
 # Example
 pummit sparkles 'I am unko man'
@@ -47,15 +47,23 @@ pummit 'sparkles I am unko man'
 
 ## 安装😊
 
+它与 Homebrew 一起分发。
+
+```bash
+brew tap hidemaruowo/tap
+brew update
+brew install pummit
+```
+
 如果您安装了 Go，请运行它。
 
 ```bash
-go install github.com/HidemaruOwO/pummit/pummit@latest
+go install github.com/HidemaruOwO/pummit@latest
 ```
 
-[HTTPS://GitHub.com/hide MA入O五O/朴MM IT/releases](https://github.com/HidemaruOwO/pummit/releases)
+<https://github.com/HidemaruOwO/pummit/releases>
 
-如果未安装，请从Release下载与您的环境相匹配的文件，然后运行以下命令。
+如果未安装，请从Release下载适合您环境的文件并执行以下命令。
 
 ```bash
 tar xzvf pummit**.tar.gz
@@ -67,8 +75,7 @@ sudo mv pummit /usr/local/bin
 ```bash
 git clone https://github.com/HidemaruOwO/pummit.git
 cd pummit
-mkdir build && cd build
-go build ../pummit/
+go build main.go
 ```
 
 ## 依赖关系🪡
@@ -79,7 +86,7 @@ go build ../pummit/
 
 ## 与lazygit一起使用🔍
 
-以下键绑定`.config/lazygit/config.yml`请设置为
+以下键绑定`.config/lazygit/config.yml`に設定してください
 
 ```yaml
 customCommands:
@@ -119,7 +126,7 @@ customCommands:
 
 ## 关于别名功能📎
 
-例如`wastebasket`输入起来有点困难，但是如果使用alias功能就可以`wb`您可以轻松输入。
+例如`wastebasket`输入起来有点困难，但是如果使用alias功能就可以`wb`您将能够轻松输入它。
 
 ```bash
 $ pummit wb モジュールの削除
@@ -154,7 +161,7 @@ $ pummit wb モジュールの削除
 $ pummit alias add 's' 'sparkles'
 ```
 
-在这种情况下`s`只需在提交消息中输入别名“表情符号前缀”即可。`sparkles`您现在可以替换 .
+在这种情况下`s`只需在提交消息中输入别名“表情符号前缀”即可。`sparkles`将能够被替代。
 
 ```bash
 $ pummit s 新機能の追加

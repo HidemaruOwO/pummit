@@ -12,5 +12,5 @@ func VersionCmd() {
 }
 
 func version() string {
-	return fmt.Sprintf(`pummit %s %s/%s`, config.Version, runtime.GOOS, runtime.GOARCH)
+	return fmt.Sprintf(`pummit %s %s/%s`, config.VERSION, runtime.GOOS, runtime.GOARCH)
 }

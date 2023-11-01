@@ -33,9 +33,9 @@ You can easily create beautiful commit messages like this one.
 pummit can be used in two ways
 
 ```bash
-pummit emojiprefix 'subject'
+pummit <emojiprefix> '<subject>'
 # or
-pummit 'emojiprefix subject'
+pummit '<emojiprefix> <subject>'
 
 # Example
 pummit sparkles 'I am unko man'
@@ -47,15 +47,23 @@ pummit 'sparkles I am unko man'
 
 ## Install 😊
 
+It is distributed with Homebrew.
+
+```bash
+brew tap hidemaruowo/tap
+brew update
+brew install pummit
+```
+
 If you have Go installed, run this.
 
 ```bash
-go install github.com/HidemaruOwO/pummit/pummit@latest
+go install github.com/HidemaruOwO/pummit@latest
 ```
 
 <https://github.com/HidemaruOwO/pummit/releases>
 
-If it is not installed, download the file suitable for your environment from Release and execute the following command.
+If it is not installed, download the file that matches your environment from Release and run the following command.
 
 ```bash
 tar xzvf pummit**.tar.gz
@@ -67,8 +75,7 @@ sudo mv pummit /usr/local/bin
 ```bash
 git clone https://github.com/HidemaruOwO/pummit.git
 cd pummit
-mkdir build && cd build
-go build ../pummit/
+go build main.go
 ```
 
 ## Dependencies 🪡
@@ -119,7 +126,7 @@ customCommands:
 
 ## About the alias function 📎
 
-for example`wastebasket`It's a little difficult to enter, but if you use the alias function, you can`wb`You can enter it easily.
+for example`wastebasket`を入力するのは少し大変ですが、エイリアス機能を使うと`wb`You can enter it easily.
 
 ```bash
 $ pummit wb モジュールの削除
@@ -154,7 +161,7 @@ This command allows you to add an alias.
 $ pummit alias add 's' 'sparkles'
 ```
 
-In this case`s`というエイリアスを入力するだけでコミットメッセージのEmoji prefixに`sparkles`will be able to be substituted.
+In this case`s`Just enter the alias "Emoji prefix" in the commit message.`sparkles`will be able to be substituted.
 
 ```bash
 $ pummit s 新機能の追加
@@ -198,7 +205,7 @@ This command displays all registered aliases.
 $ pummit alias list
 ```
 
-If the alias`s=sparkles`と`t=tada`If it is registered, the following will be output.
+If the alias`s=sparkles`and`t=tada`If it is registered, the following will be output.
 
 ```bash
 📎 There is aliases
@@ -243,7 +250,7 @@ Alias : Prefix : Emoji
   d : books : 📚
 ```
 
-このようにエイリアスが混乱するほどある場合でも
+Even if there are a lot of confusing aliases like this:
 
 ```bash
 $ pummit alias reset

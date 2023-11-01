@@ -7,11 +7,13 @@ import (
 	"github.com/HidemaruOwO/nuts/log"
 )
 
-const Version string = "v1.1.3"
-const BaseJsonData string = `{
+const VERSION string = "v1.2.3"
+
+// const BaseJsonData string = `{
+const BASE_JSON_DATA string = `{
 	"writeEmoji": true,
 	"useAlias": true,
-  "alias": [  
+  "alias": [
   ["s", "sparkles", "✨"],
   ["t", "tada", "🎉"],
   ["r", "recycle", "♻️"],
@@ -29,7 +31,9 @@ const BaseJsonData string = `{
 ]
 }`
 
-func IsDebug() bool {
+var IS_DEBUG bool = isDebug()
+
+func isDebug() bool {
 	isDebug := false
 
 	envDebug := os.Getenv("DEBUG")

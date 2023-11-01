@@ -1,12 +1,12 @@
-package main
+package src
 
 import (
 	"fmt"
 	"os"
 	"runtime"
-	"strconv"
+	// "strconv"
 
-	"github.com/HidemaruOwO/nuts/log"
+	// "github.com/HidemaruOwO/nuts/log"
 	"github.com/HidemaruOwO/pummit/src/cmd"
 	alias_cmd "github.com/HidemaruOwO/pummit/src/cmd/alias"
 	"github.com/HidemaruOwO/pummit/src/config"
@@ -14,19 +14,7 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-var isDebug bool = config.IsDebug()
-
-func main() {
-	envDebug := os.Getenv("DEBUG")
-
-	if envDebug != "" {
-		var err error
-		isDebug, err = strconv.ParseBool(envDebug)
-		if err != nil {
-			log.ErrorExit(err)
-		}
-	}
-
+func AppEntry() {
 	lib.Init(lib.PlatformPath("pummit"))
 
 	app := &cli.App{
@@ -44,9 +32,9 @@ func main() {
 
 	app.Name = "pummit"
 	app.Usage = "pummit <emoji prefix> <subject>"
-	app.Description = "Easily create nicely formatted commit messages "
+	app.Description = "Create good commit message in CLI"
 
-	app.Version = fmt.Sprintf("%s %s", config.Version, runtime.GOARCH)
+	app.Version = fmt.Sprintf("%s %s", config.VERSION, runtime.GOARCH)
 	app.Commands = []*cli.Command{
 		{
 			Name:  "alias",
@@ -133,7 +121,6 @@ func main() {
 			},
 		},
 	}
-
 	if err := app.Run(os.Args); err != nil {
 		fmt.Println(err)
 	}

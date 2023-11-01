@@ -4,6 +4,7 @@ import (
 	"sync"
 
 	"github.com/HidemaruOwO/nuts/log"
+	"github.com/HidemaruOwO/pummit/src/config"
 	"github.com/HidemaruOwO/pummit/src/lib"
 )
 
@@ -15,7 +16,7 @@ func aliasDelete(targets []string) {
 	alias := lib.GetAlias()
 	slice := alias.Alias
 
-	log.Debugf(isDebug, "Removing %v\n", targets)
+	log.Debugf(config.IS_DEBUG, "Removing %v\n", targets)
 
 	var wg sync.WaitGroup
 	wg.Add(len(targets))
