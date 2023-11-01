@@ -13,7 +13,7 @@ checksum:
   name_template: "checksums.txt"
 
 builds:
-  - id: "virtualslime"
+  - id: "pummit"
     main: ./src/
     env:
       - CGO_ENABLED=0
