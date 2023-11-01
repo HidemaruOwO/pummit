@@ -22,7 +22,10 @@ jobs:
       - name: Test
         id: test_step
         continue-on-error: true
-        run: go build -ldflags="-s -w" -trimpath src/main.go
+        run: |
+          mkdir build
+          cd build
+          go build -ldflags="-s -w" -trimpath ../src
 
       - name: Set Check Status Success
         uses: Sibz/github-status-action@v1

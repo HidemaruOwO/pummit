@@ -53,14 +53,18 @@ jobs:
           go-version-file: "go.mod"
         #
       - name: Build
-        run: go build -ldflags="-s -w" -trimpath src/main.go
+        run: |
+          mkdir build
+          cd build
+          go build -ldflags="-s -w" -trimpath ../src
+        shell: bash
 
       - name: Rename file
-        run: mv main virtualslime && ls
+        run: cd build && mv src pummit && ls
         shell: bash
 
       - name: Artifact
         uses: actions/upload-artifact@v3
         with:
-          name: VirtualSlimeAPI_${{ matrix.target }}
-          path: virtualslime*
+          name: pummit_${{ matrix.target }}
+          path: pummit*
