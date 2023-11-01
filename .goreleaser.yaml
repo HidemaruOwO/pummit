@@ -34,10 +34,8 @@ builds:
         goarch: arm
       - goos: freebsd
         goarch: arm64
-    asmflags:
-      - all=-trimpath={{.Env.GOPATH}}
-    gcflags:
-      - all=-trimpath={{.Env.GOPATH}}
+    flags:
+      - -trimpath
 
 brews:
   - name: virtualslime-api
