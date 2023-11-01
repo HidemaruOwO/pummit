@@ -2,7 +2,7 @@
 
 # pummit 🚛
 
-[![Test CLI](https://github.com/HidemaruOwO/pummit/actions/workflows/build-test.yml/badge.svg)](https://github.com/HidemaruOwO/pummit/actions/workflows/build-test.yml)
+[![Test CLI](https://github.com/HidemaruOwO/pummit/actions/workflows/test.yml/badge.svg)](https://github.com/HidemaruOwO/pummit/actions/workflows/test.yml)
 ![最終コミット](https://img.shields.io/github/last-commit/HidemaruOwO/pummit?style=flat-square)
 ![リポジトリのスター](https://img.shields.io/github/stars/HidemaruOwO/pummit?style=flat-square)
 ![問題](https://img.shields.io/github/issues/HidemaruOwO/pummit?style=flat-square)
