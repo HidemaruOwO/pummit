@@ -33,9 +33,9 @@
 pummit 有兩種使用方式
 
 ```bash
-pummit emojiprefix 'subject'
+pummit <emojiprefix> '<subject>'
 # or
-pummit 'emojiprefix subject'
+pummit '<emojiprefix> <subject>'
 
 # Example
 pummit sparkles 'I am unko man'
@@ -47,10 +47,18 @@ pummit 'sparkles I am unko man'
 
 ## 安裝😊
 
+它與 Homebrew 一起分發。
+
+```bash
+brew tap hidemaruowo/tap
+brew update
+brew install pummit
+```
+
 如果您安裝了 Go，請運行它。
 
 ```bash
-go install github.com/HidemaruOwO/pummit/pummit@latest
+go install github.com/HidemaruOwO/pummit@latest
 ```
 
 <https://github.com/HidemaruOwO/pummit/releases>
@@ -67,8 +75,7 @@ sudo mv pummit /usr/local/bin
 ```bash
 git clone https://github.com/HidemaruOwO/pummit.git
 cd pummit
-mkdir build && cd build
-go build ../pummit/
+go build main.go
 ```
 
 ## 依賴關係🪡
@@ -119,7 +126,7 @@ customCommands:
 
 ## 關於別名功能📎
 
-例如`wastebasket`輸入起來有點困難，但是如果使用alias功能就可以`wb`您將能夠輕鬆輸入它。
+例如`wastebasket`輸入起來有點困難，但是如果使用alias功能就可以`wb`您可以輕鬆輸入。
 
 ```bash
 $ pummit wb モジュールの削除
