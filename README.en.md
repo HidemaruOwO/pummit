@@ -2,7 +2,7 @@
 
 # pummit 🚛
 
-[![Test CLI](https://github.com/HidemaruOwO/pummit/actions/workflows/build-test.yml/badge.svg)](https://github.com/HidemaruOwO/pummit/actions/workflows/build-test.yml)![最終コミット](https://img.shields.io/github/last-commit/HidemaruOwO/pummit?style=flat-square)![リポジトリのスター](https://img.shields.io/github/stars/HidemaruOwO/pummit?style=flat-square)![問題](https://img.shields.io/github/issues/HidemaruOwO/pummit?style=flat-square)![オープンな問題](https://img.shields.io/github/issues-raw/HidemaruOwO/pummit?style=flat-square)![バグの問題](https://img.shields.io/github/issues/HidemaruOwO/pummit/bug?style=flat-square)
+[![Test CLI](https://github.com/HidemaruOwO/pummit/actions/workflows/test.yml/badge.svg)](https://github.com/HidemaruOwO/pummit/actions/workflows/test.yml)![最終コミット](https://img.shields.io/github/last-commit/HidemaruOwO/pummit?style=flat-square)![リポジトリのスター](https://img.shields.io/github/stars/HidemaruOwO/pummit?style=flat-square)![問題](https://img.shields.io/github/issues/HidemaruOwO/pummit?style=flat-square)![オープンな問題](https://img.shields.io/github/issues-raw/HidemaruOwO/pummit?style=flat-square)![バグの問題](https://img.shields.io/github/issues/HidemaruOwO/pummit/bug?style=flat-square)
 
 ![image](https://user-images.githubusercontent.com/82384920/225959857-76495875-c426-4669-a8d4-372ebf3acfad.png)
 
@@ -154,7 +154,7 @@ This command allows you to add an alias.
 $ pummit alias add 's' 'sparkles'
 ```
 
-In this case`s`Just enter the alias "Emoji prefix" in the commit message.`sparkles`will be able to be substituted.
+In this case`s`というエイリアスを入力するだけでコミットメッセージのEmoji prefixに`sparkles`will be able to be substituted.
 
 ```bash
 $ pummit s 新機能の追加
@@ -198,7 +198,7 @@ This command displays all registered aliases.
 $ pummit alias list
 ```
 
-If the alias`s=sparkles`and`t=tada`If it is registered, the following will be output.
+If the alias`s=sparkles`と`t=tada`If it is registered, the following will be output.
 
 ```bash
 📎 There is aliases
@@ -243,7 +243,7 @@ Alias : Prefix : Emoji
   d : books : 📚
 ```
 
-Even if there are a lot of confusing aliases like this:
+このようにエイリアスが混乱するほどある場合でも
 
 ```bash
 $ pummit alias reset
