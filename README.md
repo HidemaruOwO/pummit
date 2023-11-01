@@ -11,26 +11,31 @@
 
 ![image](https://user-images.githubusercontent.com/82384920/225959857-76495875-c426-4669-a8d4-372ebf3acfad.png)
 
-## what is this?
+## なんだこれは
 
-It allows you to lovely create a nicely commit message like this
+このような綺麗な形のコミットメッセージを簡単に作成出来ます
 
-![image](https://user-images.githubusercontent.com/82384920/225978215-9ac68cd4-cdb0-44c9-bca3-4d2cff1896cf.png)
+<img width="1441" alt="image" src="https://github.com/HidemaruOwO/pummit/assets/82384920/8461400a-94f6-431d-99d4-32ae74afe7fd">
 
 </div>
+
+- Select Language
 
 <table>
   <thead>
     <tr>
-      <th style="text-align:center">🤡English (Translated by ChatGPT)</a></th>
-      <th style="text-align:center"><a href="README.ja.md">🎌日本語</a></th>
+      <th style="text-align:center"><a href="README.md">🎌日本語</a></th>
+      <th style="text-align:center"><a href="README.en.md">🤡English</a></th>
+      <th style="text-align:center"><a href="README.zh-CN.md">🐉简体中文</a></th>
+      <th style="text-align:center"><a href="README.zh-TW.md">🍜繁体中文</a></th>
+      <th style="text-align:center"><a href="README.ko.md">🌸한국어</a></th>
     </tr>
   </thead>
 </table>
 
-## Usage 💨
+## 使い方 💨
 
-You can use pummit in two ways.
+pummitは２つの方法で使用することができます
 
 ```bash
 pummit emojiprefix 'subject'
@@ -45,9 +50,9 @@ pummit 'sparkles I am unko man'
 # Run: git commit -m ':sparkles: I am unko man (path/to/added/file, path/to/added/file)'
 ```
 
-## Install 😊
+## インストール 😊
 
-If Go is installed, please run this.
+Goがインストールされている場合はこちらを実行してください。
 
 ```bash
 go install github.com/HidemaruOwO/pummit/pummit@latest
@@ -55,15 +60,14 @@ go install github.com/HidemaruOwO/pummit/pummit@latest
 
 https://github.com/HidemaruOwO/pummit/releases
 
-If Go is not installed, download the appropriate file for your environment from
-Release and execute the following command.
+インストールされていない場合はReleaseから環境にあったファイルをダウンロードして、以下のコマンドを実行してください。
 
 ```bash
 tar xzvf pummit**.tar.gz
 sudo mv pummit /usr/local/bin
 ```
 
-## Build 🔨
+## ビルド 🔨
 
 ```bash
 git clone https://github.com/HidemaruOwO/pummit.git
@@ -72,29 +76,29 @@ mkdir build && cd build
 go build ../pummit/
 ```
 
-## dependence 🪡
+## 依存関係 🪡
 
-To use pummit, please register the following command in your path
+pummitを使うには以下のコマンドをパスに登録してください
 
 - git
 
-## How to use on lazygit 🔍
+## lazygitで使うには 🔍
 
-Set the following key bindings in `.config/lazygit/config.yml`
+以下のキーバインドを`.config/lazygit/config.yml`に設定してください
 
 ```yaml
 customCommands:
-- key: 'c'
-  prompts:
-    - type: 'input'
-      title: 'Commit message'
-      initialValue: ''
-  command: "pummit '{{index .PromptResponses 0}}'"
-  context: 'files'
-  description: 'commit changes(Custom Command)'
+  - key: "c"
+    prompts:
+      - type: "input"
+        title: "Commit message"
+        initialValue: ""
+    command: "pummit '{{index .PromptResponses 0}}'"
+    context: "files"
+    description: "commit changes(Custom Command)"
 ```
 
-### Sample emoji prefixes 🌟
+### 絵文字プレフィックスのサンプル 🌟
 
 ```
 # ==================== Emojis ====================
@@ -120,17 +124,16 @@ customCommands:
 # Commit body...
 ```
 
-## About Alias Function 📎
+## エイリアス機能について 📎
 
-For example, typing `wastebasket` is a bit of a challenge, but the alias feature
-makes it easy to type `wb`.
+例えば`wastebasket`を入力するのは少し大変ですが、エイリアス機能を使うと`wb`で簡単に入力できるようになります。
 
 ```bash
-$ pummit wb 'Delete module'
-# Result: :wastebasket: Delete module (path/to/added/file)
+$ pummit wb モジュールの削除
+# Result: :wastebasket: モジュールの削除 (path/to/added/file)
 ```
 
-The aliases set by default are as follows
+デフォルトで設定されているエイリアスは以下の通りです。
 
 ```
  📎 There is aliases
@@ -154,71 +157,74 @@ Alias : Prefix : Emoji
 
 ### Add command
 
-This command allows aliases to be added.
+このコマンドはエイリアスを追加することが出来ます。
 
 ```bash
 $ pummit alias add 's' 'sparkles'
 ```
 
-In this case, by simply entering the alias `s`, you can assign `sparkles` to the
-Emoji prefix of the commit message.
+この場合では`s`というエイリアスを入力するだけでコミットメッセージのEmoji prefixに`sparkles`を代入できるようになります。
 
 ```bash
-$ pummit s 'Add new feature'
-# Run: git commit -m ':sparkles: Add new feature (path/to/added/file)'
+$ pummit s 新機能の追加
+# Run: git commit -m ':sparkles: 新機能の追加 (path/to/added/file)'
 ```
 
 ### Delete command
 
-This command allows you to delete an alias.
+このコマンドはエイリアスを削除することが出来ます。
 
 ```bash
 $ pummit alias delete s
 ```
 
-In this case, if the `s=spakles` alias is registered and this command is
-executed, the association between `s` and `sparkles` will be lost. Therefore, if
-you run the following command, only `s` will be assigned to the Emoji prefix.
+この場合では、`s=spakles`というエイリアスが登録されている前提でこのコマンドを実行した場合`s`と`sparkles`の関連付けがなくなるため、以下のコマンドを実行してもEmoji prefixには`s`しか代入されません。
 
 ```bash
-$ pummit s 'Add new feature'
-# Run: git commmit -m ':s: Add new feature (path/to/added/file)'
+$ pummit s 新機能の追加
+# Run: git commmit -m ':s: 新機能の追加 (path/to/added/file)'
 ```
 
-You can also specify multiple aliases to delete as arguments.
+また引数に削除したいエイリアスを複数指定することが出来ます。
 
 ```bash
 $ pummit alias delete s sm c h
 ```
 
+### Delete --all command
+
+このコマンドは登録されているエイリアスを全て削除します。
+
+```bash
+$ pummit alias delete --all
+```
+
 ### List command
 
-This command displays all registered aliases.
+このコマンドは登録されているエイリアスを全て表示します。
 
 ```bash
 $ pummit alias list
 ```
 
-f aliases such as `s=sparkles` and `t=tada` are registered, the output will be
-as follows:
+もし、エイリアスに`s=sparkles`と`t=tada`が登録されている場合は以下のように出力されます。
 
 ```bash
 📎 There is aliases
 Alias : Prefix : Emoji
-  s : sparkles : ✨ 
+  s : sparkles : ✨
   t : tada : 🎉
 ```
 
 ### Reset command
 
-This command resets the aliases.
+このコマンドをエイリアスをリセットします。
 
 ```bash
 $ pummit alias reset
 ```
 
-It can be used for recovery when there are too many confusing aliases or when
-you have directly tampered with `~/.config/pummit/config.json` and caused a bug.
+もし、エイリアスがこのように沢山あって混乱するほどあったり、`config.json`を直接弄ってバグらせてしまったときのリカバリとして使うことが出来ます。
 
 ```bash
 $ pummit alias list
@@ -246,7 +252,7 @@ Alias : Prefix : Emoji
   d : books : 📚
 ```
 
-Even when there are confusingly many aliases like this one
+このようにエイリアスが混乱するほどある場合でも
 
 ```bash
 $ pummit alias reset
@@ -272,8 +278,8 @@ Alias : Prefix : Emoji
   a : art : 🎨
 ```
 
-With a single command, it can be returned to this beautiful state.
+コマンド一つでこのような綺麗な状態に戻せます。
 
-## Special Thanks ✨
+## スペシャルサンクス ✨
 
 - [Qiita - GitHubのコミットメッセージに絵文字を入れて開発効率をあげる](https://qiita.com/Jung0/items/0a9a7a97a2c17f92d3c5)

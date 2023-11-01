@@ -1,0 +1,56 @@
+name: Release
+on:
+  release:
+    types:
+      - published
+
+permissions:
+  contents: write
+  repository-projects: write
+  actions: write
+  statuses: read
+
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+
+    # Multi platform support
+    # strategy:
+    # matrix:
+    # platform: [macos-latest, ubuntu-latest, windows-latest]
+    # fail-fast: false
+
+    # runs-on: ${{ matrix.platform }}
+
+    steps:
+      - name: Wait Tests
+        id: test_result
+        uses: Sibz/await-status-action@v1.0.1
+        with:
+          contexts: test-status
+          authToken: ${{ secrets.GITHUB_TOKEN }}
+          timeout: 30
+      - name: Check Test Result
+        if: steps.test_result.outputs.result != 'success'
+        run: |
+          echo "feiled ${{ steps.test_result.outputs.failedCheckNames }}"
+          echo "status ${{ steps.test_result.outputs.failedCheckStates }}"
+          exit 1
+      - name: Checkout Sources
+        uses: actions/checkout@v3
+      - name: Setup
+        run: echo "Set up your programming language here."
+        # これらをuseしてセットアップをしてください
+        # uses: actions/setup-go@v2
+        #
+      - name: Build
+        run: echo "Build from src here."
+        # ./build.sh
+
+      - name: Release
+        run: echo "Release flow here."
+        # これらを使いましょう
+        # https://github.com/actions/upload-artifact
+        # Goの場合はhttps://github.com/goreleaser/goreleaser-action が使えます
+        # 他の言語なども調べれば見つかるでしょう

@@ -1,0 +1,39 @@
+name: Test CLI
+
+on:
+  push:
+
+permissions:
+  statuses: write
+
+jobs:
+  test:
+    name: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Test
+        id: test_step
+        continue-on-error: true
+        run: |
+          echo "Write Test here"
+      - name: Set Check Status Success
+        uses: Sibz/github-status-action@v1
+        if: steps.test_step.outcome == 'success'
+        with:
+          context: test-status
+          authToken: ${{ secrets.GITHUB_TOKEN }}
+          state: success
+      - name: Set Check Status Failure
+        uses: Sibz/github-status-action@v1
+        if: steps.test_step.outcome == 'failure'
+        with:
+          context: test-status
+          authToken: ${{ secrets.GITHUB_TOKEN }}
+          state: failure
+
+      - name: Fail
+        uses: Sibz/action-always-fail@v1.0.1
+        if: steps.test_step.outcome == 'failure'

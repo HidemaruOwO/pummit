@@ -1,0 +1,42 @@
+name: "\U0001F41B バグの報告"
+description: バグや不具合､ 予期せぬ動作などの報告
+labels: [bug]
+title: ':bug: [バグ] '
+body:
+
+  - type: markdown
+    attributes:
+      value: |
+        ご報告ありがとうございます！
+        問題を迅速に解決するために､ 以下の複数の項目に沿ってお答え下さい。
+
+  - type: input
+    attributes:
+      label: 機能名及び動作
+      placeholder: 例：コマンドが途中で落ちる
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: 再現方法
+      placeholder: 例：実行したコマンドや出力など
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: 詳細な情報
+      description: 可能な限り詳しく報告して下さい
+      placeholder: |
+        例：サンプルコマンド通りに動かない
+        　　シンタックスエラー(syntax error)になる
+        　　非推奨のコードが使われている
+        など...
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: その他
+      description: 他に何か伝えたい事があれば

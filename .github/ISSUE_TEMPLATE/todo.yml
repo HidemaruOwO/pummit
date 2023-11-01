@@ -1,0 +1,27 @@
+name: "🥇 To Do（リポジトリオーナー向け）"
+description: タスクを追加します
+labels: [ todo ]
+title: ":1st_place_medal: [To Do] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        この Issueタイプは､ ToDoリストを明確に示すために存在します。
+        本来はProjectsを使用すべきですが､ 関連付け易さを優先しています｡
+
+        **リポジトリオーナー以外は､ 基本作成しないで下さい｡**
+
+  - type: textarea
+    attributes:
+      label: 新機能及び改善など
+      placeholder: 新しいコマンドを追加する
+
+  - type: input
+    attributes:
+      label: Pull request / Issue 割振番号
+      placeholder: 例：#29
+
+  - type: textarea
+    attributes:
+      label: 詳細
+      description: より詳細な説明が必要な場合

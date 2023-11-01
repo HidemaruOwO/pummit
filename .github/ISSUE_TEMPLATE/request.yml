@@ -1,0 +1,49 @@
+name: "✨ 提案・リクエスト"
+description: 機能リクエストや､ ちょっとした提案など
+labels: [ enhancement ]
+title: ':sparkles: [提案] '
+body:
+
+  - type: markdown
+    attributes:
+      value: |
+        素敵な案を寄せて頂きありがとうございます！
+
+        どの様なものかを把握するために､ 以下の複数の項目に沿ってお答えください。
+
+  - type: input
+    attributes:
+      label: 簡潔な説明
+      description: 一言で説明して下さい
+      placeholder: 例：ワークフローの改善
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: 詳細な説明
+      description: 可能な限り詳しく記述して下さい
+      placeholder: |
+        例：Gradleを用いる言語のワークフローは､
+        　　キャッシュの方法を変えた方が良い｡
+        　　```
+        　　- - uses: actions/cache@v3
+        　　-   with:
+        　　-     path: |
+        　　-       ~/.gradle/caches
+        　　-       ~/.gradle/wrapper/dists
+        　　-   key: kotlin-1-${{ hashFiles('kotlin/hello_world_1/gradle/wrapper/gradle-wrapper.properties') }}
+        　　-   restore-keys: kotlin-1-
+        　　```
+        　　```
+        　　+ - uses: actions/setup-java@v3
+        　　+   with:
+        　　+     cache: 'gradle'
+        　　```
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: その他
+      description: 他に伝えたい事があれば書いて下さい

@@ -1,0 +1,26 @@
+# Reference: https://qiita.com/shun198/items/176037432f7efc8fde26
+
+name: Create Release Note
+
+on:
+  pull_request:
+    types:
+      - closed
+    branches:
+      - develop
+
+permissions:
+  contents: write
+  repository-projects: write
+  actions: write
+
+jobs:
+  release:
+    permissions:
+      contents: write
+      pull-requests: write
+    runs-on: ubuntu-latest
+    steps:
+      - uses: release-drafter/release-drafter@v5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
