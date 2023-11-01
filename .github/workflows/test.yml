@@ -12,13 +12,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+
+      - name: Setup
+        uses: actions/setup-go@v4
+        with:
+          go-version-file: "go.mod"
 
       - name: Test
         id: test_step
         continue-on-error: true
-        run: |
-          echo "Write Test here"
+        run: go build -ldflags="-s -w" -trimpath src/main.go
+
       - name: Set Check Status Success
         uses: Sibz/github-status-action@v1
         if: steps.test_step.outcome == 'success'

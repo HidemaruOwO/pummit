@@ -1,4 +1,4 @@
-name: "Build"
+name: "Artifact"
 on:
   push:
 
@@ -16,10 +16,20 @@ jobs:
     # Multi platform support
     strategy:
       matrix:
-        platform: [macos-latest, ubuntu-latest, windows-latest]
+        target:
+          - x86_64-unknown-linux-musl
+          - x86_64-pc-windows-msvc
+          - x86_64-apple-darwin
+        include:
+          - target: x86_64-unknown-linux-musl
+            os: ubuntu-latest
+          - target: x86_64-pc-windows-msvc
+            os: windows-latest
+          - target: x86_64-apple-darwin
+            os: macos-latest
       fail-fast: false
 
-    runs-on: ${{ matrix.platform }}
+    runs-on: ${{ matrix.os }}
 
     steps:
       - name: Wait Tests
@@ -36,18 +46,21 @@ jobs:
           echo "status ${{ steps.test_result.outputs.failedCheckStates }}"
           exit 1
       - name: Checkout Sources
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Setup
-        run: echo "Set up your programming language here."
-        # これらをuseしてセットアップをしてください
-        # uses: actions/setup-go@v2
+        uses: actions/setup-go@v4
+        with:
+          go-version-file: "go.mod"
         #
       - name: Build
-        run: echo "Build from src here." >> artifact_file
-        # ./build.sh
+        run: go build -ldflags="-s -w" -trimpath src/main.go
+
+      - name: Rename file
+        run: mv main virtualslime && ls
+        shell: bash
 
       - name: Artifact
         uses: actions/upload-artifact@v3
         with:
-          name: Artifact-${{ runner.os }}
-          path: artifact_file
+          name: VirtualSlimeAPI_${{ matrix.target }}
+          path: virtualslime*

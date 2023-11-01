@@ -38,19 +38,19 @@ jobs:
           echo "status ${{ steps.test_result.outputs.failedCheckStates }}"
           exit 1
       - name: Checkout Sources
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
       - name: Setup
-        run: echo "Set up your programming language here."
-        # これらをuseしてセットアップをしてください
-        # uses: actions/setup-go@v2
-        #
-      - name: Build
-        run: echo "Build from src here."
-        # ./build.sh
+        uses: actions/setup-go@v4
+        with:
+          go-version-file: "go.mod"
 
       - name: Release
-        run: echo "Release flow here."
-        # これらを使いましょう
-        # https://github.com/actions/upload-artifact
-        # Goの場合はhttps://github.com/goreleaser/goreleaser-action が使えます
-        # 他の言語なども調べれば見つかるでしょう
+        uses: goreleaser/goreleaser-action@v5
+        env:
+          TAP_GITHUB_TOKEN: ${{ secrets.TAP_GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          args: release --rm-dist
