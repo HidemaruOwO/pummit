@@ -38,7 +38,7 @@ builds:
       - -trimpath
 
 brews:
-  - name: virtualslime-api
+  - name: pummit
     repository:
       owner: HidemaruOwO
       name: homebrew-tap
