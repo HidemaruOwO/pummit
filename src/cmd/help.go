@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"github.com/HidemaruOwO/pummit/pummit/config"
+	"github.com/HidemaruOwO/pummit/src/config"
 	//  "github.com/fatih/color"
 	"fmt"
 )
@@ -19,7 +19,7 @@ Usage:
 
 Subcommand:
   pummit alias [add|del|delete|list|reset]
-  
+
   add: Add alias
     pummit alias add [alias name] [emoji prefix]
 

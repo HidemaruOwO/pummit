@@ -10,7 +10,7 @@ import (
 	"runtime"
 
 	"github.com/HidemaruOwO/nuts/log"
-	"github.com/HidemaruOwO/pummit/pummit/config"
+	"github.com/HidemaruOwO/pummit/src/config"
 	"github.com/tucnak/store"
 )
 

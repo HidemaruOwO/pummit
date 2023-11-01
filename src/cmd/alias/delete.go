@@ -4,7 +4,7 @@ import (
 	"sync"
 
 	"github.com/HidemaruOwO/nuts/log"
-	"github.com/HidemaruOwO/pummit/pummit/lib"
+	"github.com/HidemaruOwO/pummit/src/lib"
 )
 
 func AliasDeleteCmd(targets []string) {

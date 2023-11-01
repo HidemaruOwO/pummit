@@ -1,6 +1,6 @@
-name: "\U0001F947 To Do（リポジトリオーナー向け）"
+name: "🥇 To Do（リポジトリオーナー向け）"
 description: タスクを追加します
-labels: [todo]
+labels: [ todo ]
 title: ":1st_place_medal: [To Do] "
 body:
   - type: markdown
