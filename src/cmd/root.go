@@ -12,8 +12,6 @@ import (
 	"github.com/HidemaruOwO/pummit/src/lib"
 )
 
-var isDebug bool = config.IsDebug()
-
 func RootCmd(prefix string, subject string) {
 	gitCommit(prefix, subject)
 }
@@ -21,7 +19,7 @@ func RootCmd(prefix string, subject string) {
 func gitCommit(prefix string, subject string) {
 	gitChangeCmd := exec.Command("git", "diff", "--name-only", "--cached")
 	gitChangeOutput, err := gitChangeCmd.Output()
-	log.Debugf(isDebug, "%s", gitChangeOutput)
+	log.Debugf(config.IS_DEBUG, "%s", gitChangeOutput)
 	if err != nil {
 		log.ErrorExit(err)
 	}
@@ -57,7 +55,7 @@ func gitCommit(prefix string, subject string) {
 		go func(index int, value []string) {
 			defer wg.Done()
 			if value[0] == prefix {
-				log.Debugf(isDebug, "Found prefix %s\n", aliasList[index][1])
+				log.Debugf(config.IS_DEBUG, "Found prefix %s\n", aliasList[index][1])
 				mu.Lock()
 				prefix = aliasList[index][1]
 				mu.Unlock()
