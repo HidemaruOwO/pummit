@@ -7,10 +7,10 @@ import (
 	"strconv"
 
 	"github.com/HidemaruOwO/nuts/log"
-	"github.com/HidemaruOwO/pummit/pummit/cmd"
-	alias_cmd "github.com/HidemaruOwO/pummit/pummit/cmd/alias"
-	"github.com/HidemaruOwO/pummit/pummit/config"
-	"github.com/HidemaruOwO/pummit/pummit/lib"
+	"github.com/HidemaruOwO/pummit/src/cmd"
+	alias_cmd "github.com/HidemaruOwO/pummit/src/cmd/alias"
+	"github.com/HidemaruOwO/pummit/src/config"
+	"github.com/HidemaruOwO/pummit/src/lib"
 	"github.com/urfave/cli/v2"
 )
 

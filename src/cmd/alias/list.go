@@ -3,7 +3,7 @@ package alias_cmd
 import (
 	"fmt"
 
-	"github.com/HidemaruOwO/pummit/pummit/lib"
+	"github.com/HidemaruOwO/pummit/src/lib"
 )
 
 func AliasListCmd() {
