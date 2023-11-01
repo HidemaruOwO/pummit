@@ -1,6 +1,6 @@
-name: "\U00002728 提案・リクエスト"
+name: "✨ 提案・リクエスト"
 description: 機能リクエストや､ ちょっとした提案など
-labels: [enhancement]
+labels: [ enhancement ]
 title: ':sparkles: [提案] '
 body:
 
@@ -8,7 +8,7 @@ body:
     attributes:
       value: |
         素敵な案を寄せて頂きありがとうございます！
-        
+
         どの様なものかを把握するために､ 以下の複数の項目に沿ってお答えください。
 
   - type: input

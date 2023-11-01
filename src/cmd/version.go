@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"runtime"
 
-	"github.com/HidemaruOwO/pummit/pummit/config"
+	"github.com/HidemaruOwO/pummit/src/config"
 )
 
 func VersionCmd() {

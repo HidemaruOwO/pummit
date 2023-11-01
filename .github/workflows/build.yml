@@ -1,0 +1,70 @@
+name: "Artifact"
+on:
+  push:
+
+permissions:
+  contents: write
+  repository-projects: write
+  actions: write
+  statuses: read
+
+jobs:
+  release:
+    name: Release
+    # runs-on: ubuntu-latest
+
+    # Multi platform support
+    strategy:
+      matrix:
+        target:
+          - x86_64-unknown-linux-musl
+          - x86_64-pc-windows-msvc
+          - x86_64-apple-darwin
+        include:
+          - target: x86_64-unknown-linux-musl
+            os: ubuntu-latest
+          - target: x86_64-pc-windows-msvc
+            os: windows-latest
+          - target: x86_64-apple-darwin
+            os: macos-latest
+      fail-fast: false
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Wait Tests
+        id: test_result
+        uses: Sibz/await-status-action@v1
+        with:
+          contexts: test-status
+          authToken: ${{ secrets.GITHUB_TOKEN }}
+          timeout: 30
+      - name: Check Test Result
+        if: steps.test_result.outputs.result != 'success'
+        run: |
+          echo "feiled ${{ steps.test_result.outputs.failedCheckNames }}"
+          echo "status ${{ steps.test_result.outputs.failedCheckStates }}"
+          exit 1
+      - name: Checkout Sources
+        uses: actions/checkout@v4
+      - name: Setup
+        uses: actions/setup-go@v4
+        with:
+          go-version-file: "go.mod"
+        #
+      - name: Build
+        run: |
+          mkdir build
+          cd build
+          go build -ldflags="-s -w" -trimpath ../src
+        shell: bash
+
+      - name: Rename file
+        run: cd build && mv src pummit && ls
+        shell: bash
+
+      - name: Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: pummit_${{ matrix.target }}
+          path: build/pummit*

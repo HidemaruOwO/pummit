@@ -1,0 +1,6 @@
+enhancement: ['feature/*','feat/*']
+bug: ['fix/*','hotfix/*']
+emergency: ['fix/*','hotfix/*']
+refactor: 'refactor/*'
+documentation: 'docs/*'
+test: 'test/*'

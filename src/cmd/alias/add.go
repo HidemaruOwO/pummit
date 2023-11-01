@@ -6,8 +6,8 @@ import (
 	"sync"
 
 	"github.com/HidemaruOwO/nuts/log"
-	"github.com/HidemaruOwO/pummit/pummit/config"
-	"github.com/HidemaruOwO/pummit/pummit/lib"
+	"github.com/HidemaruOwO/pummit/src/config"
+	"github.com/HidemaruOwO/pummit/src/lib"
 )
 
 var isDebug bool = config.IsDebug()
