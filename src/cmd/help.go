@@ -15,7 +15,6 @@ func help() string {
 
 Usage:
   pummit [emoji prefix] [subject]
-  Create prettier commit message
 
 Subcommand:
   pummit alias [add|del|delete|list|reset]
@@ -37,5 +36,5 @@ Subcommand:
 
 Flags:
   --help Show help
-  --version Show version`, config.Version)
+  --version Show version`, config.VERSION)
 }

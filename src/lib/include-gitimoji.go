@@ -1,16 +1,16 @@
 package lib
 
 import (
-	"sync"
-
 	"github.com/HidemaruOwO/nuts/log"
+	"github.com/HidemaruOwO/pummit/src/config"
+	"sync"
 )
 
 func IncludeGitimoji(prefix string) (bool, string) {
 	var emoji string
 	var gitimoji Gitmoji = GetGitmoji()
 
-	log.Debugf(isDebug, "prefix: %s\n", prefix)
+	log.Debugf(config.IS_DEBUG, "prefix: %s\n", prefix)
 
 	var wg sync.WaitGroup
 
@@ -18,7 +18,7 @@ func IncludeGitimoji(prefix string) (bool, string) {
 		wg.Add(1)
 		go func(index int, value Gitmojis) {
 			if value.Name == prefix {
-				log.Debugf(isDebug, "found prefix from gitmoji\n")
+				log.Debugf(config.IS_DEBUG, "found prefix from gitmoji\n")
 				emoji = gitimoji.Gitmojis[index].Emoji
 			}
 			wg.Done()
@@ -26,7 +26,7 @@ func IncludeGitimoji(prefix string) (bool, string) {
 	}
 	wg.Wait()
 
-	log.Debugf(isDebug, "gitimoji: %s\n", emoji)
+	log.Debugf(config.IS_DEBUG, "gitimoji: %s\n", emoji)
 
 	if emoji == "" {
 		return false, ""

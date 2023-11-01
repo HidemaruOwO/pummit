@@ -14,8 +14,6 @@ import (
 	"github.com/tucnak/store"
 )
 
-var isDebug bool = config.IsDebug()
-
 type Gitmoji struct {
 	Schema   string     `json:"$schema"`
 	Gitmojis []Gitmojis `json:"gitmojis"`
@@ -40,7 +38,7 @@ func Init(path string) {
 
 	_, err := os.Stat(path)
 	if !os.IsNotExist(err) {
-		log.Debugf(isDebug, "File is exists\n")
+		log.Debugf(config.IS_DEBUG, "File is exists\n")
 	} else {
 		store.Init("pummit")
 		url := "https://raw.githubusercontent.com/carloscuesta/gitmoji/master/packages/gitmojis/src/gitmojis.json"
@@ -60,15 +58,15 @@ func Init(path string) {
 			log.Criticalf("JSON encoding failed\n")
 			log.ErrorExit(err)
 		}
-		log.Debugf(isDebug, "Create gitimoji.json\n")
+		log.Debugf(config.IS_DEBUG, "Create gitimoji.json\n")
 		store.Save("gitimoji.json", gitmoji)
 
 		var alias Alias
-		if err := json.Unmarshal([]byte(config.BaseJsonData), &alias); err != nil {
+		if err := json.Unmarshal([]byte(config.BASE_JSON_DATA), &alias); err != nil {
 			log.Criticalf("JSON encoding failed\n")
 			log.ErrorExit(err)
 		}
-		log.Debugf(isDebug, "Create config.json\n")
+		log.Debugf(config.IS_DEBUG, "Create config.json\n")
 		store.Save("config.json", alias)
 	}
 }

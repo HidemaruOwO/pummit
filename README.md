@@ -38,9 +38,9 @@
 pummitは２つの方法で使用することができます
 
 ```bash
-pummit emojiprefix 'subject'
+pummit <emojiprefix> '<subject>'
 # or
-pummit 'emojiprefix subject'
+pummit '<emojiprefix> <subject>'
 
 # Example
 pummit sparkles 'I am unko man'
@@ -52,10 +52,18 @@ pummit 'sparkles I am unko man'
 
 ## インストール 😊
 
+Homebrewで配布してます。
+
+```bash
+brew tap hidemaruowo/tap
+brew update
+brew install pummit
+```
+
 Goがインストールされている場合はこちらを実行してください。
 
 ```bash
-go install github.com/HidemaruOwO/pummit/pummit@latest
+go install github.com/HidemaruOwO/pummit@latest
 ```
 
 https://github.com/HidemaruOwO/pummit/releases
@@ -72,8 +80,7 @@ sudo mv pummit /usr/local/bin
 ```bash
 git clone https://github.com/HidemaruOwO/pummit.git
 cd pummit
-mkdir build && cd build
-go build ../pummit/
+go build main.go
 ```
 
 ## 依存関係 🪡

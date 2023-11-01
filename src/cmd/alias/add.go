@@ -6,11 +6,8 @@ import (
 	"sync"
 
 	"github.com/HidemaruOwO/nuts/log"
-	"github.com/HidemaruOwO/pummit/src/config"
 	"github.com/HidemaruOwO/pummit/src/lib"
 )
-
-var isDebug bool = config.IsDebug()
 
 func AliasAddCmd(alias string, prefix string) {
 	aliasAdd(alias, prefix)

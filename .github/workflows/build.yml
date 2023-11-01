@@ -53,18 +53,15 @@ jobs:
           go-version-file: "go.mod"
         #
       - name: Build
-        run: |
-          mkdir build
-          cd build
-          go build -ldflags="-s -w" -trimpath ../src
+        run: go build -ldflags="-s -w" -trimpath main.go
         shell: bash
 
       - name: Rename file
-        run: cd build && mv src pummit && ls
+        run: mv main pummit && ls
         shell: bash
 
       - name: Artifact
         uses: actions/upload-artifact@v3
         with:
           name: pummit_${{ matrix.target }}
-          path: build/pummit*
+          path: pummit*
