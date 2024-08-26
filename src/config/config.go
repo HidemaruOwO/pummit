@@ -7,12 +7,13 @@ import (
 	"github.com/HidemaruOwO/nuts/log"
 )
 
-const VERSION string = "v1.2.3"
+const VERSION string = "v1.2.4"
 
 // const BaseJsonData string = `{
 const BASE_JSON_DATA string = `{
 	"writeEmoji": true,
 	"useAlias": true,
+  "useLimitPathesLength": 50,
   "alias": [
   ["s", "sparkles", "✨"],
   ["t", "tada", "🎉"],
