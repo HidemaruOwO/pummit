@@ -14,7 +14,7 @@ func AliasAddCmd(alias string, prefix string) {
 }
 
 func aliasAdd(alias string, prefix string) {
-	aliases := lib.GetAlias()
+	aliases := lib.GetAppConfig()
 
 	if alias != strings.TrimSpace(alias) || prefix != strings.TrimSpace(prefix) {
 		log.Warnf("Please do not include spaces in alias and emoji prefixes\n")
@@ -43,7 +43,7 @@ func aliasAdd(alias string, prefix string) {
 		os.Exit(0)
 	}
 
-	aliases.Alias = append(aliases.Alias, []string{alias, prefix, emoji})
+	*aliases.Alias = append(*aliases.Alias, []string{alias, prefix, emoji})
 
 	lib.WriteConfig(aliases)
 	log.Infof(

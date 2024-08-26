@@ -66,12 +66,12 @@ func gitCommit(prefix string, subject string) {
 
 	_, emoji := lib.IncludeGitimoji(prefix)
 
-	aliases := lib.GetAlias()
+	aliases := lib.GetAppConfig()
 	gitChange = strings.ReplaceAll(gitChange, "\n", ", ")
 
 	var commitMsg string
 
-	if aliases.WriteEmoji {
+	if *aliases.WriteEmoji {
 
 		if emoji != "" {
 			prefix = emoji

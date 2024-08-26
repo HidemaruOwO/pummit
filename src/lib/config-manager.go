@@ -27,10 +27,11 @@ type Gitmojis struct {
 	Name        string `json:"name"`
 	Semver      string `json:"semver"`
 }
-type Alias struct {
-	WriteEmoji bool       `json:"writeEmoji"`
-	UseAlias   bool       `json:"useAlias"`
-	Alias      [][]string `json:"alias"`
+type AppConfig struct {
+	WriteEmoji           *bool       `json:"writeEmoji"`
+	UseAlias             *bool       `json:"useAlias"`
+	UseLimitPathesLength *int        `json:"useLimitPathesLength"`
+	Alias                *[][]string `json:"alias"`
 }
 
 func Init(path string) {
@@ -61,13 +62,13 @@ func Init(path string) {
 		log.Debugf(config.IS_DEBUG, "Create gitimoji.json\n")
 		store.Save("gitimoji.json", gitmoji)
 
-		var alias Alias
-		if err := json.Unmarshal([]byte(config.BASE_JSON_DATA), &alias); err != nil {
+		var appConfig AppConfig
+		if err := json.Unmarshal([]byte(config.BASE_JSON_DATA), &appConfig); err != nil {
 			log.Criticalf("JSON encoding failed\n")
 			log.ErrorExit(err)
 		}
 		log.Debugf(config.IS_DEBUG, "Create config.json\n")
-		store.Save("config.json", alias)
+		store.Save("config.json", appConfig)
 	}
 }
 
@@ -81,27 +82,27 @@ func GetGitmoji() Gitmoji {
 	return gitimoji
 }
 
-func GetAlias() Alias {
-	var alias Alias
+func GetAppConfig() AppConfig {
+	var appConfig AppConfig
 	store.SetApplicationName("pummit")
-	if err := store.Load("config.json", &alias); err != nil {
+	if err := store.Load("config.json", &appConfig); err != nil {
 		log.Criticalf("Loading alias list failed\n")
 		log.ErrorExit(err)
 	}
-	return alias
+	checkConfig(appConfig)
+	return appConfig
+}
+
+func checkConfig(appConfig AppConfig) {
+	log.Debugf(config.IS_DEBUG, "%+v\n", appConfig)
 }
 
 func GetAliasList() [][]string {
-	var alias Alias
-	store.SetApplicationName("pummit")
-	if err := store.Load("config.json", &alias); err != nil {
-		log.Criticalf("Loading alias list failed\n")
-		log.ErrorExit(err)
-	}
-	return alias.Alias
+	var config = GetAppConfig()
+	return *config.Alias
 }
 
-func WriteConfig(configData Alias) {
+func WriteConfig(configData AppConfig) {
 	store.SetApplicationName("pummit")
 	if err := store.Save("config.json", configData); err != nil {
 		log.ErrorExit(err)
