@@ -65,26 +65,35 @@ func gitCommit(prefix string, subject string) {
 	wg.Wait()
 
 	_, emoji := lib.IncludeGitimoji(prefix)
+	appConfig := lib.GetAppConfig()
 
-	aliases := lib.GetAppConfig()
 	gitChange = strings.ReplaceAll(gitChange, "\n", ", ")
 
-	var commitMsg string
+	var commigMessage string
 
-	if *aliases.WriteEmoji {
+	var message string
 
+	if *appConfig.WriteEmoji {
 		if emoji != "" {
 			prefix = emoji
-			commitMsg = fmt.Sprintf("%s %s (%s)", prefix, subject, gitChange)
 		} else {
-			commitMsg = fmt.Sprintf(":%s: %s (%s)", prefix, subject, gitChange)
+			prefix = fmt.Sprintf(":%s:", prefix)
 		}
-
-	} else {
-		commitMsg = fmt.Sprintf(":%s: %s (%s)", prefix, subject, gitChange)
 	}
 
-	cmd := exec.Command("git", "commit", "-m", commitMsg)
+	if *appConfig.UseLimitPathesLength {
+		if *appConfig.LimitPathesLength < len([]rune(gitChange)) {
+			gitChange = fmt.Sprintf("%s...", gitChange[:*appConfig.LimitPathesLength])
+		}
+
+		message = fmt.Sprintf("%s (%s)", subject, gitChange)
+	} else {
+		message = fmt.Sprintf("%s", subject)
+	}
+
+	commigMessage = fmt.Sprintf("%s %s", prefix, message)
+
+	cmd := exec.Command("git", "commit", "-m", commigMessage)
 	_, err = cmd.Output()
 	if err != nil {
 		log.ErrorExit(err)
