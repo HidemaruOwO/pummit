@@ -13,8 +13,8 @@ func AliasDeleteCmd(targets []string) {
 }
 
 func aliasDelete(targets []string) {
-	alias := lib.GetAlias()
-	slice := alias.Alias
+	alias := lib.GetAppConfig()
+	slice := *alias.Alias
 
 	log.Debugf(config.IS_DEBUG, "Removing %v\n", targets)
 
@@ -29,7 +29,7 @@ func aliasDelete(targets []string) {
 	}
 	wg.Wait()
 
-	alias.Alias = slice
+	*alias.Alias = slice
 	lib.WriteConfig(alias)
 }
 

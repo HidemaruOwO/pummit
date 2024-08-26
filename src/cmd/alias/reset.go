@@ -27,7 +27,7 @@ func aliasReset() {
 
 	input = strings.TrimSpace(input)
 	if input == "y" || input == "Y" {
-		var alias lib.Alias
+		var alias lib.AppConfig
 		if err := json.Unmarshal([]byte(config.BASE_JSON_DATA), &alias); err != nil {
 			log.Criticalf("JSON encoding failed\n")
 			log.ErrorExit(err)
