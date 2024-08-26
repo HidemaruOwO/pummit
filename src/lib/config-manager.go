@@ -30,7 +30,8 @@ type Gitmojis struct {
 type AppConfig struct {
 	WriteEmoji           *bool       `json:"writeEmoji"`
 	UseAlias             *bool       `json:"useAlias"`
-	UseLimitPathesLength *int        `json:"useLimitPathesLength"`
+	UseLimitPathesLength *bool       `json:"useLimitPathesLength"`
+	LimitPathesLength    *int        `json:"limitPathesLength"`
 	Alias                *[][]string `json:"alias"`
 }
 
@@ -93,8 +94,17 @@ func GetAppConfig() AppConfig {
 	return appConfig
 }
 
-func checkConfig(appConfig AppConfig) {
-	log.Debugf(config.IS_DEBUG, "%+v\n", appConfig)
+func resetConfig() {
+	var appConfig AppConfig
+	store.SetApplicationName("pummit")
+	if err := json.Unmarshal([]byte(config.BASE_JSON_DATA), &appConfig); err != nil {
+		log.Criticalf("JSON encoding failed\n")
+		log.ErrorExit(err)
+	}
+	log.Debugf(config.IS_DEBUG, "Reset config.json\n")
+	if err := store.Save("config.json", appConfig); err != nil {
+		log.ErrorExit(err)
+	}
 }
 
 func GetAliasList() [][]string {
@@ -107,6 +117,34 @@ func WriteConfig(configData AppConfig) {
 	if err := store.Save("config.json", configData); err != nil {
 		log.ErrorExit(err)
 	}
+}
+
+// configの値が正常が見るわ！
+func checkConfig(appConfig AppConfig) {
+	log.Debugf(config.IS_DEBUG, "%+v\n", appConfig)
+	// TODO configにプロパティを追加する度に書く必要があるわ！
+	if appConfig.UseAlias == nil {
+		defaultValue := true
+		appConfig.UseAlias = &defaultValue
+	}
+	if appConfig.WriteEmoji == nil {
+		defaultValue := true
+		appConfig.WriteEmoji = &defaultValue
+	}
+	if appConfig.UseLimitPathesLength == nil {
+		defaultValue := true
+		appConfig.UseLimitPathesLength = &defaultValue
+	}
+	if appConfig.LimitPathesLength == nil {
+		defaultValue := 50
+		appConfig.LimitPathesLength = &defaultValue
+	}
+	if appConfig.Alias == nil {
+		defaultValue := [][]string{}
+		appConfig.Alias = &defaultValue
+	}
+
+	WriteConfig(appConfig)
 }
 
 func PlatformPath(path string) string {
