@@ -1,41 +1,73 @@
 <div align="center">
 
-# pummit 🚛
-
-[![Test CLI](https://github.com/HidemaruOwO/pummit/actions/workflows/test.yml/badge.svg)](https://github.com/HidemaruOwO/pummit/actions/workflows/test.yml)
-![最終コミット](https://img.shields.io/github/last-commit/HidemaruOwO/pummit?style=flat-square)
-![リポジトリのスター](https://img.shields.io/github/stars/HidemaruOwO/pummit?style=flat-square)
-![問題](https://img.shields.io/github/issues/HidemaruOwO/pummit?style=flat-square)
-![オープンな問題](https://img.shields.io/github/issues-raw/HidemaruOwO/pummit?style=flat-square)
-![バグの問題](https://img.shields.io/github/issues/HidemaruOwO/pummit/bug?style=flat-square)
-
 ![image](https://user-images.githubusercontent.com/82384920/225959857-76495875-c426-4669-a8d4-372ebf3acfad.png)
-
-## なんだこれは
-
-このような綺麗な形のコミットメッセージを簡単に作成出来ます
-
-<img width="1441" alt="image" src="https://github.com/HidemaruOwO/pummit/assets/82384920/8461400a-94f6-431d-99d4-32ae74afe7fd">
 
 </div>
 
-- Select Language
+# pummit 🚛
 
-<table>
-  <thead>
-    <tr>
-      <th style="text-align:center"><a href="README.md">🎌日本語</a></th>
-      <th style="text-align:center"><a href="README.en.md">🤡English</a></th>
-      <th style="text-align:center"><a href="README.zh-CN.md">🐉简体中文</a></th>
-      <th style="text-align:center"><a href="README.zh-TW.md">🍜繁体中文</a></th>
-      <th style="text-align:center"><a href="README.ko.md">🌸한국어</a></th>
-    </tr>
-  </thead>
-</table>
+Make the commit message more beautiful in CLI 🎨
 
-## 使い方 💨
+<details>
+  <summary>See commit messages by pummit</summary>
+  <img src="docs/assets/commit.png" alt="pummit commit" />
+</details>
 
-pummitは２つの方法で使用することができます
+## 🚀 Features
+
+- Beautiful commit message
+- Emoji alias
+- Lazygit support (option)
+
+## 🛠 Installation
+
+```bash
+go install github.com/HidemaruOwO/pummit@latest
+```
+
+- macOS or linuxbrew user
+
+```bash
+brew tap hidemaruowo/tap
+brew update
+brew install pummit
+```
+
+- others
+
+You can download pummit from builded binary.
+
+```bash
+# ~/Downloads
+
+tar xzvf pummit**.tar.gz
+sudo mv pummit /usr/local/bin
+```
+
+https://github.com/HidemaruOwO/pummit/releases
+
+### 🏗 Build from Source
+
+```bash
+git clone https://github.com/HidemaruOwO/pummit.git
+cd pummit
+go build -ldflags="-s -w" -trimpath main.go
+
+mv main pummit
+```
+
+<!-- - Arch Linux -->
+
+<!-- ```sh -->
+<!-- git clone https://github.com/HidemaruOwO/MicroRepository.git -->
+<!-- cd MicroRepository -->
+
+<!-- makepkg -si -->
+<!-- ``` -->
+
+## 🎯 Usage
+
+You can use pummit in two different ways.
 
 ```bash
 pummit <emojiprefix> '<subject>'
@@ -50,48 +82,42 @@ pummit 'sparkles I am unko man'
 # Run: git commit -m ':sparkles: I am unko man (path/to/added/file, path/to/added/file)'
 ```
 
-## インストール 😊
+<details>
+    <summary>Learn emoji prefixes</summary>
 
-Homebrewで配布してます。
+    # ==================== Emojis ====================
+    # 🎉  :tada: 初めてのコミット（Initial Commit）
+    # ♻️   :recycle: マージ(Merge)
+    # 🔖  :bookmark: バージョンタグ（Version Tag）
+    # ✨  :sparkles: 新機能（New Feature）
+    # 🐛  :bug: バグ修正（Bagfix）
+    # 👀  :eyes: リファクタリング(Refactoring)
+    # 📚  :books: ドキュメント（Documentation）
+    # 🎨  :art: デザインUI/UX(Accessibility)
+    # 🐎  :horse: パフォーマンス（Performance）
+    # 🔧  :wrench: ツール（Tooling）
+    # 🚨  :rotating_light: テスト（Tests）
+    # 💩  :hankey: 非推奨追加（Deprecation）
+    # 🗑️  :wastebasket: 削除（Removal）
+    # 🚧  :construction: WIP(Work In Progress)
+    # ☃️  :snowman: 仕様変更
 
-```bash
-brew tap hidemaruowo/tap
-brew update
-brew install pummit
-```
+    # ==================== Format ====================
+    # :emoji: Subject (Dir/AddedFile Dir/AddedFile)
+    #
+    # Commit body...
 
-Goがインストールされている場合はこちらを実行してください。
+</details>
 
-```bash
-go install github.com/HidemaruOwO/pummit@latest
-```
+## Dependencies 🪡
 
-https://github.com/HidemaruOwO/pummit/releases
-
-インストールされていない場合はReleaseから環境にあったファイルをダウンロードして、以下のコマンドを実行してください。
-
-```bash
-tar xzvf pummit**.tar.gz
-sudo mv pummit /usr/local/bin
-```
-
-## ビルド 🔨
-
-```bash
-git clone https://github.com/HidemaruOwO/pummit.git
-cd pummit
-go build main.go
-```
-
-## 依存関係 🪡
-
-pummitを使うには以下のコマンドをパスに登録してください
+To use pummit, please register the following command in your path
 
 - git
 
-## lazygitで使うには 🔍
+## To use with lazygit 🔍
 
-以下のキーバインドを`.config/lazygit/config.yml`に設定してください
+If you want to use pummit with lazygit, you should add the following key bindings to `.config/lazygit/config.yml`.
 
 ```yaml
 customCommands:
@@ -105,188 +131,35 @@ customCommands:
     description: "commit changes(Custom Command)"
 ```
 
-### 絵文字プレフィックスのサンプル 🌟
+## 🌍 For contributer
 
-```
-# ==================== Emojis ====================
-# 🎉  :tada: 初めてのコミット（Initial Commit）
-# ♻️   :recycle: マージ(Merge)
-# 🔖  :bookmark: バージョンタグ（Version Tag）
-# ✨  :sparkles: 新機能（New Feature）
-# 🐛  :bug: バグ修正（Bagfix）
-# 👀  :eyes: リファクタリング(Refactoring)
-# 📚  :books: ドキュメント（Documentation）
-# 🎨  :art: デザインUI/UX(Accessibility)
-# 🐎  :horse: パフォーマンス（Performance）
-# 🔧  :wrench: ツール（Tooling）
-# 🚨  :rotating_light: テスト（Tests）
-# 💩  :hankey: 非推奨追加（Deprecation）
-# 🗑️  :wastebasket: 削除（Removal）
-# 🚧  :construction: WIP(Work In Progress)
-# ☃️  :snowman: 仕様変更
+By contributing to this project, you agree to the following terms:
 
-# ==================== Format ====================
-# :emoji: Subject (Dir/AddedFile Dir/AddedFile)
-#
-# Commit body...
-```
+1. **You grant a license**: You grant the project owner a perpetual, worldwide, non-exclusive, royalty-free, irrevocable license to use, modify, distribute, and sublicense your contributions under the **Apache License 2.0**.
+2. **You retain ownership**: You still own the copyright of your contribution, but you waive any claims against the project related to your contribution.
+3. **No additional patent rights**: You **do not** grant additional patent rights beyond what is covered by Apache 2.0.
+4. **Your contributions are original**: You confirm that your contributions do not violate any third-party rights.
 
-## エイリアス機能について 📎
+By submitting a pull request, you agree to these terms.
 
-例えば`wastebasket`を入力するのは少し大変ですが、エイリアス機能を使うと`wb`で簡単に入力できるようになります。
+## 📜 License
 
-```bash
-$ pummit wb モジュールの削除
-# Result: :wastebasket: モジュールの削除 (path/to/added/file)
-```
+<div align="left" style="flex: inline" >
+<a href="https://www.apache.org/licenses/LICENSE-2.0" >
+<img src="https://img.shields.io/badge/License-Apache%20License%202.0-blue.svg" alt="Apache License 2.0"
+</a>
+<a href="https://github.com/MakeNowJust/sushi-ware" >
+<img src="https://img.shields.io/badge/License-SUSHI--WARE%20%F0%9F%8D%A3-blue.svg" alt="SUSHI-WARE LICENSE"
+</a>
+</div>
 
-デフォルトで設定されているエイリアスは以下の通りです。
+This project is dual-licensed under [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0) and [SUSHI-WARE LICENSE](https://github.com/MakeNowJust/sushi-ware).
 
-```
- 📎 There is aliases
-Alias : Prefix : Emoji
-----------------------
-  sm : snowman : ☃️
-  h : horse : 🐎
-  w : wrench : 🔧
-  l : rotating_light : 🚨
-  p : hankey : 💩
-  wb : wastebasket : 🗑️
-  c : construction : 🚧
-  r : recycle : ♻️
-  s : sparkles : ✨
-  t : tada : 🎉
-  e : eyes : 👀
-  b : bug : 🐛
-  d : books : 📚
-  a : art : 🎨
-```
+A reference to the latest license should be used, even if the attached license is outdated of major versions.
 
-### Add command
+## 🤝 Reference
 
-このコマンドはエイリアスを追加することが出来ます。
+This repository was created using the [MicroRepository](https://github.com/HidemaruOwO/MicroRepository) template.
 
-```bash
-$ pummit alias add 's' 'sparkles'
-```
-
-この場合では`s`というエイリアスを入力するだけでコミットメッセージのEmoji prefixに`sparkles`を代入できるようになります。
-
-```bash
-$ pummit s 新機能の追加
-# Run: git commit -m ':sparkles: 新機能の追加 (path/to/added/file)'
-```
-
-### Delete command
-
-このコマンドはエイリアスを削除することが出来ます。
-
-```bash
-$ pummit alias delete s
-```
-
-この場合では、`s=spakles`というエイリアスが登録されている前提でこのコマンドを実行した場合`s`と`sparkles`の関連付けがなくなるため、以下のコマンドを実行してもEmoji prefixには`s`しか代入されません。
-
-```bash
-$ pummit s 新機能の追加
-# Run: git commmit -m ':s: 新機能の追加 (path/to/added/file)'
-```
-
-また引数に削除したいエイリアスを複数指定することが出来ます。
-
-```bash
-$ pummit alias delete s sm c h
-```
-
-### Delete --all command
-
-このコマンドは登録されているエイリアスを全て削除します。
-
-```bash
-$ pummit alias delete --all
-```
-
-### List command
-
-このコマンドは登録されているエイリアスを全て表示します。
-
-```bash
-$ pummit alias list
-```
-
-もし、エイリアスに`s=sparkles`と`t=tada`が登録されている場合は以下のように出力されます。
-
-```bash
-📎 There is aliases
-Alias : Prefix : Emoji
-  s : sparkles : ✨
-  t : tada : 🎉
-```
-
-### Reset command
-
-このコマンドをエイリアスをリセットします。
-
-```bash
-$ pummit alias reset
-```
-
-もし、エイリアスがこのように沢山あって混乱するほどあったり、`config.json`を直接弄ってバグらせてしまったときのリカバリとして使うことが出来ます。
-
-```bash
-$ pummit alias list
- 📎 There is aliases
-Alias : Prefix : Emoji
-----------------------
-  hjjciiiisadsadasda : sparkles : ✨
-  w : wrench : 🔧
-  s : sparkles : ✨
-  l : rotating_light : 🚨
-  p : hankey : 💩
-  wb : wastebasket : 🗑️
-  c : construction : 🚧
-  sm : snowman : ☃️
-  hj : sparkles : ✨
-  hjjjksda : sparkles : ✨
-  hjjca : sparkles : ✨
-  hjjciiiia : sparkles : ✨
-  a : art : 🎨
-  h : horse : 🐎
-  r : recycle : ♻️
-  t : tada : 🎉
-  b : bug : 🐛
-  e : eyes : 👀
-  d : books : 📚
-```
-
-このようにエイリアスが混乱するほどある場合でも
-
-```bash
-$ pummit alias reset
-> May I reset the aliases? :(Y/n) y
-[INFO] Alias reseted
-
- 📎 There is aliases
-Alias : Prefix : Emoji
-----------------------
-  sm : snowman : ☃️
-  h : horse : 🐎
-  w : wrench : 🔧
-  l : rotating_light : 🚨
-  p : hankey : 💩
-  wb : wastebasket : 🗑️
-  c : construction : 🚧
-  r : recycle : ♻️
-  s : sparkles : ✨
-  t : tada : 🎉
-  e : eyes : 👀
-  b : bug : 🐛
-  d : books : 📚
-  a : art : 🎨
-```
-
-コマンド一つでこのような綺麗な状態に戻せます。
-
-## スペシャルサンクス ✨
-
-- [Qiita - GitHubのコミットメッセージに絵文字を入れて開発効率をあげる](https://qiita.com/Jung0/items/0a9a7a97a2c17f92d3c5)
+- [HidemaruOwO/MicroRepository](https://github.com/HidemaruOwO/MicroRepository)
+- [Qiita - Add emojis to GitHub commit messages to improve development efficiency](https://qiita.com/Jung0/items/0a9a7a97a2c17f92d3c5)
