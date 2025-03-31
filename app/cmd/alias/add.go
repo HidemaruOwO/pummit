@@ -6,7 +6,7 @@ import (
 	"sync"
 
 	"github.com/HidemaruOwO/nuts/log"
-	"github.com/HidemaruOwO/pummit/src/lib"
+	"github.com/HidemaruOwO/pummit/app/lib"
 )
 
 func AliasAddCmd(alias string, prefix string) {

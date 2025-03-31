@@ -1,4 +1,4 @@
-package src
+package app
 
 import (
 	"fmt"
@@ -7,10 +7,10 @@ import (
 	// "strconv"
 
 	// "github.com/HidemaruOwO/nuts/log"
-	"github.com/HidemaruOwO/pummit/src/cmd"
-	alias_cmd "github.com/HidemaruOwO/pummit/src/cmd/alias"
-	"github.com/HidemaruOwO/pummit/src/config"
-	"github.com/HidemaruOwO/pummit/src/lib"
+	"github.com/HidemaruOwO/pummit/app/cmd"
+	alias_cmd "github.com/HidemaruOwO/pummit/app/cmd/alias"
+	"github.com/HidemaruOwO/pummit/app/config"
+	"github.com/HidemaruOwO/pummit/app/lib"
 	"github.com/urfave/cli/v2"
 )
 

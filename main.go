@@ -1,7 +1,7 @@
 package main
 
-import "github.com/HidemaruOwO/pummit/src"
+import "github.com/HidemaruOwO/pummit/app"
 
 func main() {
-	src.Fire()
+	app.Fire()
 }

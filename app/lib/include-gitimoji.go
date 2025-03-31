@@ -2,7 +2,7 @@ package lib
 
 import (
 	"github.com/HidemaruOwO/nuts/log"
-	"github.com/HidemaruOwO/pummit/src/config"
+	"github.com/HidemaruOwO/pummit/app/config"
 	"sync"
 )
 

@@ -8,8 +8,8 @@ import (
 	"strings"
 
 	"github.com/HidemaruOwO/nuts/log"
-	"github.com/HidemaruOwO/pummit/src/config"
-	"github.com/HidemaruOwO/pummit/src/lib"
+	"github.com/HidemaruOwO/pummit/app/config"
+	"github.com/HidemaruOwO/pummit/app/lib"
 	"github.com/fatih/color"
 )
 

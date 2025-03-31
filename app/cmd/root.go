@@ -8,8 +8,8 @@ import (
 	"sync"
 
 	"github.com/HidemaruOwO/nuts/log"
-	"github.com/HidemaruOwO/pummit/src/config"
-	"github.com/HidemaruOwO/pummit/src/lib"
+	"github.com/HidemaruOwO/pummit/app/config"
+	"github.com/HidemaruOwO/pummit/app/lib"
 )
 
 func RootCmd(prefix string, subject string) {

@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"github.com/HidemaruOwO/pummit/src/config"
+	"github.com/HidemaruOwO/pummit/app/config"
 	//  "github.com/fatih/color"
 	"fmt"
 )
