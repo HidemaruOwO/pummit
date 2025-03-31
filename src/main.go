@@ -14,7 +14,7 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-func AppEntry() {
+func Fire() {
 	lib.Init(lib.PlatformPath("pummit"))
 
 	app := &cli.App{
