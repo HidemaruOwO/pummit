@@ -87,7 +87,7 @@ pummit 'sparkles I am unko man'
 
     # ==================== Emojis ====================
     # 🎉  :tada: 初めてのコミット（Initial Commit）
-    # ♻️   :recycle: マージ(Merge)
+    # ♻️  :recycle: マージ(Merge)
     # 🔖  :bookmark: バージョンタグ（Version Tag）
     # ✨  :sparkles: 新機能（New Feature）
     # 🐛  :bug: バグ修正（Bagfix）
