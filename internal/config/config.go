@@ -29,8 +29,8 @@ func Init() error {
 		return err
 	}
 
-	// load default config
-	json.Unmarshal(variable.DEFAULT_CONFIG, &DefaultConfig)
+	// デフォルトの値を読み込む
+	json.Unmarshal([]byte(variable.DEFAULT_CONFIG), &DefaultConfig)
 
 	configDir := filepath.Join(home, ".config", "pummit")
 	if err := os.MkdirAll(configDir, 0755); err != nil {
@@ -45,6 +45,7 @@ func Init() error {
 // コンフィグを読み込む
 func Load() error {
 	if _, err := os.Stat(ConfigPath); os.IsNotExist(err) {
+		// CurrentConfigにDefaultConfigを代入
 		CurrentConfig = DefaultConfig
 		return Save() // ファイルが存在しない場合は新規作成
 	}
