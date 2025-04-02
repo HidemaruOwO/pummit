@@ -53,11 +53,7 @@ jobs:
           go-version-file: "go.mod"
         #
       - name: Build
-        run: go build -ldflags="-s -w" -trimpath main.go
-        shell: bash
-
-      - name: Rename file
-        run: mv main pummit && ls
+        run: go build -ldflags="-s -w" -trimpath ./cmd/pummit
         shell: bash
 
       - name: Artifact
