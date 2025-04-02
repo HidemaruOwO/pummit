@@ -10,7 +10,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// ListCmd はエイリアス一覧表示コマンドです
 var ListCmd = &cobra.Command{
 	Use:   "alias:list",
 	Short: "Show the list of aliases that have been set",
@@ -25,20 +24,18 @@ var ListCmd = &cobra.Command{
 			return nil
 		}
 
-		// キーでソートして順序を一定に
+		// ソート
 		keys := make([]string, 0, len(aliases))
 		for k := range aliases {
 			keys = append(keys, k)
 		}
 		sort.Strings(keys)
 
-		// ヘッダー
 		bold := color.New(color.Bold).SprintFunc()
 		fmt.Printf("%s\t%s\n", bold("Alias"), bold("Emoji"))
 		// fmt.Printf("%s\t%s\n", bold("エイリアス"), bold("絵文字"))
 		fmt.Println("----------------------")
 
-		// エイリアス一覧
 		for _, k := range keys {
 			fmt.Printf("%s\t%s\n", k, aliases[k])
 		}

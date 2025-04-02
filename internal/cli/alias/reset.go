@@ -6,7 +6,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// ResetCmd はエイリアスリセットコマンドです
 var ResetCmd = &cobra.Command{
 	Use:   "alias:reset",
 	Short: "Reset all alias settings",

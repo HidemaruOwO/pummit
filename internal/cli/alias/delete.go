@@ -6,7 +6,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// DeleteCmd はエイリアス削除コマンドです
 var DeleteCmd = &cobra.Command{
 	Use:   "alias:delete [name]",
 	Short: "Delete the specified alias",

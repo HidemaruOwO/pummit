@@ -6,7 +6,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// AddCmd はエイリアス追加コマンドです
 var AddCmd = &cobra.Command{
 	Use:   "alias:add [name] [emoji]",
 	Short: "Add a new alias",
