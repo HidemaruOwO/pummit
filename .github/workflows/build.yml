@@ -1,4 +1,4 @@
-name: "Artifact"
+name: "Build Artifacts"
 on:
   push:
 
@@ -10,23 +10,10 @@ permissions:
 
 jobs:
   release:
-    name: Release
-    # runs-on: ubuntu-latest
-
-    # Multi platform support
+    name: Build
     strategy:
       matrix:
-        target:
-          - x86_64-unknown-linux-musl
-          - x86_64-pc-windows-msvc
-          - x86_64-apple-darwin
-        include:
-          - target: x86_64-unknown-linux-musl
-            os: ubuntu-latest
-          - target: x86_64-pc-windows-msvc
-            os: windows-latest
-          - target: x86_64-apple-darwin
-            os: macos-latest
+        os: [ubuntu-latest, windows-latest, macos-latest]
       fail-fast: false
 
     runs-on: ${{ matrix.os }}
@@ -39,25 +26,57 @@ jobs:
           contexts: test-status
           authToken: ${{ secrets.GITHUB_TOKEN }}
           timeout: 30
+
       - name: Check Test Result
         if: steps.test_result.outputs.result != 'success'
         run: |
-          echo "feiled ${{ steps.test_result.outputs.failedCheckNames }}"
+          echo "failed ${{ steps.test_result.outputs.failedCheckNames }}"
           echo "status ${{ steps.test_result.outputs.failedCheckStates }}"
           exit 1
+
       - name: Checkout Sources
         uses: actions/checkout@v4
-      - name: Setup
+
+      - name: Setup Go
         uses: actions/setup-go@v4
         with:
           go-version-file: "go.mod"
-        #
-      - name: Build
-        run: go build -ldflags="-s -w" -trimpath ./cmd/pummit
+
+      - name: Set OS-specific vars
+        id: vars
+        shell: bash
+        run: |
+          if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
+            echo "extension=.exe" >> $GITHUB_OUTPUT
+            echo "GOOS=windows" >> $GITHUB_OUTPUT
+          elif [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
+            echo "extension=" >> $GITHUB_OUTPUT
+            echo "GOOS=linux" >> $GITHUB_OUTPUT
+          else
+            echo "extension=" >> $GITHUB_OUTPUT
+            echo "GOOS=darwin" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Build AMD64
+        run: |
+          GOOS=${{ steps.vars.outputs.GOOS }} GOARCH=amd64 go build -ldflags="-s -w" -trimpath -o pummit-${{ steps.vars.outputs.GOOS }}-amd64${{ steps.vars.outputs.extension }} ./cmd/pummit
         shell: bash
 
-      - name: Artifact
-        uses: actions/upload-artifact@v3
+      - name: Build ARM64
+        run: |
+          GOOS=${{ steps.vars.outputs.GOOS }} GOARCH=arm64 go build -ldflags="-s -w" -trimpath -o pummit-${{ steps.vars.outputs.GOOS }}-arm64${{ steps.vars.outputs.extension }} ./cmd/pummit
+        shell: bash
+
+      - name: Upload AMD64 Artifact
+        uses: actions/upload-artifact@v4
         with:
-          name: pummit_${{ matrix.target }}
-          path: pummit*
+          name: pummit_${{ steps.vars.outputs.GOOS }}_amd64
+          path: pummit-${{ steps.vars.outputs.GOOS }}-amd64${{ steps.vars.outputs.extension }}
+          retention-days: 7
+
+      - name: Upload ARM64 Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: pummit_${{ steps.vars.outputs.GOOS }}_arm64
+          path: pummit-${{ steps.vars.outputs.GOOS }}-arm64${{ steps.vars.outputs.extension }}
+          retention-days: 7
