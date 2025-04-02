@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+
+	"github.com/HidemaruOwO/pummit/internal/variable"
 )
 
 type Config struct {
@@ -14,11 +16,6 @@ type Config struct {
 	FilesLength    int        `json:"limitPathesLength"`
 	Aliases        [][]string `json:"alias"`
 }
-
-// TODO variables/consts.go に移動させる
-//
-//go:embed config.json
-var DEFAULT_CONFIG []byte
 
 var (
 	DefaultConfig = Config{}
@@ -33,7 +30,7 @@ func Init() error {
 	}
 
 	// load default config
-	json.Unmarshal(DEFAULT_CONFIG, &DefaultConfig)
+	json.Unmarshal(variable.DEFAULT_CONFIG, &DefaultConfig)
 
 	configDir := filepath.Join(home, ".config", "pummit")
 	if err := os.MkdirAll(configDir, 0755); err != nil {
