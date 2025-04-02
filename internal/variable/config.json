@@ -9,7 +9,6 @@
     ["t,new,init", "tada", "🎉"],
     ["r,pr,pull,merge", "recycle", "♻️"],
     ["wb,rm,remove,del,delete", "wastebasket", "🗑️"],
-    ["p,pack,mod,module", "package", "📦️"]
     ["b,fix,error", "bug", "🐛"],
     ["e,lint,format,refactor", "eyes", "👀"],
     ["d,doc,docs,document,documents", "books", "📚"],
@@ -18,5 +17,6 @@
     ["w,change,tool,tools,lib,library", "wrench", "🔧"],
     ["l,test,testing", "rotating_light", "🚨"],
     ["sm,special,important", "snowman", "☃️"],
+    ["p,pack,mod,module", "package", "📦️"]
   ]
 }
