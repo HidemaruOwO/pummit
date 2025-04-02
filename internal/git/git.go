@@ -31,7 +31,18 @@ func Commit(cm CommitMessage) error {
 	// 参考: app/cmd/root.go:76
 	// cm.EmojiをUseRawEmojiに従ってプレフィックスから絵文字に置き換える
 	if config.CurrentConfig.UseRawEmoji {
+		// TODO エイリアスの絵文字ハンドラに新しいエイリアスの形に対応させる ("s,feat,feature", "sparkles", "✨")
+		// エイリアスを取得して、エイリアスにあるかとそのエイリアスの絵文字を返す関数を実装する
+		// 例: found, emoji := alias.GetEmoji(cm.Emoji)
+		// bool, emoji symbol
 
+		// とりあえずの条件分岐
+		if cm.Emoji == "ALIAS" {
+			// エイリアスの絵文字を取得
+			cm.Emoji = "EMOJI"
+		} else {
+			cm.Emoji = fmt.Sprintf(":%s:", cm.Emoji)
+		}
 	}
 
 	// 変更済みのファイルを取得
