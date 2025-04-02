@@ -2,56 +2,66 @@ package alias
 
 import (
 	"errors"
-
 	"github.com/HidemaruOwO/pummit/internal/config"
 )
 
-// エラー定義
+type Alias struct {
+	Name  string
+	Emoji string
+}
+
 var (
 	ErrAliasExists   = errors.New("alias already exists")
 	ErrAliasNotFound = errors.New("alias not found")
 )
 
-// Add はエイリアスを追加します
+// 指定されたエイリアスのインデックスを返す
+func findAlias(name string) (int, bool) {
+	for i, a := range config.CurrentConfig.Aliases {
+		if a[0] == name {
+			return i, true
+		}
+	}
+	return -1, false
+}
+
 func Add(name, emoji string) error {
-	// 既に存在するか確認
-	if _, exists := config.CurrentConfig.Aliases[name]; exists {
+	if _, exists := findAlias(name); exists {
 		return ErrAliasExists
 	}
-
-	// エイリアスを追加して保存
-	config.CurrentConfig.Aliases[name] = emoji
+	config.CurrentConfig.Aliases = append(config.CurrentConfig.Aliases, []string{name, emoji})
 	return config.Save()
 }
 
-// Delete はエイリアスを削除します
 func Delete(name string) error {
-	// エイリアスが存在するか確認
-	if _, exists := config.CurrentConfig.Aliases[name]; !exists {
+	idx, exists := findAlias(name)
+	if !exists {
 		return ErrAliasNotFound
 	}
 
-	// 削除して保存
-	delete(config.CurrentConfig.Aliases, name)
+	last := len(config.CurrentConfig.Aliases) - 1
+	config.CurrentConfig.Aliases[idx] = config.CurrentConfig.Aliases[last]
+	config.CurrentConfig.Aliases = config.CurrentConfig.Aliases[:last]
+
 	return config.Save()
 }
 
-// Get はエイリアスに関連付けられた絵文字を取得します
 func Get(name string) (string, error) {
-	emoji, exists := config.CurrentConfig.Aliases[name]
-	if !exists {
-		return "", ErrAliasNotFound
+	if idx, exists := findAlias(name); exists {
+		return config.CurrentConfig.Aliases[idx][1], nil
 	}
-	return emoji, nil
+	return "", ErrAliasNotFound
 }
 
-// List は全てのエイリアスのリストを返します
 func List() map[string]string {
-	return config.CurrentConfig.Aliases
+	aliases := make(map[string]string, len(config.CurrentConfig.Aliases))
+	for _, a := range config.CurrentConfig.Aliases {
+		aliases[a[0]] = a[1]
+	}
+	return aliases
 }
 
-// Reset は全てのエイリアスをリセットします
 func Reset() error {
-	config.CurrentConfig.Aliases = make(map[string]string)
+	config.CurrentConfig.Aliases = make([][]string, 0)
 	return config.Save()
 }
