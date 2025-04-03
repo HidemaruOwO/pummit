@@ -2,6 +2,7 @@ package cli
 
 import (
 	"fmt"
+	"os"
 	"runtime"
 
 	"github.com/HidemaruOwO/pummit/internal/cli/alias"
@@ -21,6 +22,13 @@ var rootCmd = &cobra.Command{
 	// https://github.com/HidemaruOwO/pummit`,
 	Long: fmt.Sprintf(`pummit v%s %s
   Make the commit message more beautiful in CLI 🎨`, variable.VERSION, runtime.GOARCH),
+	Run: func(cmd *cobra.Command, args []string) {
+		if version {
+			versionCmd.Run(cmd, args)
+			os.Exit(0)
+		}
+		// fmt.Println("pummit is a tool that helps create consistent git commit messages using emojis and formatters.")
+	},
 }
 
 func Execute() error {
@@ -29,10 +37,7 @@ func Execute() error {
 		return err
 	}
 
-	// --versionの時にverionCmdを実行したい
-	// fmt.Println(version)
-
-	// rootCmd.PersistentFlags().BoolVarP(&version, "version", "v", false, "Show the version of pummit")
+	rootCmd.PersistentFlags().BoolVarP(&version, "version", "v", false, "Show the version of pummit")
 
 	rootCmd.AddCommand(versionCmd)
 	rootCmd.AddCommand(alias.AddCmd)
