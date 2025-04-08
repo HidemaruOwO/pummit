@@ -23,7 +23,6 @@ func IsGitRepository() bool {
 	return err == nil
 }
 
-// TODO これをroot.goで実行するように実装する。
 // コミットを作成
 func Commit(cm CommitMessage) error {
 	log := logger.New()
@@ -36,14 +35,30 @@ func Commit(cm CommitMessage) error {
 	}
 
 	// 絵文字エイリアス実装
-	if config.CurrentConfig.UseRawEmoji {
+	if config.CurrentConfig.UseAlias {
 		found, emoji := alias.GetEmoji(cm.Emoji)
+		if config.CurrentConfig.UseRawEmoji {
 
-		if found {
-			cm.Emoji = emoji
+			if found {
+				cm.Emoji = emoji
+			} else {
+				// エイリアスが見つからない場合はそのまま
+				cm.Emoji = fmt.Sprintf(":%s:", cm.Emoji)
+			}
 		} else {
-			cm.Emoji = fmt.Sprintf(":%s:", cm.Emoji)
+			// TODO
+			// この場合はエイリアスを使用するが絵文字には変換しない場合なのでalias.findAlias関数にemoji prefixを返すようにも実装してあげるようにする必要がある
+			// (e.g) found, emoji, prefix := alias.GetEmoji(cm.Emoji)
+			if found {
+				cm.Emoji = emoji
+			} else {
+				// エイリアスが見つからない場合はそのまま
+				cm.Emoji = fmt.Sprintf(":%s:", cm.Emoji)
+			}
 		}
+	} else {
+		// エイリアスを使用しない場合はそのまま
+		cm.Emoji = fmt.Sprintf(":%s:", cm.Emoji)
 	}
 
 	// コミットメッセージが長くなりすぎないようにするため
