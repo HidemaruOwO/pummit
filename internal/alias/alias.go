@@ -159,6 +159,6 @@ func List() map[string]string {
 }
 
 func Reset() error {
-	config.CurrentConfig.Aliases = make([][]string, 0)
+	config.CurrentConfig.Aliases = config.DefaultConfig.Aliases
 	return config.Save()
 }
