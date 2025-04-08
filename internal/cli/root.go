@@ -4,9 +4,11 @@ import (
 	"fmt"
 	"os"
 	"runtime"
+	"strings"
 
 	"github.com/HidemaruOwO/pummit/internal/cli/alias"
 	"github.com/HidemaruOwO/pummit/internal/config"
+	"github.com/HidemaruOwO/pummit/internal/git"
 	"github.com/HidemaruOwO/pummit/internal/variable"
 	"github.com/spf13/cobra"
 )
@@ -16,7 +18,7 @@ var (
 )
 
 var rootCmd = &cobra.Command{
-	Use:   "pummit",
+	Use:   "pummit [emoji] [message...]",
 	Short: "Make the commit message more beautiful in CLI 🎨",
 	// Long: `pummit is a tool that helps create consistent git commit messages using emojis and formatters. For detailed documentation, please refer to:
 	// https://github.com/HidemaruOwO/pummit`,
@@ -27,8 +29,20 @@ var rootCmd = &cobra.Command{
 			versionCmd.Run(cmd, args)
 			os.Exit(0)
 		}
-		// fmt.Println("pummit is a tool that helps create consistent git commit messages using emojis and formatters.")
+
+		if len(args) < 2 {
+			cmd.Help()
+			os.Exit(0)
+		}
+
+		cm := git.CommitMessage{
+			Emoji:   args[0],
+			Message: strings.Join(args[1:], " "),
+		}
+
+		git.Commit(cm)
 	},
+	Args: cobra.ArbitraryArgs,
 }
 
 func Execute() error {
