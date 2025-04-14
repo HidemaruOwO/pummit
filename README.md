@@ -126,9 +126,9 @@ customCommands:
       - type: "input"
         title: "Commit message"
         initialValue: ""
-    command: "pummit '{{index .PromptResponses 0}}'"
+    command: "pummit {{index .PromptResponses 0}}"
     context: "files"
-    description: "commit changes(Custom Command)"
+    description: "Commit with pummit"
 ```
 
 ## 🌍 For contributer
