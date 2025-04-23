@@ -1,7 +1,17 @@
 package main
 
-import "github.com/HidemaruOwO/pummit/app"
+import (
+	"os"
+
+	"github.com/HidemaruOwO/pummit/internal/cli"
+	"github.com/HidemaruOwO/pummit/pkg/logger"
+)
 
 func main() {
-	app.Fire()
+	log := logger.New()
+
+	if err := cli.Execute(); err != nil {
+		log.Error(err.Error())
+		os.Exit(1)
+	}
 }
