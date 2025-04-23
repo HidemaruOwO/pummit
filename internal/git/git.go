@@ -35,30 +35,33 @@ func Commit(cm CommitMessage) error {
 	}
 
 	// 絵文字エイリアス実装
+	found, emoji := alias.GetEmoji(cm.Emoji)
 	if config.CurrentConfig.UseAlias {
-		found, emoji := alias.GetEmoji(cm.Emoji)
-		if config.CurrentConfig.UseRawEmoji {
-
-			if found {
-				cm.Emoji = emoji
-			} else {
-				// エイリアスが見つからない場合はそのまま
-				cm.Emoji = fmt.Sprintf(":%s:", cm.Emoji)
-			}
+		if found {
+			// 55行目のTODOを実装したらここはemojiがprefixになる
+			// cm.Emoji = fmt.Sprintf(":%s:", prefix)
+			cm.Emoji = emoji
 		} else {
-			// TODO
-			// この場合はエイリアスを使用するが絵文字には変換しない場合なのでalias.findAlias関数にemoji prefixを返すようにも実装してあげるようにする必要がある
-			// (e.g) found, emoji, prefix := alias.GetEmoji(cm.Emoji)
-			if found {
-				cm.Emoji = emoji
-			} else {
-				// エイリアスが見つからない場合はそのまま
-				cm.Emoji = fmt.Sprintf(":%s:", cm.Emoji)
-			}
+			// エイリアスが見つからない場合はそのまま
+			cm.Emoji = fmt.Sprintf(":%s:", cm.Emoji)
 		}
+
 	} else {
-		// エイリアスを使用しない場合はそのまま
+		// エイリアスが見つからない場合は"::"で括る
 		cm.Emoji = fmt.Sprintf(":%s:", cm.Emoji)
+	}
+
+	if config.CurrentConfig.UseRawEmoji {
+		// TODO
+		// 絵文字には変換しない場合なのでalias.findAlias関数にemoji prefixを返すようにも実装してあげるようにする必要がある
+		// (e.g) found, emoji, prefix := alias.GetEmoji(cm.Emoji)
+
+		if found {
+			cm.Emoji = emoji
+		} else {
+			// エイリアスが見つからない場合はそのまま
+			cm.Emoji = fmt.Sprintf(":%s:", cm.Emoji)
+		}
 	}
 
 	// コミットメッセージが長くなりすぎないようにするため
