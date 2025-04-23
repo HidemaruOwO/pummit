@@ -59,12 +59,12 @@ jobs:
 
       - name: Build AMD64
         run: |
-          GOOS=${{ steps.vars.outputs.GOOS }} GOARCH=amd64 go build -ldflags="-s -w" -trimpath -o pummit-${{ steps.vars.outputs.GOOS }}-amd64${{ steps.vars.outputs.extension }} ./cmd/pummit
+          GOOS=${{ steps.vars.outputs.GOOS }} GOARCH=amd64 go build -ldflags="-s -w" -trimpath -o pummit-${{ steps.vars.outputs.GOOS }}-amd64${{ steps.vars.outputs.extension }} ./main.go
         shell: bash
 
       - name: Build ARM64
         run: |
-          GOOS=${{ steps.vars.outputs.GOOS }} GOARCH=arm64 go build -ldflags="-s -w" -trimpath -o pummit-${{ steps.vars.outputs.GOOS }}-arm64${{ steps.vars.outputs.extension }} ./cmd/pummit
+          GOOS=${{ steps.vars.outputs.GOOS }} GOARCH=arm64 go build -ldflags="-s -w" -trimpath -o pummit-${{ steps.vars.outputs.GOOS }}-arm64${{ steps.vars.outputs.extension }} ./main.go
         shell: bash
 
       - name: Upload AMD64 Artifact
