@@ -7,7 +7,6 @@ import (
 	"time"
 )
 
-// Gitmoji は1つの絵文字エントリーを表す
 type Gitmoji struct {
 	Emoji       string `json:"emoji"`
 	Entity      string `json:"entity"`
@@ -16,12 +15,10 @@ type Gitmoji struct {
 	Name        string `json:"name"`
 }
 
-// GitmojiResponse はAPIレスポンスを表す
 type GitmojiResponse struct {
 	Gitmojis []Gitmoji `json:"gitmojis"`
 }
 
-// GetAllGitmojis は全てのgitmojiを取得します
 func GetAllGitmojis() ([]Gitmoji, error) {
 	client := &http.Client{
 		Timeout: 10 * time.Second,
@@ -45,7 +42,6 @@ func GetAllGitmojis() ([]Gitmoji, error) {
 	return response.Gitmojis, nil
 }
 
-// FindByCode は指定されたコードを持つGitmojiを検索します
 func FindByCode(code string, gitmojis []Gitmoji) (Gitmoji, bool) {
 	for _, gitmoji := range gitmojis {
 		if gitmoji.Code == code {
@@ -55,7 +51,6 @@ func FindByCode(code string, gitmojis []Gitmoji) (Gitmoji, bool) {
 	return Gitmoji{}, false
 }
 
-// FindByName は指定された名前を持つGitmojiを検索します
 func FindByName(name string, gitmojis []Gitmoji) (Gitmoji, bool) {
 	for _, gitmoji := range gitmojis {
 		if gitmoji.Name == name {
