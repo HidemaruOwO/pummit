@@ -8,6 +8,7 @@ import (
 
 	"github.com/HidemaruOwO/pummit/internal/alias"
 	"github.com/HidemaruOwO/pummit/internal/config"
+	"github.com/HidemaruOwO/pummit/internal/emojis"
 	"github.com/HidemaruOwO/pummit/pkg/logger"
 )
 
@@ -34,33 +35,22 @@ func Commit(cm CommitMessage) error {
 		os.Exit(1)
 	}
 
-	// 絵文字エイリアス実装
-	found, emoji := alias.GetEmoji(cm.Emoji)
-	if config.CurrentConfig.UseAlias {
-		if found {
-			// 55行目のTODOを実装したらここはemojiがprefixになる
-			// cm.Emoji = fmt.Sprintf(":%s:", prefix)
-			cm.Emoji = emoji
-		} else {
-			// エイリアスが見つからない場合はそのまま
-			cm.Emoji = fmt.Sprintf(":%s:", cm.Emoji)
-		}
-
-	} else {
-		// エイリアスが見つからない場合は"::"で括る
-		cm.Emoji = fmt.Sprintf(":%s:", cm.Emoji)
-	}
+	enteredEmoji := cm.Emoji
+	found, prefix, emoji := alias.GetEmoji(enteredEmoji)
 
 	if config.CurrentConfig.UseRawEmoji {
-		// TODO
-		// 絵文字には変換しない場合なのでalias.findAlias関数にemoji prefixを返すようにも実装してあげるようにする必要がある
-		// (e.g) found, emoji, prefix := alias.GetEmoji(cm.Emoji)
-
-		if found {
+		// :emoji: mode
+		if config.CurrentConfig.UseAlias && found {
 			cm.Emoji = emoji
 		} else {
-			// エイリアスが見つからない場合はそのまま
-			cm.Emoji = fmt.Sprintf(":%s:", cm.Emoji)
+			cm.Emoji = ConvertToEmoji(enteredEmoji)
+		}
+	} else {
+		// :name: mode
+		if config.CurrentConfig.UseAlias && found {
+			cm.Emoji = fmt.Sprintf(":%s:", prefix)
+		} else {
+			cm.Emoji = fmt.Sprintf(":%s:", enteredEmoji)
 		}
 	}
 
@@ -109,4 +99,12 @@ func GetBranch() (string, error) {
 	}
 
 	return strings.TrimSpace(string(output)), nil
+}
+
+func ConvertToEmoji(name string) string {
+	emoji, err := emojis.GetEmojiByName(name)
+	if err != nil {
+		return fmt.Sprintf(":%s:", emoji)
+	}
+	return emoji
 }

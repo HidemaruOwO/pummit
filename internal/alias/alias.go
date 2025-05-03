@@ -46,17 +46,15 @@ func findEmojiIndex(emoji string) (int, bool) {
 	return -1, false
 }
 
-func GetEmoji(name string) (bool, string) {
+// (e.g) found, prefix, emoji := alias.GetEmoji(cm.Emoji)
+func GetEmoji(name string) (bool, string, string) {
 	idx, exists := findAlias(name)
 	if !exists {
-		return false, ""
+		return false, "", ""
 	}
 
 	item := config.CurrentConfig.Aliases[idx]
-	if len(item) >= 3 {
-		return true, item[2]
-	}
-	return true, item[1]
+	return true, item[1], item[2]
 }
 
 func Add(name, emoji string) error {
