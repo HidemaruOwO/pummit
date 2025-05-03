@@ -5,7 +5,7 @@
 
 version: 2
 updates:
-  - package-ecosystem: "(Example: npm pip)" # とにかく代入可能な値を検索してください
+  - package-ecosystem: "gomod" # とにかく代入可能な値を検索してください
     # https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file#package-ecosystem
     directory: "/" # Location of package manifests
     schedule:
