@@ -2,8 +2,11 @@ package alias
 
 import (
 	"errors"
-	"github.com/HidemaruOwO/pummit/internal/config"
+	"fmt"
 	"strings"
+
+	"github.com/HidemaruOwO/pummit/internal/config"
+	"github.com/HidemaruOwO/pummit/internal/emojis"
 )
 
 type Alias struct {
@@ -34,12 +37,9 @@ func findAlias(name string) (int, bool) {
 	return -1, false
 }
 
-func findEmojiIndex(emoji string) (int, bool) {
+func findEmojiIndex(actualEmoji string) (int, bool) {
 	for i, a := range config.CurrentConfig.Aliases {
-		if len(a) >= 3 && a[2] == emoji {
-			return i, true
-		}
-		if len(a) == 2 && a[1] == emoji {
+		if len(a) == 3 && a[2] == actualEmoji {
 			return i, true
 		}
 	}
@@ -57,15 +57,29 @@ func GetEmoji(name string) (bool, string, string) {
 	return true, item[1], item[2]
 }
 
-func Add(name, emoji string) error {
+func Add(name, emojiName string) error {
 	if _, exists := findAlias(name); exists {
 		return ErrAliasExists
 	}
 
-	idx, exists := findEmojiIndex(emoji)
+	actualEmoji, err := emojis.GetEmojiByName(emojiName)
+	if err != nil {
+		return fmt.Errorf("failed to find emoji with name '%s': %w", emojiName, err)
+	}
+
+	idx, exists := findEmojiIndex(actualEmoji)
 
 	if exists {
 		item := config.CurrentConfig.Aliases[idx]
+
+		if len(item) != 3 {
+			return fmt.Errorf("inconsistent alias data format found for emoji '%s'", actualEmoji)
+		}
+
+		if item[1] != emojiName {
+			return fmt.Errorf("emoji '%s' already exists with a different prefix '%s', requested '%s'", actualEmoji, item[1], emojiName)
+		}
+
 		parts := strings.Split(item[0], ",")
 
 		for _, part := range parts {
@@ -77,13 +91,10 @@ func Add(name, emoji string) error {
 		parts = append(parts, name)
 		joined := strings.Join(parts, ",")
 
-		if len(item) >= 3 {
-			config.CurrentConfig.Aliases[idx] = []string{joined, item[1], item[2]}
-		} else {
-			config.CurrentConfig.Aliases[idx] = []string{joined, item[1]}
-		}
+		config.CurrentConfig.Aliases[idx] = []string{joined, emojiName, actualEmoji}
+
 	} else {
-		config.CurrentConfig.Aliases = append(config.CurrentConfig.Aliases, []string{name, emoji})
+		config.CurrentConfig.Aliases = append(config.CurrentConfig.Aliases, []string{name, emojiName, actualEmoji})
 	}
 
 	return config.Save()

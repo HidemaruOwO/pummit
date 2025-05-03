@@ -8,7 +8,7 @@ import (
 
 	"github.com/HidemaruOwO/pummit/internal/cli/alias"
 	"github.com/HidemaruOwO/pummit/internal/config"
-	"github.com/HidemaruOwO/pummit/internal/emojis"
+	// "github.com/HidemaruOwO/pummit/internal/emojis"
 	"github.com/HidemaruOwO/pummit/internal/git"
 	"github.com/HidemaruOwO/pummit/internal/variable"
 	"github.com/spf13/cobra"
