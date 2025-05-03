@@ -6,19 +6,23 @@ import (
 	"strings"
 
 	"github.com/HidemaruOwO/pummit/internal/config"
-	"github.com/HidemaruOwO/pummit/internal/emojis"
 )
 
+// Alias represents an emoji alias with its name, prefix, and the actual emoji.
 type Alias struct {
-	Name  string
-	Emoji string
+	Name   string
+	Prefix string
+	Emoji  string
 }
 
 var (
-	ErrAliasExists   = errors.New("alias already exists")
+	// ErrAliasExists is returned when trying to add an alias that already exists.
+	ErrAliasExists = errors.New("alias already exists")
+	// ErrAliasNotFound is returned when an alias cannot be found.
 	ErrAliasNotFound = errors.New("alias not found")
 )
 
+// findAlias searches for an alias by name and returns its index and existence.
 func findAlias(name string) (int, bool) {
 	for i, a := range config.CurrentConfig.Aliases {
 		if a[0] == name {
@@ -37,16 +41,18 @@ func findAlias(name string) (int, bool) {
 	return -1, false
 }
 
-func findEmojiIndex(actualEmoji string) (int, bool) {
+// findEmojiIndex searches for an alias by emoji and returns its index and existence.
+func findEmojiIndex(emoji string) (int, bool) {
 	for i, a := range config.CurrentConfig.Aliases {
-		if len(a) == 3 && a[2] == actualEmoji {
+		if len(a) == 3 && a[2] == emoji {
 			return i, true
 		}
 	}
 	return -1, false
 }
 
-// (e.g) found, prefix, emoji := alias.GetEmoji(cm.Emoji)
+// GetEmoji returns the prefix and emoji for a given alias name.
+// Returns (found, prefix, emoji) where found indicates if the alias exists.
 func GetEmoji(name string) (bool, string, string) {
 	idx, exists := findAlias(name)
 	if !exists {
@@ -54,30 +60,32 @@ func GetEmoji(name string) (bool, string, string) {
 	}
 
 	item := config.CurrentConfig.Aliases[idx]
-	return true, item[1], item[2]
+	if len(item) == 3 {
+		return true, item[1], item[2]
+	} else if len(item) == 2 {
+		return true, "", item[1]
+	}
+	return false, "", ""
 }
 
-func Add(name, emojiName string) error {
+// Add adds a new alias with the given name, prefix, and emoji.
+// If the alias already exists or the emoji is already registered with a different prefix,
+// it returns an error.
+func Add(name, prefix, emoji string) error {
 	if _, exists := findAlias(name); exists {
 		return ErrAliasExists
 	}
 
-	actualEmoji, err := emojis.GetEmojiByName(emojiName)
-	if err != nil {
-		return fmt.Errorf("failed to find emoji with name '%s': %w", emojiName, err)
-	}
-
-	idx, exists := findEmojiIndex(actualEmoji)
+	idx, exists := findEmojiIndex(emoji)
 
 	if exists {
 		item := config.CurrentConfig.Aliases[idx]
-
 		if len(item) != 3 {
-			return fmt.Errorf("inconsistent alias data format found for emoji '%s'", actualEmoji)
+			return fmt.Errorf("inconsistent alias data format found for emoji '%s'", emoji)
 		}
 
-		if item[1] != emojiName {
-			return fmt.Errorf("emoji '%s' already exists with a different prefix '%s', requested '%s'", actualEmoji, item[1], emojiName)
+		if item[1] != prefix {
+			return fmt.Errorf("emoji '%s' already exists with a different prefix '%s', requested '%s'", emoji, item[1], prefix)
 		}
 
 		parts := strings.Split(item[0], ",")
@@ -91,15 +99,16 @@ func Add(name, emojiName string) error {
 		parts = append(parts, name)
 		joined := strings.Join(parts, ",")
 
-		config.CurrentConfig.Aliases[idx] = []string{joined, emojiName, actualEmoji}
-
+		config.CurrentConfig.Aliases[idx] = []string{joined, prefix, emoji}
 	} else {
-		config.CurrentConfig.Aliases = append(config.CurrentConfig.Aliases, []string{name, emojiName, actualEmoji})
+		config.CurrentConfig.Aliases = append(config.CurrentConfig.Aliases, []string{name, prefix, emoji})
 	}
 
 	return config.Save()
 }
 
+// Delete removes an alias by name.
+// It returns ErrAliasNotFound if the alias doesn't exist.
 func Delete(name string) error {
 	idx, exists := findAlias(name)
 	if !exists {
@@ -108,33 +117,59 @@ func Delete(name string) error {
 
 	item := config.CurrentConfig.Aliases[idx]
 
-	if item[0] == name {
-		last := len(config.CurrentConfig.Aliases) - 1
-		config.CurrentConfig.Aliases[idx] = config.CurrentConfig.Aliases[last]
-		config.CurrentConfig.Aliases = config.CurrentConfig.Aliases[:last]
-		return config.Save()
-	}
-
-	parts := strings.Split(item[0], ",")
-	result := make([]string, 0, len(parts)-1)
-
-	for _, part := range parts {
-		if part != name {
-			result = append(result, part)
+	if len(item) == 3 {
+		if !strings.Contains(item[0], ",") {
+			last := len(config.CurrentConfig.Aliases) - 1
+			config.CurrentConfig.Aliases[idx] = config.CurrentConfig.Aliases[last]
+			config.CurrentConfig.Aliases = config.CurrentConfig.Aliases[:last]
+		} else {
+			parts := strings.Split(item[0], ",")
+			result := make([]string, 0, len(parts)-1)
+			found := false
+			for _, part := range parts {
+				if part != name {
+					result = append(result, part)
+				} else {
+					found = true
+				}
+			}
+			if !found {
+				return ErrAliasNotFound
+			}
+			joined := strings.Join(result, ",")
+			config.CurrentConfig.Aliases[idx] = []string{joined, item[1], item[2]}
 		}
-	}
-
-	joined := strings.Join(result, ",")
-
-	if len(item) >= 3 {
-		config.CurrentConfig.Aliases[idx] = []string{joined, item[1], item[2]}
+	} else if len(item) == 2 {
+		if !strings.Contains(item[0], ",") {
+			last := len(config.CurrentConfig.Aliases) - 1
+			config.CurrentConfig.Aliases[idx] = config.CurrentConfig.Aliases[last]
+			config.CurrentConfig.Aliases = config.CurrentConfig.Aliases[:last]
+		} else {
+			parts := strings.Split(item[0], ",")
+			result := make([]string, 0, len(parts)-1)
+			found := false
+			for _, part := range parts {
+				if part != name {
+					result = append(result, part)
+				} else {
+					found = true
+				}
+			}
+			if !found {
+				return ErrAliasNotFound
+			}
+			joined := strings.Join(result, ",")
+			config.CurrentConfig.Aliases[idx] = []string{joined, item[1]}
+		}
 	} else {
-		config.CurrentConfig.Aliases[idx] = []string{joined, item[1]}
+		return fmt.Errorf("inconsistent alias data format found for alias '%s'", name)
 	}
 
 	return config.Save()
 }
 
+// Get returns the emoji for a given alias name.
+// It returns an error if the alias doesn't exist.
 func Get(name string) (string, error) {
 	idx, exists := findAlias(name)
 	if !exists {
@@ -142,24 +177,32 @@ func Get(name string) (string, error) {
 	}
 
 	item := config.CurrentConfig.Aliases[idx]
-	if len(item) >= 3 {
+	if len(item) == 3 {
 		return item[2], nil
+	} else if len(item) == 2 {
+		return item[1], nil
 	}
-	return item[1], nil
+	return "", fmt.Errorf("inconsistent alias data format found for alias '%s'", name)
 }
 
+// List returns a map of all aliases to their emoji values.
 func List() map[string]string {
 	result := make(map[string]string)
 	for _, item := range config.CurrentConfig.Aliases {
-		parts := strings.Split(item[0], ",")
+		aliasNames := ""
 		emoji := ""
 
-		if len(item) >= 3 {
+		if len(item) == 3 {
+			aliasNames = item[0]
 			emoji = item[2]
-		} else {
+		} else if len(item) == 2 {
+			aliasNames = item[0]
 			emoji = item[1]
+		} else {
+			continue
 		}
 
+		parts := strings.Split(aliasNames, ",")
 		for _, name := range parts {
 			result[name] = emoji
 		}
@@ -167,6 +210,7 @@ func List() map[string]string {
 	return result
 }
 
+// Reset resets the aliases to the default configuration.
 func Reset() error {
 	config.CurrentConfig.Aliases = config.DefaultConfig.Aliases
 	return config.Save()
