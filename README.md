@@ -13,44 +13,42 @@ Make your commit messages beautiful, consistent, and meaningful with emoji suppo
 [![Release](https://img.shields.io/github/v/release/HidemaruOwO/pummit)](https://github.com/HidemaruOwO/pummit/releases)
 [![Go Report Card](https://goreportcard.com/badge/github.com/HidemaruOwO/pummit)](https://goreportcard.com/report/github.com/HidemaruOwO/pummit)
 
-[English](README.md)
-
 </div>
 
 ---
 
 ## ✨ Features
 
-### 🎨 **Beautiful Commit Messages**
+### **Beautiful Commit Messages**
 - Emoji-prefixed commit messages for visual clarity
 - Consistent formatting across your entire project
 - Support for Conventional Commits and Gitmoji standards
 
-### 🚀 **Smart Automation**
+### **Smart Automation**
 - **Branch-based suggestions**: Automatically suggests emojis based on branch names (`feature/` → ✨, `fix/` → 🐛)
 - **Interactive mode**: Step-by-step guided commit creation with `pummit interactive`
 - **Scope support**: Conventional Commits scope input assistance
 - **Template system**: Predefined commit message templates
 
-### ⚙️ **Powerful Configuration**
+### **Powerful Configuration**
 - Flexible alias system with multiple shortcuts
 - TOML-based configuration for better readability
 - CLI-based configuration management (no editor required)
 - Automatic migration from JSON to TOML
 
-### 🌍 **Multi-language Support**
+### **Multi-language Support**
 - English and Japanese UI
 - Configurable language settings
 - Community translation support
 
-### 🛡️ **Enterprise Ready**
+### **Enterprise Ready**
 - Offline mode for air-gapped environments
 - Comprehensive error handling and diagnostics
 - Cross-platform compatibility (Windows, macOS, Linux)
 - Security-focused design with SBOM generation
 
 <details>
-  <summary>📸 See commit messages created by pummit</summary>
+  <summary>See commit messages created by pummit</summary>
   <img src="docs/assets/commit.png" alt="pummit commit examples" />
 </details>
 
@@ -296,21 +294,9 @@ fi
 
 | OS | Version | Terminal | Status |
 |----|---------|----------|--------|
-| **macOS** | 10.15+ | Terminal.app, iTerm2 | ✅ Fully Supported |
-| **Linux** | Ubuntu 20.04+, RHEL 8+ | gnome-terminal, xterm | ✅ Fully Supported |
-| **Windows** | Windows 10+ | PowerShell, CMD, Windows Terminal | ✅ Supported |
-
-### Terminal Compatibility
-
-| Terminal | macOS | Linux | Windows | Notes |
-|----------|-------|-------|---------|-------|
-| Terminal.app | ✅ | - | - | Native support |
-| iTerm2 | ✅ | - | - | Full feature support |
-| gnome-terminal | - | ✅ | - | Full feature support |
-| xterm | - | ✅ | - | Basic support |
-| PowerShell | - | - | ✅ | Windows 10+ |
-| Windows Terminal | - | - | ✅ | Recommended |
-| CMD | - | - | ⚠️ | Limited color support |
+| **macOS** | 10.15+ | Terminal.app, iTerm2, wezterm | ✅ Fully Supported |
+| **Linux** | Ubuntu 20.04+, RHEL 8+ | gnome-terminal, xterm, wezterm | ✅ Fully Supported |
+| **Windows** | Windows 10+ | PowerShell, CMD, Windows Terminal, wezterm | ✅ Supported |
 
 ---
 
