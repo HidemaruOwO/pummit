@@ -596,96 +596,61 @@ internal/
 
 ### 5. ツール定義
 
-MCPクライアントに以下のツールを提供します。
+LLMが自律的なワークフローを実行できるよう、以下のプリミティブなツールを提供します。
 
-| ツール名 | 説明 | 入力パラメータ | 出力例 |
+#### `git` ツール
+
+ここの説明を実際に実装するときは英語で書いてください。実際の実装上での`git.smart_commit`と`git.commit`の説明にこの文章をそのまま使ってください。（またこれは重要なことなのでllm-context.mdにメモること）
+
+| ツール名 | 説明 | 入力パラメータ | 出力例（成功時） |
 | :--- | :--- | :--- | :--- |
-| `git.getChangedFiles` | ステージングされているファイルの一覧を取得します。 | `(none)` | `{ "files": ["file1.go", "file2.md"] }` |
-| `git.commit` | 絵文字付きでコミットを実行します。 | `emoji: string`, `message: string` | `{ "success": true, "sha": "..." }` |
-| `alias.list` | 登録されているエイリアスの一覧を取得します。 | `(none)` | `{ "aliases": [...] }` |
-| `config.get` | 指定した設定キーの値を取得します。 | `key: string` | `{ "value": true }` |
-| `config.set` | 指定した設定キーに値を設定します。 | `key: string`, `value: any` | `{ "success": true }` |
-| `doctor.run` | pummitの環境診断を実行します。 | `(none)` | `{ "results": [...] }` |
+| `git.smart_commit` | **PRIMARY TOOL FOR COMMITTING.** Intelligently analyze repository changes and create a commit with auto-generated message and emoji. Use this when the user simply says 'commit', 'make a commit', or gives minimal instructions like 'commit the changes' without specifying exact files or messages. Handles the complete workflow: file analysis, message generation, and execution. | `message_hint: string` (optional), `auto_approve: bool` (default: false) | `{ "status": "pending_approval", "plan": {...} }` or `{ "success": true }` |
+| `git.get_edited_files` | `git status -s -u` を実行し、変更があったファイルの一覧をショートフォーマットで取得します。 | `(none)` | `{ "status": " M internal/git/git.go\n?? new_file.txt" }` |
+| `git.get_current_branch` | 現在のGitブランチ名を取得します。 | `(none)` | `{ "branch": "main" }` |
+| `git.add_files` | 指定されたファイルをステージングします。 | `files: string[]` | `{ "success": true }` |
+| `git.commit` | Create a Git commit with specific user-provided emoji, message, and staging preferences. Use this ONLY when the user provides explicit commit details (specific message, emoji, or file selection). For simple 'commit' requests, use git.smart_commit instead. | `emoji: string`, `message: string`, `offline: bool` | `{ "success": true }` |
+| `git.move_branch` | 指定されたブランチにチェックアウトします。 | `branch: string` | `{ "success": true }` |
+| `git.create_branch` | 新しいブランチを作成してチェックアウトします。 | `branch: string` | `{ "success": true }` |
 
-### 6. 実装イメージ
+#### `alias` ツール
 
-#### サーバー初期化 (`internal/mcp/server.go`)
-```go
-package mcp
+| ツール名 | 説明 | 入力パラメータ | 出力例（成功時） |
+| :--- | :--- | :--- | :--- |
+| `alias.list_aliases` | すべてのエイリアスの一覧を取得します。 | `(none)` | `{ "aliases": { "feat": "✨", "fix": "🐛" } }` |
 
-import (
-	"fmt"
-	"github.com/mark3labs/mcp-go/server"
-	"github.com/HidemaruOwO/pummit/internal/variable" // バージョン情報のため
-)
+#### `doctor` ツール
 
-// StartMCPServer はMCPサーバーを起動します。
-func StartMCPServer() error {
-	s := server.NewMCPServer(
-		"pummit",
-		variable.Version, // 動的にバージョン情報を設定
-		server.WithRecovery(), // ハンドラ内でのパニックから回復
-	)
+| ツール名 | 説明 | 入力パラメータ | 出力例（成功時） |
+| :--- | :--- | :--- | :--- |
+| `doctor.run_diagnostics` | システムの健全性を診断します。 | `(none)` | `{ "results": [...] }` |
 
-	// 各ツールをサーバーに登録
-	registerGitTools(s)
-	registerConfigTools(s)
-	registerAliasTools(s)
-	registerDoctorTools(s)
+### 6. LLMの自律的ワークフロー
 
-	// 標準入出力でサーバーを起動
-	if err := server.ServeStdio(s); err != nil {
-		return fmt.Errorf("mcp server error: %w", err)
-	}
-	return nil
-}
-```
+このツールセットにより、LLMは「コミットして」という単純な指示から、以下のような自律的ワークフローを実行できます。
 
-#### ツール実装 (`internal/mcp/tool_git.go`)
-```go
-package mcp
+1.  **現状把握**: `git.get_edited_files` と `git.get_current_branch` を実行し、「どのファイルが変更され、どのブランチにいるか」を把握します。
+2.  **計画立案**: 変更されたファイルの内容を分析し、どのようなコミットが適切かを判断します。同時に `alias.list_aliases` を実行して、利用可能な絵文字エイリアスを確認します。
+3.  **実行**:
+    -   `git.add_files` を呼び出し、コミット対象のファイルをステージングします。
+    -   ファイルの内容とエイリアスに基づき、最適なコミットメッセージ（例: `✨ 新機能を追加`）を生成します。
+    -   `git.commit` を呼び出して、生成したメッセージでコミットを実行します。
 
-import (
-	"context"
-	"github.com/HidemaruOwO/pummit/internal/git" // 既存のビジネスロジックを再利用
-	"github.com/mark3labs/mcp-go/mcp"
-	"github.com/mark3labs/mcp-go/server"
-)
+### 7. エラーハンドリング設計
 
-func registerGitTools(s *server.MCPServer) {
-	commitTool := mcp.NewTool("git.commit",
-		mcp.WithDescription("絵文字付きでコミットを実行します。"),
-		mcp.WithString("emoji", mcp.Required(), mcp.Description("コミットに使用する絵文字またはエイリアス")),
-		mcp.WithString("message", mcp.Required(), mcp.Description("コミットメッセージ")),
-	)
-	s.AddTool(commitTool, handleGitCommit)
-}
+LLMがエラー発生時に自律的に回復を試みたり、ユーザーに的確な報告をしたりできるよう、エラー情報を構造化し、具体的な対応方針を定めます。(実際にはこれらの出力は英語で)
 
-func handleGitCommit(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	emoji, _ := request.RequireString("emoji")
-	message, _ := request.RequireString("message")
-
-	// 既存のビジネスロジックを呼び出す
-	// 実際のコミット処理は internal/git に実装されているものを呼び出す
-	err := git.CommitWithOfflineMode(emoji, message, false) // 仮
-	if err != nil {
-		return mcp.NewToolResultError(err.Error()), nil
-	}
-
-	return mcp.NewToolResultText("Commit successful"), nil
-}
-```
-
-### 7. エラーハンドリングとロギング
-
-- **エラー**: ツール実行中にエラーが発生した場合、`mcp.NewToolResultError()` を使用してJSON-RPC 2.0仕様に準拠したエラーオブジェクトをクライアントに返却します。
-- **ログ**: デバッグ目的で、MCPサーバーの通信内容や内部動作に関するログをファイルに出力する機能を設けます。ログ出力は設定ファイルで有効/無効を切り替えられるようにします。
-  - **ログファイル**: `~/.config/pummit/mcp.log`
-  - **ログレベル**: `DEBUG`, `INFO`, `ERROR`
+| ツール | エラーシナリオ | LLMの対応策 | LLMからユーザーへの報告メッセージ例 |
+| :--- | :--- | :--- | :--- |
+| **`git.get_edited_files`** | Gitリポジトリではない | 処理を中断し、ユーザーに `git init` の実行を提案する。 | 「おっと、ここはGitリポジトリではないようです。コミット機能を使うには、まずリポジトリを初期化する必要があります。`git init` を実行して初期化しますか？」 |
+| **`git.add_files`** | 指定ファイルが存在しない | `get_edited_files` を再実行してファイル一覧を再確認し、正しいファイル名で再試行する。失敗が続く場合はユーザーに報告する。 | 「ファイル `non_existent_file.go` が見つかりませんでした。もう一度ファイル名を確認してみますね... やはり見つからないようです。ファイル名が正しいか、またはファイルが削除されていないか確認していただけますか？」 |
+| **`git.commit`** | ステージングされたファイルがない | `get_edited_files` を実行し、変更があれば `add_files` を呼び出してから `commit` を再試行する。変更がなければユーザーに報告する。 | 「コミットする変更が見つかりませんでした。ですが、いくつか変更されたファイルがあるようです。これらのファイルをステージングしてコミットしますか？」 |
+| | Gitの `user.name`/`user.email` が未設定 | `doctor` ツールを実行して診断し、具体的な設定コマンドをユーザーに提示する。 | 「コミットを実行するために、Gitのユーザー設定が必要です。`doctor` ツールで確認したところ、`user.name` と `user.email` が設定されていないようです。以下のコマンドを実行して設定してください。\n```\ngit config --global user.name \"Your Name\"\ngit config --global user.email \"you@example.com\"\n```」 |
+| **`git.move_branch`** | 指定ブランチが存在しない | ユーザーにブランチが存在しないことを報告し、`create_branch` を使って新規作成するかどうかを尋ねる。 | 「ブランチ `feature/new-idea` は存在しないようです。同名の新しいブランチを作成して、そちらに移動しますか？」 |
+| **`git.create_branch`** | 指定ブランチが既に存在する | ユーザーにブランチが既に存在することを報告し、`move_branch` を使ってそのブランチに移動するかどうかを尋ねる。 | 「ブランチ `feature/existing-work` は既に存在していますね。そのブランチに移動しますか？」 |
 
 ### 8. テスト戦略
 
-- **単体テスト**: 各ツールのハンドラ関数（`handleGitCommit`など）が、正常系・異常系の両方で正しく動作することを検証します。既存のビジネスロジックはモック化します。
+- **単体テスト**: 各ツールのハンドラ関数が、正常系・異常系の両方で正しく動作することを検証します。既存のビジネスロジックはモック化します。
 - **統合テスト**: `mcp-go`のテスト機能を利用し、サーバー全体がMCPリクエストに対して正しく応答できるかを確認します。実際のstdioを模した入力を用いて、リクエストからレスポンスまでの一連の流れをテストします。
 
 ---
