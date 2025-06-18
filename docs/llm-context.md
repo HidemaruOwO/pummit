@@ -1,3 +1,5 @@
+**重要:llm-context.mdは最後の行まで必ず読んでください。**
+
 # Pummit プロジェクトコンテキスト
 
 ## 1. プロジェクト概要
@@ -197,3 +199,32 @@ pummit/
 #### 将来の計画（v4での削除予定）
 - JSON設定ファイルのサポート廃止により、`internal/doctor/checker.go`の`validateJSONConfig()`関数を削除予定
 - 完全なTOML移行後に診断ロジックを簡素化
+---
+
+## 9. MCPサーバー設計の最終決定事項（2025/6/19）
+
+### 9.1. LLM誘導のためのツール説明文設計
+
+MCPサーバー実装において、LLMが「pummit MCPでコミットして」という自然語指示で適切なツールを選択できるよう、**ツール説明文による戦略的誘導**を採用しました。
+
+#### 重要な実装要件
+- **ツール説明は英語で記述すること**
+- 以下の説明文を実装時にそのまま使用すること
+
+#### `git.smart_commit` の説明文（実装用）
+```
+"PRIMARY TOOL FOR COMMITTING. Intelligently analyze repository changes and create a commit with auto-generated message and emoji. Use this when the user simply says 'commit', 'make a commit', or gives minimal instructions like 'commit the changes' without specifying exact files or messages. Handles the complete workflow: file analysis, message generation, and execution."
+```
+
+#### `git.commit` の説明文（実装用）  
+```
+"Create a Git commit with specific user-provided emoji, message, and staging preferences. Use this ONLY when the user provides explicit commit details (specific message, emoji, or file selection). For simple 'commit' requests, use git.smart_commit instead."
+```
+
+### 9.2. 設計の核心
+
+1. **高レベルワークフローツール**: `git.smart_commit` が現状把握→分析→実行の完全なワークフローを内蔵
+2. **自然語対応**: 特別なシステムプロンプト不要で「コミットして」だけで動作
+3. **LLM誘導設計**: 説明文のキーワード（PRIMARY、simple instructions等）でLLMの選択を誘導
+
+この設計により、既存コードベースを最大限活用しつつ、LLMの自律的ワークフローを実現します。
