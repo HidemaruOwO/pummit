@@ -9,11 +9,12 @@
 5. [設定システム](#設定システム)
 6. [外部依存関係](#外部依存関係)
 7. [新機能仕様](#新機能仕様)
-8. [品質保証・テスト戦略](#品質保証・テスト戦略)
-9. [セキュリティ考慮事項](#セキュリティ考慮事項)
-10. [パフォーマンス設計](#パフォーマンス設計)
-11. [リスク分析と対策](#リスク分析と対策)
-12. [今後の開発指針](#今後の開発指針)
+8. [MCPサーバー機能](#mcpサーバー機能)
+9. [品質保証・テスト戦略](#品質保証・テスト戦略)
+10. [セキュリティ考慮事項](#セキュリティ考慮事項)
+11. [パフォーマンス設計](#パフォーマンス設計)
+12. [リスク分析と対策](#リスク分析と対策)
+13. [今後の開発指針](#今後の開発指針)
 
 ---
 
@@ -45,63 +46,52 @@
 
 ### 全体アーキテクチャ
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                    User Interface Layer                        │
-├─────────────────────────┬───────────────────────────────────────┤
-│    CLI Commands         │     Interactive Prompts              │
-│  - pummit sparkles     │  - Confirmation dialogs              │
-│  - pummit alias:add    │  - Y/N prompts                       │
-│  - pummit --version    │  - Input validation                  │
-└─────────────────────────┴───────────────────────────────────────┘
-                          │
-                          ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                   Application Layer                            │
-├─────────────────┬─────────────────┬───────────────────────────┤
-│ Root Command    │ Alias Commands  │    Version Command        │
-│ Handler         │                 │                           │
-│ - Main logic    │ - add/delete    │ - Show version            │
-│ - Arg parsing   │ - list/reset    │ - Build info              │
-└─────────────────┴─────────────────┴───────────────────────────┘
-                          │
-                          ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                  Business Logic Layer                          │
-├─────────────┬─────────────┬─────────────┬─────────────────────┤
-│ Git Ops     │ Alias Mgmt  │ Emoji Proc  │   Configuration     │
-│             │             │             │                     │
-│ - Commit    │ - CRUD ops  │ - Convert   │ - Load/Save         │
-│ - File list │ - Search    │ - Validate  │ - Default values    │
-│ - Branch    │ - Multiple  │ - API call  │ - User settings     │
-└─────────────┴─────────────┴─────────────┴─────────────────────┘
-                          │
-                          ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                 Infrastructure Layer                           │
-├─────────────────┬─────────────────┬───────────────────────────┤
-│  File System    │    Network      │        Logging            │
-│                 │                 │                           │
-│ - Config files  │ - HTTP client   │ - Colored output          │
-│ - Git commands  │ - Gitmoji API   │ - Debug levels            │
-│ - Permissions   │ - Timeout       │ - Error formatting        │
-└─────────────────┴─────────────────┴───────────────────────────┘
-                          │
-                          ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                    External Systems                            │
-├─────────────────┬─────────────────┬───────────────────────────┤
-│ Git Repository  │ Gitmoji Service │    User Config Files      │
-│                 │                 │                           │
-│ - .git folder   │ - GitHub API    │ - ~/.config/pummit/       │
-│ - Commit logs   │ - JSON response │ - config.json             │
-│ - File changes  │ - Rate limits   │ - Permissions: 0644       │
-└─────────────────┴─────────────────┴───────────────────────────┘
+```mermaid
+graph TD
+    subgraph User Interface Layer
+        A[CLI Commands]
+        B[Interactive Prompts]
+        C[MCP Server (pummit mcp)]
+    end
 
-データフロー:
-User Input → CLI → Application → Business Logic → Infrastructure → External
-     ↑                                                                 │
-     └─────────────────── Response ←──────────────────────────────────┘
+    subgraph Application Layer
+        D[Root Command Handler]
+        E[Alias Commands]
+        F[MCP Command Handler]
+    end
+
+    subgraph Business Logic Layer
+        G[Git Ops]
+        H[Alias Mgmt]
+        I[Config Mgmt]
+        J[Doctor]
+    end
+
+    subgraph Infrastructure Layer
+        K[File System]
+        L[Network]
+        M[Logging]
+        N[Stdio JSON-RPC]
+    end
+
+    subgraph External Systems
+        O[Git Repository]
+        P[Gitmoji Service]
+        Q[User Config Files]
+        R[MCP Client (e.g. Claude Desktop)]
+    end
+
+    A & B --> D & E
+    C --> F
+
+    D & E --> G & H & I & J
+    F --> G & H & I & J
+
+    G & H & I & J --> K & L & M
+    F --> N
+
+    K & L & M --> O & P & Q
+    N <--> R
 ```
 
 ### レイヤー構成
@@ -151,41 +141,40 @@ pummit/
 ├── main.go                           # エントリーポイント
 ├── internal/                         # 内部実装（非公開）
 │   ├── cli/                         # CLI関連
-│   │   ├── root.go                  # ルートコマンド
-│   │   ├── version.go               # バージョンコマンド
-│   │   └── alias/                   # エイリアス管理
-│   │       ├── add.go               # エイリアス追加
-│   │       ├── delete.go            # エイリアス削除
-│   │       ├── list.go              # エイリアス一覧
-│   │       └── reset.go             # エイリアスリセット
+│   │   ├── root.go
+│   │   ├── mcp.go                   # MCPサーバー起動コマンド
+│   │   └── ...
+│   ├── mcp/                         # MCPサーバー機能
+│   │   ├── server.go                # サーバー初期化とツール登録
+│   │   ├── tool_git.go              # Git関連ツール
+│   │   ├── tool_config.go           # 設定関連ツール
+│   │   ├── tool_alias.go            # エイリアス関連ツール
+│   │   └── tool_doctor.go           # 診断ツール
 │   ├── alias/                       # エイリアス管理ロジック
-│   │   └── alias.go                 # エイリアス操作
+│   │   └── alias.go
 │   ├── config/                      # 設定管理
-│   │   └── config.go                # 設定読み書き
+│   │   └── config.go
+│   ├── doctor/                      # 診断機能
+│   │   └── checker.go
 │   ├── emojis/                      # 絵文字処理
-│   │   └── emojis.go                # 絵文字変換
+│   │   └── emojis.go
 │   ├── git/                         # Git操作
-│   │   └── git.go                   # Git コマンド実行
+│   │   └── git.go
 │   ├── prompt/                      # インタラクティブUI
-│   │   └── prompt.go                # プロンプト処理
+│   │   └── prompt.go
 │   ├── utils/                       # ユーティリティ
-│   │   └── slice.go                 # スライス操作
+│   │   └── slice.go
 │   └── variable/                    # 定数・埋め込みデータ
-│       ├── consts.go                # 定数定義
-│       ├── config.json              # デフォルト設定
-│       ├── discord-emojis.flat.json # 絵文字データ
-│       └── discord-emojis.pretty.json
+│       ├── consts.go
+│       ├── config.json
+│       └── discord-emojis.flat.json
 ├── pkg/                             # 公開パッケージ
 │   ├── gitmoji/                     # Gitmoji API連携
 │   │   └── gitmoji.go               # API クライアント
 │   └── logger/                      # ログ機能
 │       └── logger.go                # ロガー実装
 └── docs/                            # ドキュメント
-    ├── README.md                    # 利用者向け文書
-    ├── alias.md                     # エイリアス機能説明
-    ├── branch.md                    # ブランチ戦略
-    ├── commit.md                    # コミット規約
-    └── directory.md                 # ディレクトリ構造
+    └── ...
 ```
 
 ### 責務分散
@@ -567,6 +556,137 @@ sequenceDiagram
 2. **バージョン固定**: セマンティックバージョニング遵守
 3. **ライセンス互換性**: Apache 2.0 と互換性のあるライセンスのみ
 4. **セキュリティ**: 定期的な脆弱性チェック
+
+---
+
+## MCPサーバー機能
+
+### 1. 概要
+
+pummitにModel Context Protocol (MCP) サーバー機能を追加し、外部のMCPクライアント（例: Claude Desktop）からpummitの機能を利用可能にします。これにより、AIアシスタントとの連携を強化し、自然言語によるGit操作や設定管理を実現します。
+
+### 2. アーキテクチャとプロトコル実装
+
+- **統合方法**: `pummit mcp` コマンドを新しいエントリーポイントとして追加します。このコマンドは標準入出力（stdio）を介してJSON-RPC通信を行い、MCPサーバーとして動作します。
+- **プロトコル実装**: `github.com/mark3labs/mcp-go` ライブラリを利用してサーバーを構築します。このライブラリはMCPの高レベルな抽象化を提供し、プロトコルの詳細を意識することなくツールやリソースの定義に集中できます。
+- **既存ロジックの再利用**: MCPハンドラは、`internal/git`, `internal/config`, `internal/alias`, `internal/doctor` といった既存のビジネスロジック層のモジュールを再利用し、機能の一貫性を保ちます。
+
+### 3. コマンド体系
+
+```bash
+# MCPサーバーを標準入出力モードで起動
+pummit mcp
+```
+
+### 4. モジュール構成
+
+`internal/mcp/` ディレクトリを新設し、MCPサーバー関連のコードを集約します。
+
+```
+internal/
+├── mcp/
+│   ├── server.go        # MCPサーバーの初期化とツール登録
+│   ├── tool_git.go      # Git関連ツールの定義とハンドラ
+│   ├── tool_config.go   # 設定関連ツールの定義とハンドラ
+│   ├── tool_alias.go    # エイリアス関連ツールの定義とハンドラ
+│   └── tool_doctor.go   # 診断ツールの定義とハンドラ
+└── cli/
+    └── mcp.go           # `pummit mcp` コマンドの定義
+```
+
+### 5. ツール定義
+
+MCPクライアントに以下のツールを提供します。
+
+| ツール名 | 説明 | 入力パラメータ | 出力例 |
+| :--- | :--- | :--- | :--- |
+| `git.getChangedFiles` | ステージングされているファイルの一覧を取得します。 | `(none)` | `{ "files": ["file1.go", "file2.md"] }` |
+| `git.commit` | 絵文字付きでコミットを実行します。 | `emoji: string`, `message: string` | `{ "success": true, "sha": "..." }` |
+| `alias.list` | 登録されているエイリアスの一覧を取得します。 | `(none)` | `{ "aliases": [...] }` |
+| `config.get` | 指定した設定キーの値を取得します。 | `key: string` | `{ "value": true }` |
+| `config.set` | 指定した設定キーに値を設定します。 | `key: string`, `value: any` | `{ "success": true }` |
+| `doctor.run` | pummitの環境診断を実行します。 | `(none)` | `{ "results": [...] }` |
+
+### 6. 実装イメージ
+
+#### サーバー初期化 (`internal/mcp/server.go`)
+```go
+package mcp
+
+import (
+	"fmt"
+	"github.com/mark3labs/mcp-go/server"
+	"github.com/HidemaruOwO/pummit/internal/variable" // バージョン情報のため
+)
+
+// StartMCPServer はMCPサーバーを起動します。
+func StartMCPServer() error {
+	s := server.NewMCPServer(
+		"pummit",
+		variable.Version, // 動的にバージョン情報を設定
+		server.WithRecovery(), // ハンドラ内でのパニックから回復
+	)
+
+	// 各ツールをサーバーに登録
+	registerGitTools(s)
+	registerConfigTools(s)
+	registerAliasTools(s)
+	registerDoctorTools(s)
+
+	// 標準入出力でサーバーを起動
+	if err := server.ServeStdio(s); err != nil {
+		return fmt.Errorf("mcp server error: %w", err)
+	}
+	return nil
+}
+```
+
+#### ツール実装 (`internal/mcp/tool_git.go`)
+```go
+package mcp
+
+import (
+	"context"
+	"github.com/HidemaruOwO/pummit/internal/git" // 既存のビジネスロジックを再利用
+	"github.com/mark3labs/mcp-go/mcp"
+	"github.com/mark3labs/mcp-go/server"
+)
+
+func registerGitTools(s *server.MCPServer) {
+	commitTool := mcp.NewTool("git.commit",
+		mcp.WithDescription("絵文字付きでコミットを実行します。"),
+		mcp.WithString("emoji", mcp.Required(), mcp.Description("コミットに使用する絵文字またはエイリアス")),
+		mcp.WithString("message", mcp.Required(), mcp.Description("コミットメッセージ")),
+	)
+	s.AddTool(commitTool, handleGitCommit)
+}
+
+func handleGitCommit(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	emoji, _ := request.RequireString("emoji")
+	message, _ := request.RequireString("message")
+
+	// 既存のビジネスロジックを呼び出す
+	// 実際のコミット処理は internal/git に実装されているものを呼び出す
+	err := git.CommitWithOfflineMode(emoji, message, false) // 仮
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+
+	return mcp.NewToolResultText("Commit successful"), nil
+}
+```
+
+### 7. エラーハンドリングとロギング
+
+- **エラー**: ツール実行中にエラーが発生した場合、`mcp.NewToolResultError()` を使用してJSON-RPC 2.0仕様に準拠したエラーオブジェクトをクライアントに返却します。
+- **ログ**: デバッグ目的で、MCPサーバーの通信内容や内部動作に関するログをファイルに出力する機能を設けます。ログ出力は設定ファイルで有効/無効を切り替えられるようにします。
+  - **ログファイル**: `~/.config/pummit/mcp.log`
+  - **ログレベル**: `DEBUG`, `INFO`, `ERROR`
+
+### 8. テスト戦略
+
+- **単体テスト**: 各ツールのハンドラ関数（`handleGitCommit`など）が、正常系・異常系の両方で正しく動作することを検証します。既存のビジネスロジックはモック化します。
+- **統合テスト**: `mcp-go`のテスト機能を利用し、サーバー全体がMCPリクエストに対して正しく応答できるかを確認します。実際のstdioを模した入力を用いて、リクエストからレスポンスまでの一連の流れをテストします。
 
 ---
 
