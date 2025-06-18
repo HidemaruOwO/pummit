@@ -1,0 +1,150 @@
+# Project Understanding Rules
+
+When starting work on this project:
+
+1. First, read and understand the codebase by exploring the directory structure
+2. Use `tree` command excluding large directories (node_modules, etc.)
+3. Read `docs/llm-context.md` to understand previous learnings about the project
+4. **Read `docs/architecture.md` as the primary project specification** - this document contains the complete technical specification, feature requirements, and implementation guidelines that must be followed
+5. Summarize your understanding of the project structure and purpose
+6. Update `docs/llm-context.md` with new insights when completing tasks
+
+## Implementation Rules
+
+- **Always follow `docs/architecture.md`** - this is the authoritative project specification and must be adhered to for all implementation decisions
+- All code implementation must align with the architecture, specifications, and requirements defined in `docs/architecture.md`
+- When adding new features or making changes, ensure they comply with the design patterns, coding standards, and technical requirements outlined in the architecture document
+- If there are conflicts between ad-hoc requests and the architecture document, prioritize the architecture document and clarify with the user
+
+Always maintain context about the project's architecture and purpose as defined in the specification.
+
+## Language and Communication Rules
+
+- **回答は必ず日本語で返すこと** - All responses must be provided in Japanese language
+
+## Workflow Efficiency Rules
+
+- **After receiving tool results, carefully reflect on their quality and determine optimal next steps before proceeding.** Use your thinking to plan and iterate based on this new information, and then take the best next action.
+- **For maximum efficiency, whenever you need to perform multiple independent operations, invoke all relevant tools simultaneously rather than sequentially.**
+
+# Comment Writing and Quality Rules
+
+## Comment Format
+- Use language-standard comment symbols (Rust: `//`, JavaScript/TypeScript: `//`, Python: `#`, etc.)
+- Non-standard symbols like `///` are prohibited in regular code comments
+- All comments must be written in Japanese
+- Translate English comments to Japanese consistently
+
+## Comment Content Rules
+
+### Comments to Include (High Value)
+- **Why the code was written** - reasons and background
+- Business logic and rule explanations
+- External dependencies and constraint explanations
+- Important notes for future developers
+- Performance and security considerations
+- Intent and purpose of complex algorithms
+- Architecture design decisions and rationale
+- Security requirements and their reasoning (e.g., file permissions, encryption choices)
+
+### Prohibited Comments (Low/No Value)
+- Comments that simply describe what the code does
+- Simple descriptions of implementation details
+- Obviously unnecessary explanations
+- Outdated or incorrect information
+- Descriptions of content obviously clear from variable or function names
+- Type annotations in comments (e.g., `// エラー型` for `enum Error`)
+- Function purpose comments that duplicate function names (e.g., `// データを取得` for `fn get_data()`)
+- Struct/field descriptions that are obvious from naming (e.g., `//ホスト名` for `pub host: String`)
+
+### Specific Examples of Unnecessary Comments
+```rust
+// 削除すべき例
+/// 設定を保存
+pub fn save_config() { ... }
+
+/// ユーザーID
+pub user_id: String,
+
+/// エラー型
+pub enum MyError { ... }
+
+// 保持すべき例
+// セキュリティのためUnixでファイル権限を適切に設定
+#[cfg(unix)]
+{ ... }
+
+// architecture.mdの仕様に準拠したサンプル設定を生成
+pub fn sample() -> Self { ... }
+```
+
+## Comment Quality Standards
+- Write only information that can be understood without reading the code
+- Focus on "why" rather than "what"
+- Include only information that remains valid even when implementation changes
+- Use concise and specific expressions
+- Prioritize architectural intent over implementation details
+- Preserve security and performance rationale
+
+## Comment Cleanup Rules
+When cleaning existing code comments:
+1. Remove all obvious type/function/variable name descriptions
+2. Remove redundant implementation descriptions
+3. Preserve important design decisions and constraints
+4. Maintain important security and performance annotations
+5. Keep TODO comments that reference specific architecture requirements
+
+## Format Rules
+- Place appropriate blank lines before and after comments
+- Match indentation to code level
+- Use consistent notation for multi-line comments
+- Maintain consistent spacing and formatting
+
+# Naming Convention Rules
+
+## Core Principles
+- Balance brevity and clarity: `d` → `data`, `currentBufferPathRawString` → `bufPathRaw`
+- Use consistent patterns for same concepts across codebase
+- Follow language-specific conventions (camelCase, snake_case, PascalCase)
+
+## Naming Patterns
+
+### Variables
+- Descriptive but concise: `imagePath`, `fileExt`, `isTemp`
+- Error handling: `expandErr`, `configErr`, `baseErr`
+- Booleans: `isTemp`, `hasPermission`, `canRead`
+
+### Files and Paths
+- Use: `srcFile`, `dstFile`, `fileExt`, `filename`, `stem`
+- Avoid: `originalExtension`, `currentBufferPathRaw`
+
+### Commands and Handles
+- Commands: `pasteCmd`, `targetsCmd`, `textCmd`
+- Handles: `pasteHandle`, `targetsHandle`
+
+## Recommended Abbreviations
+- `directory` → `dir`
+- `temporary` → `tmp`
+- `extension` → `ext`
+- `configuration` → `config`
+- `buffer` → `buf`
+- `number` → `nr`
+- `source` → `src`
+- `destination` → `dst`
+
+## Language Conventions
+- **TypeScript/JavaScript**: camelCase for variables, PascalCase for types
+- **Go**: camelCase for local, PascalCase for exported
+- **Rust**: snake_case for variables, PascalCase for types
+
+## Avoid
+- Excessive abbreviation: `c`, `d`, `f`
+- Verbose descriptions: `finalPathCandidateX11`
+- Mixed naming styles within same project
+
+## Checklist
+1. Consistent naming within file/module
+2. Variable role clear from name
+3. Not unnecessarily long
+4. Same concepts use same names
+5. Follow
