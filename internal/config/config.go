@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"runtime"
 
 	"github.com/HidemaruOwO/pummit/internal/variable"
 )
@@ -23,23 +24,49 @@ var (
 	ConfigPath    string
 )
 
-func Init() error {
+// クロスプラットフォーム対応の設定ディレクトリ取得
+func GetConfigDir() (string, error) {
 	home, err := os.UserHomeDir()
+	if err != nil {
+		return "", err
+	}
+
+	var configDir string
+	switch runtime.GOOS {
+	case "windows":
+		// Windows: %APPDATA%\pummit
+		appData := os.Getenv("APPDATA")
+		if appData != "" {
+			configDir = filepath.Join(appData, "pummit")
+		} else {
+			// フォールバック: ユーザーホームディレクトリ
+			configDir = filepath.Join(home, "pummit")
+		}
+	default:
+		// Unix系 (Linux, macOS): ~/.config/pummit
+		configDir = filepath.Join(home, ".config", "pummit")
+	}
+
+	return configDir, nil
+}
+
+func Init() error {
+	// デフォルトの値を読み込む
+	json.Unmarshal([]byte(variable.DEFAULT_CONFIG), &DefaultConfig)
+
+	configDir, err := GetConfigDir()
 	if err != nil {
 		return err
 	}
 
-	// デフォルトの値を読み込む
-	json.Unmarshal([]byte(variable.DEFAULT_CONFIG), &DefaultConfig)
-
-	configDir := filepath.Join(home, ".config", "pummit")
 	if err := os.MkdirAll(configDir, 0755); err != nil {
 		return err
 	}
 
 	ConfigPath = filepath.Join(configDir, "config.json")
 
-	return Load()
+	// 自動マイグレーション対応の設定読み込み
+	return AutoMigrate()
 }
 
 // コンフィグを読み込む
