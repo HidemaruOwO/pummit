@@ -5,12 +5,14 @@ import (
 	"os"
 
 	"github.com/HidemaruOwO/pummit/internal/config"
+	"github.com/HidemaruOwO/pummit/internal/prompt"
 	"github.com/spf13/cobra"
 )
 
 var (
-	forceFlag  bool
-	dryRunFlag bool
+	forceFlag   bool
+	dryRunFlag  bool
+	previewFlag bool
 )
 
 var migrateCmd = &cobra.Command{
@@ -25,9 +27,11 @@ This command will:
 4. Save the new config.toml file
 
 Examples:
-  pummit migrate                  # Standard migration
-  pummit migrate --force          # Overwrite existing TOML config
-  pummit migrate --dry-run        # Preview changes without applying`,
+	 pummit migrate                  # Standard migration
+	 pummit migrate --force          # Overwrite existing TOML config
+	 pummit migrate --dry-run        # Preview changes without applying
+	 pummit migrate --preview        # Automatically open TOML file after migration
+	 pummit migrate --dry-run --preview  # Preview existing TOML during dry-run`,
 	Run: func(cmd *cobra.Command, args []string) {
 		// マイグレーション実行
 		result, err := config.MigrateConfig(forceFlag, dryRunFlag)
@@ -47,6 +51,12 @@ Examples:
 			if result.ConvertedFrom != "" {
 				fmt.Printf("  Source: %s\n", result.ConvertedFrom)
 			}
+
+			// ドライラン時でも既存のTOMLファイルがあればプレビュー可能
+			if _, err := os.Stat(result.TOMLPath); err == nil {
+				fmt.Printf("\n")
+				showConfigPreview(result.TOMLPath)
+			}
 			return
 		}
 
@@ -62,6 +72,10 @@ Examples:
 				fmt.Printf("\n💡 Your configuration has been converted from JSON to TOML format.\n")
 				fmt.Printf("   The application will now use the TOML configuration by default.\n")
 			}
+
+			// プレビュー機能を実行
+			fmt.Printf("\n")
+			showConfigPreview(result.TOMLPath)
 		} else {
 			fmt.Printf("\n⚠️  %s\n", result.Message)
 		}
@@ -137,8 +151,40 @@ func init() {
 	// フラグを追加
 	migrateCmd.Flags().BoolVar(&forceFlag, "force", false, "Overwrite existing TOML configuration")
 	migrateCmd.Flags().BoolVar(&dryRunFlag, "dry-run", false, "Show what would be done without making changes")
+	migrateCmd.Flags().BoolVar(&previewFlag, "preview", false, "Preview the TOML configuration file")
 
 	// サブコマンドを追加
 	migrateCmd.AddCommand(rollbackCmd)
 	migrateCmd.AddCommand(statusCmd)
+}
+
+// 設定ファイルプレビュー機能
+func showConfigPreview(configPath string) {
+	if previewFlag {
+		// --previewフラグが指定された場合は自動的にプレビュー
+		runEditorSelection(configPath)
+	} else {
+		// フラグがない場合は確認プロンプトを表示
+		promptResult, err := prompt.Run("Would you like to preview the created TOML configuration?")
+		if err != nil {
+			fmt.Printf("Warning: Failed to show preview prompt: %v\n", err)
+		} else if promptResult.Confirmed {
+			runEditorSelection(configPath)
+		}
+	}
+}
+
+// エディター選択とファイルオープンの実行
+func runEditorSelection(configPath string) {
+	editorResult, err := prompt.RunEditorSelector(configPath)
+	if err != nil {
+		fmt.Printf("Error: Failed to run editor selector: %v\n", err)
+	} else if !editorResult.Canceled {
+		fmt.Printf("Opening %s with %s...\n", configPath, editorResult.Command)
+		if err := prompt.OpenWithEditor(editorResult.Command, configPath); err != nil {
+			fmt.Printf("Error: Failed to open file with editor: %v\n", err)
+		}
+	} else {
+		fmt.Println("Preview canceled.")
+	}
 }
