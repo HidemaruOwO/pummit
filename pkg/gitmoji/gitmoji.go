@@ -1,8 +1,10 @@
 package gitmoji
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
+	"net"
 	"net/http"
 	"time"
 )
@@ -19,19 +21,48 @@ type GitmojiResponse struct {
 	Gitmojis []Gitmoji `json:"gitmojis"`
 }
 
+// オフライン対応のGitmoji取得（フォールバック機能付き）
 func GetAllGitmojis() ([]Gitmoji, error) {
-	client := &http.Client{
-		Timeout: 10 * time.Second,
+	return GetAllGitmojisWithConfig(false)
+}
+
+// 設定可能なGitmoji取得関数
+func GetAllGitmojisWithConfig(offlineMode bool) ([]Gitmoji, error) {
+	if offlineMode {
+		// オフラインモードでは即座にエラーを返してフォールバックを促す
+		return nil, errors.New("offline mode is enabled")
 	}
 
-	resp, err := client.Get("https://raw.githubusercontent.com/carloscuesta/gitmoji/master/packages/gitmojis/src/gitmojis.json")
+	// オフライン状態検出のためのタイムアウトを短縮（3秒）
+	client := &http.Client{
+		Timeout: 3 * time.Second,
+		Transport: &http.Transport{
+			DialContext: (&net.Dialer{
+				Timeout: 1 * time.Second, // 接続タイムアウト
+			}).DialContext,
+		},
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	req, err := http.NewRequestWithContext(ctx, "GET", "https://raw.githubusercontent.com/carloscuesta/gitmoji/master/packages/gitmojis/src/gitmojis.json", nil)
 	if err != nil {
 		return nil, err
+	}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		// ネットワークエラーの場合、より具体的なエラーメッセージを返す
+		if netErr, ok := err.(net.Error); ok && netErr.Timeout() {
+			return nil, errors.New("network connection timeout (possibly offline)")
+		}
+		return nil, errors.New("network connection failed")
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return nil, errors.New("failed to fetch gitmojis")
+		return nil, errors.New("failed to fetch gitmojis from API")
 	}
 
 	var response GitmojiResponse
@@ -40,6 +71,35 @@ func GetAllGitmojis() ([]Gitmoji, error) {
 	}
 
 	return response.Gitmojis, nil
+}
+
+// ネットワーク状態の簡易チェック
+func IsOnline() bool {
+	client := &http.Client{
+		Timeout: 2 * time.Second,
+		Transport: &http.Transport{
+			DialContext: (&net.Dialer{
+				Timeout: 1 * time.Second,
+			}).DialContext,
+		},
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+
+	// 軽量なGETリクエストでネットワーク状態をチェック
+	req, err := http.NewRequestWithContext(ctx, "HEAD", "https://api.github.com", nil)
+	if err != nil {
+		return false
+	}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return false
+	}
+	defer resp.Body.Close()
+
+	return resp.StatusCode == http.StatusOK
 }
 
 func FindByCode(code string, gitmojis []Gitmoji) (Gitmoji, bool) {
