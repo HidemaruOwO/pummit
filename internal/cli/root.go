@@ -77,6 +77,7 @@ func Execute() error {
 
 	rootCmd.AddCommand(versionCmd)
 	rootCmd.AddCommand(migrateCmd)
+	rootCmd.AddCommand(doctorCmd)
 	rootCmd.AddCommand(alias.AddCmd)
 	rootCmd.AddCommand(alias.ListCmd)
 	rootCmd.AddCommand(alias.DeleteCmd)
