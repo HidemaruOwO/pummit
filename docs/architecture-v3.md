@@ -580,7 +580,7 @@ sequenceDiagram
 #### 新しいTOML設定構造
 ```toml
 [meta]
-version = "2.1.0"
+version = "3.0"
 
 [base]
 emoji = true # writeEmoji から変更
