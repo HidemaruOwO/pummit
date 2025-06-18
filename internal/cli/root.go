@@ -8,6 +8,7 @@ import (
 
 	"github.com/HidemaruOwO/pummit/internal/cli/alias"
 	"github.com/HidemaruOwO/pummit/internal/config"
+
 	// "github.com/HidemaruOwO/pummit/internal/emojis"
 	"github.com/HidemaruOwO/pummit/internal/git"
 	"github.com/HidemaruOwO/pummit/internal/variable"
@@ -62,6 +63,7 @@ func Execute() error {
 	rootCmd.PersistentFlags().BoolVarP(&version, "version", "v", false, "Show the version of pummit")
 
 	rootCmd.AddCommand(versionCmd)
+	rootCmd.AddCommand(migrateCmd)
 	rootCmd.AddCommand(alias.AddCmd)
 	rootCmd.AddCommand(alias.ListCmd)
 	rootCmd.AddCommand(alias.DeleteCmd)
