@@ -26,6 +26,11 @@ func IsGitRepository() bool {
 
 // コミットを作成
 func Commit(cm CommitMessage) error {
+	return CommitWithOfflineMode(cm, false)
+}
+
+// オフラインモード対応のコミット関数
+func CommitWithOfflineMode(cm CommitMessage, offlineMode bool) error {
 	log := logger.New()
 
 	// 変更済みのファイルを取得
@@ -43,7 +48,7 @@ func Commit(cm CommitMessage) error {
 		if config.CurrentConfig.UseAlias && found {
 			cm.Emoji = emoji
 		} else {
-			cm.Emoji = ConvertToEmoji(enteredEmoji)
+			cm.Emoji = ConvertToEmojiWithOfflineMode(enteredEmoji, offlineMode)
 		}
 	} else {
 		// :name: mode
@@ -102,9 +107,15 @@ func GetBranch() (string, error) {
 }
 
 func ConvertToEmoji(name string) string {
-	emoji, err := emojis.GetEmojiByName(name)
+	return ConvertToEmojiWithOfflineMode(name, false)
+}
+
+// オフラインモード対応の絵文字変換
+func ConvertToEmojiWithOfflineMode(name string, offlineMode bool) string {
+	emoji, err := emojis.GetEmojiByNameOffline(name, offlineMode)
 	if err != nil {
-		return fmt.Sprintf(":%s:", emoji)
+		// エラーが発生した場合は名前をコロンで囲んで返す
+		return fmt.Sprintf(":%s:", name)
 	}
 	return emoji
 }
