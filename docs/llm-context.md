@@ -59,7 +59,7 @@ pummit/
 コミット作成処理 (`git.CommitWithOfflineMode`) は以下の手順で実行されます。
 1.  `git diff --name-only --cached`でステージングされたファイルを取得。
 2.  入力された絵文字/エイリアスを`alias.GetEmoji()`で解決。
-3.  `config.CurrentConfig`に基づき、生の絵文字 (`✨`) か名前 (`:sparkles:`) かを決定。
+3.  `config.CurrentTOMLConfig`に基づき、生の絵文字 (`✨`) か名前 (`:sparkles:`) かを決定。
 4.  `emojis.GetEmojiByNameOffline()`で最終的な絵文字を取得（オフライン対応）。
 5.  `fmt.Sprintf`でコミットメッセージを整形。
 6.  `exec.Command("git", "commit", "-m", ...)`でGitコマンドを実行。
