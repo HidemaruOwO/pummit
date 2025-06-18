@@ -2,10 +2,8 @@ package alias
 
 import (
 	"fmt"
-	"os"
 	"sort"
 	"strings"
-	"text/tabwriter"
 
 	"github.com/HidemaruOwO/pummit/internal/config"
 	"github.com/HidemaruOwO/pummit/pkg/logger"
@@ -18,49 +16,75 @@ var ListCmd = &cobra.Command{
 	Short: "Show the list of aliases that have been set",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		log := logger.New()
-		rawAliases := config.CurrentConfig.Aliases
+		aliases := config.CurrentTOMLConfig.Alias.Entries
 
-		if len(rawAliases) == 0 {
-			log.Info("Aliases have not been set yet")
+		if len(aliases) == 0 {
+			fmt.Println()
+			log.Info("🔍 No aliases have been configured yet")
+			fmt.Println("💡 Use 'pummit alias:add <shortcut> <name> <emoji>' to add your first alias")
+			fmt.Println()
 			return nil
 		}
 
-		sort.SliceStable(rawAliases, func(i, j int) bool {
-			aliasI := rawAliases[i][0]
-			if idx := strings.Index(aliasI, ","); idx != -1 {
-				aliasI = aliasI[:idx]
-			}
-			aliasJ := rawAliases[j][0]
-			if idx := strings.Index(aliasJ, ","); idx != -1 {
-				aliasJ = aliasJ[:idx]
-			}
-			return aliasI < aliasJ
+		// Sort by name for better organization
+		sort.SliceStable(aliases, func(i, j int) bool {
+			return aliases[i].Name < aliases[j].Name
 		})
 
-		w := tabwriter.NewWriter(os.Stdout, 0, 0, 3, ' ', 0)
-		bold := color.New(color.Bold).SprintFunc()
+		// Color functions for visual hierarchy
+		title := color.New(color.Bold, color.FgCyan).SprintFunc()
+		header := color.New(color.Bold, color.FgWhite).SprintFunc()
+		emoji := color.New(color.FgYellow).SprintFunc()
+		name := color.New(color.FgGreen).SprintFunc()
+		shortcut := color.New(color.FgBlue).SprintFunc()
+		separator := color.New(color.FgHiBlack).SprintFunc()
 
-		fmt.Fprintf(w, "%s | %s | %s\n", bold("Emoji"), bold("Prefix"), bold("Alias"))
-		fmt.Fprintln(w, "-------------------")
+		fmt.Println()
+		fmt.Printf("  %s\n", title("📋 Configured Aliases"))
+		fmt.Println()
 
-		for _, item := range rawAliases {
-			aliasesStr := item[0]
-			prefix := ""
-			emoji := ""
-
-			if len(item) >= 3 {
-				prefix = item[1]
-				emoji = item[2]
-			} else if len(item) == 2 {
-				emoji = item[1]
-			} else if len(item) == 1 {
-				continue
+		// Calculate column widths for proper alignment
+		maxNameWidth := 4     // "Name"
+		maxShortcutWidth := 9 // "Shortcuts"
+		for _, entry := range aliases {
+			if len(entry.Name) > maxNameWidth {
+				maxNameWidth = len(entry.Name)
 			}
-
-			fmt.Fprintf(w, "%s | %s | %s\n", emoji, prefix, aliasesStr)
+			shortcutStr := strings.Join(entry.Shortcuts, ", ")
+			if len(shortcutStr) > maxShortcutWidth {
+				maxShortcutWidth = len(shortcutStr)
+			}
 		}
 
-		w.Flush()
+		// Add padding
+		nameWidth := maxNameWidth + 2
+		shortcutWidth := maxShortcutWidth + 2
+
+		// Print header with proper spacing
+		fmt.Printf("  %s  %-*s  %s\n",
+			header("Emoji"),
+			nameWidth, header("Name"),
+			header("Shortcuts"))
+
+		// Print separator line with exact alignment
+		fmt.Printf("  %s%s%s\n",
+			separator("─────"),
+			separator(strings.Repeat("─", nameWidth+2)),
+			separator(strings.Repeat("─", shortcutWidth)))
+
+		// Print data rows with consistent formatting
+		for _, entry := range aliases {
+			shortcuts := strings.Join(entry.Shortcuts, ", ")
+			fmt.Printf("  %s  %-*s  %s\n",
+				emoji(entry.Emoji),
+				nameWidth, name(entry.Name),
+				shortcut(shortcuts))
+		}
+
+		fmt.Println()
+		fmt.Printf("  %s %d aliases configured\n",
+			separator("✓"), len(aliases))
+		fmt.Println()
 
 		return nil
 	},

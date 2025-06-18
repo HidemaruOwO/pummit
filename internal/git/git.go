@@ -43,16 +43,20 @@ func CommitWithOfflineMode(cm CommitMessage, offlineMode bool) error {
 	enteredEmoji := cm.Emoji
 	found, prefix, emoji := alias.GetEmoji(enteredEmoji)
 
-	if config.CurrentConfig.UseRawEmoji {
-		// :emoji: mode
-		if config.CurrentConfig.UseAlias && found {
+	// TOMLベースの設定を使用
+	useRawEmoji := config.CurrentTOMLConfig.Base.Emoji
+	useAlias := config.CurrentTOMLConfig.Alias.Enabled
+
+	if useRawEmoji {
+		// 絵文字モード
+		if useAlias && found {
 			cm.Emoji = emoji
 		} else {
 			cm.Emoji = ConvertToEmojiWithOfflineMode(enteredEmoji, offlineMode)
 		}
 	} else {
-		// :name: mode
-		if config.CurrentConfig.UseAlias && found {
+		// :name: モード
+		if useAlias && found {
 			cm.Emoji = fmt.Sprintf(":%s:", prefix)
 		} else {
 			cm.Emoji = fmt.Sprintf(":%s:", enteredEmoji)
@@ -60,10 +64,9 @@ func CommitWithOfflineMode(cm CommitMessage, offlineMode bool) error {
 	}
 
 	// コミットメッセージが長くなりすぎないようにするため
-	if config.CurrentConfig.UseFilesLength {
-		if config.CurrentConfig.FilesLength < len([]rune(changed)) {
-			changed = fmt.Sprintf("%s...", changed[:config.CurrentConfig.FilesLength])
-		}
+	filesLength := config.CurrentTOMLConfig.Base.FilesLength
+	if filesLength > 0 && filesLength < len([]rune(changed)) {
+		changed = fmt.Sprintf("%s...", changed[:filesLength])
 	}
 
 	// message := cm.Emoji + " " + cm.Message + " " + changed
