@@ -95,7 +95,7 @@ var (
 func GetDefaultTOMLConfig() TOMLConfig {
 	return TOMLConfig{
 		Meta: MetaConfig{
-			Version: "2.1.0",
+			Version: "3.0",
 		},
 		Base: BaseConfig{
 			Emoji:       true,
@@ -198,8 +198,14 @@ func SaveTOMLConfig() error {
 		return err
 	}
 
+	// 設定ディレクトリが存在しない場合は作成
 	if err := os.MkdirAll(configDir, 0755); err != nil {
 		return err
+	}
+
+	// TOMLConfigPathが設定されていない場合は設定
+	if TOMLConfigPath == "" {
+		TOMLConfigPath = filepath.Join(configDir, "config.toml")
 	}
 
 	file, err := os.Create(TOMLConfigPath)
@@ -254,7 +260,7 @@ func ConvertJSONToTOML(jsonConfig Config) TOMLConfig {
 	}
 
 	// バージョンを設定
-	tomlConfig.Meta.Version = "2.1.0"
+	tomlConfig.Meta.Version = "3.0"
 
 	return tomlConfig
 }
