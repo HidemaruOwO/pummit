@@ -15,8 +15,12 @@ When starting work on this project:
 - All code implementation must align with the architecture, specifications, and requirements defined in `docs/architecture.md`
 - When adding new features or making changes, ensure they comply with the design patterns, coding standards, and technical requirements outlined in the architecture document
 - If there are conflicts between ad-hoc requests and the architecture document, prioritize the architecture document and clarify with the user
+- Write all source code output (variable names, function names, class names, etc.) in English
+- Write all comments in Japanese
+- Use English for console output, error messages, and user-facing text in the code
+- Keep Japanese only for code comments and documentation within the source files
 
-Always maintain context about the project's architecture and purpose as defined in the specification.
+Always maintain context about the projects architecture and purpose as defined in the specification.
 
 ## Language and Communication Rules
 
