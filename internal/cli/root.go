@@ -8,24 +8,25 @@ import (
 
 	"github.com/HidemaruOwO/pummit/internal/cli/alias"
 	"github.com/HidemaruOwO/pummit/internal/config"
-
-	// "github.com/HidemaruOwO/pummit/internal/emojis"
 	"github.com/HidemaruOwO/pummit/internal/git"
 	"github.com/HidemaruOwO/pummit/internal/variable"
+	"github.com/HidemaruOwO/pummit/pkg/gitmoji"
+	"github.com/HidemaruOwO/pummit/pkg/logger"
 	"github.com/spf13/cobra"
 )
 
 var (
-	version bool
+	version     bool
+	offlineMode bool
 )
 
 var rootCmd = &cobra.Command{
 	Use:   "pummit [emoji] [message...]",
-	Short: "Make the commit message more beautiful in CLI 🎨",
+	Short: "Make the commit message more beautiful in the CLI 🎨",
 	// Long: `pummit is a tool that helps create consistent git commit messages using emojis and formatters. For detailed documentation, please refer to:
 	// https://github.com/HidemaruOwO/pummit`,
 	Long: fmt.Sprintf(`pummit v%s %s
-  Make the commit message more beautiful in CLI 🎨`, variable.VERSION, runtime.GOARCH),
+  Make your commit messages beautiful, consistent, and meaningful with emoji support and smart automation 🎨`, variable.VERSION, runtime.GOARCH),
 	Run: func(cmd *cobra.Command, args []string) {
 		// emoji, err := emojis.GetEmojiByName(args[0])
 		// if err != nil {
@@ -44,12 +45,23 @@ var rootCmd = &cobra.Command{
 			os.Exit(0)
 		}
 
+		log := logger.New()
+
+		// グローバル--offlineフラグまたは自動検出でオフラインモードを制御
+		if offlineMode {
+			log.Info("Offline mode enabled via --offline flag")
+		} else if !gitmoji.IsOnline() {
+			// ネットワークが利用できない場合、自動的にオフラインモードを有効化
+			log.Info("Network appears to be offline, enabling offline mode automatically")
+			offlineMode = true
+		}
+
 		cm := git.CommitMessage{
 			Emoji:   args[0],
 			Message: strings.Join(args[1:], " "),
 		}
 
-		git.Commit(cm)
+		git.CommitWithOfflineMode(cm, offlineMode)
 	},
 	Args: cobra.ArbitraryArgs,
 }
@@ -61,6 +73,7 @@ func Execute() error {
 	}
 
 	rootCmd.PersistentFlags().BoolVarP(&version, "version", "v", false, "Show the version of pummit")
+	rootCmd.PersistentFlags().BoolVar(&offlineMode, "offline", false, "Run with offline mode（disable calling Gitmoji API）")
 
 	rootCmd.AddCommand(versionCmd)
 	rootCmd.AddCommand(migrateCmd)

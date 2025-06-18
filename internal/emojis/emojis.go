@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/HidemaruOwO/pummit/internal/variable"
+	"github.com/HidemaruOwO/pummit/pkg/gitmoji"
 )
 
 type Emoji struct {
@@ -30,12 +31,49 @@ func init() {
 	}
 }
 
+// オフライン対応の絵文字取得（フォールバック機能付き）
 func GetEmojiByName(name string) (string, error) {
+	return GetEmojiByNameWithFallback(name, false)
+}
+
+// オフラインフラグ指定での絵文字取得
+func GetEmojiByNameOffline(name string, offlineMode bool) (string, error) {
+	return GetEmojiByNameWithFallback(name, offlineMode)
+}
+
+// フォールバック機能付き絵文字取得
+func GetEmojiByNameWithFallback(name string, offlineMode bool) (string, error) {
+	// まず埋め込みデータから検索
 	emoji, ok := mapping[name]
-	if !ok {
-		return "", fmt.Errorf("emoji not found for name: %s", name)
+	if ok {
+		return emoji, nil
 	}
-	return emoji, nil
+
+	// オフラインモードの場合は埋め込みデータのみを使用
+	if offlineMode {
+		return "", fmt.Errorf("emoji not found for name: %s (offline mode)", name)
+	}
+
+	// オンラインの場合はGitmoji APIから取得を試行
+	gitmojis, err := gitmoji.GetAllGitmojisWithConfig(false)
+	if err != nil {
+		// API呼び出しに失敗した場合、埋め込みデータで再試行
+		return "", fmt.Errorf("emoji not found for name: %s (API unavailable: %v)", name, err)
+	}
+
+	// Gitmoji APIから取得したデータで検索
+	gitmojiEmoji, found := gitmoji.FindByName(name, gitmojis)
+	if found {
+		return gitmojiEmoji.Emoji, nil
+	}
+
+	// コード名でも検索
+	gitmojiEmoji, found = gitmoji.FindByCode(name, gitmojis)
+	if found {
+		return gitmojiEmoji.Emoji, nil
+	}
+
+	return "", fmt.Errorf("emoji not found for name: %s", name)
 }
 
 func GetAllEmojis() map[string]string {
