@@ -31,6 +31,20 @@ func Commit(cm CommitMessage) error {
 
 // オフラインモード対応のコミット関数
 func CommitWithOfflineMode(cm CommitMessage, offlineMode bool) error {
+	return commitWithOfflineModeInternal(cm, offlineMode)
+}
+
+// オーバーロード: 文字列パラメータでのコミット関数（MCP用）
+func CommitWithOfflineModeStrings(emoji, message string, offlineMode bool) error {
+	cm := CommitMessage{
+		Emoji:   emoji,
+		Message: message,
+	}
+	return commitWithOfflineModeInternal(cm, offlineMode)
+}
+
+// 内部実装
+func commitWithOfflineModeInternal(cm CommitMessage, offlineMode bool) error {
 	log := logger.New()
 
 	// 変更済みのファイルを取得
@@ -79,6 +93,33 @@ func CommitWithOfflineMode(cm CommitMessage, offlineMode bool) error {
 	return cmd.Run()
 }
 
+// AddFiles 指定されたファイルをステージングする
+func AddFiles(files []string) error {
+	if len(files) == 0 {
+		return nil
+	}
+
+	args := append([]string{"add"}, files...)
+	cmd := exec.Command("git", args...)
+	return cmd.Run()
+}
+
+// GetStagedFiles ステージされたファイル一覧を取得する
+func GetStagedFiles() ([]string, error) {
+	cmd := exec.Command("git", "diff", "--name-only", "--cached")
+	output, err := cmd.Output()
+	if err != nil {
+		return nil, err
+	}
+
+	staged := strings.TrimSpace(string(output))
+	if staged == "" {
+		return []string{}, nil
+	}
+
+	return strings.Split(staged, "\n"), nil
+}
+
 func GetChangedFiles() (string, error) {
 	log := logger.New()
 
@@ -96,6 +137,22 @@ func GetChangedFiles() (string, error) {
 	}
 
 	return strings.ReplaceAll(changed, "\n", ", "), nil
+}
+
+// GetChangedFilesList 変更されたファイル一覧をスライスで取得する
+func GetChangedFilesList() ([]string, error) {
+	cmd := exec.Command("git", "diff", "--name-only", "--cached")
+	output, err := cmd.Output()
+	if err != nil {
+		return nil, err
+	}
+
+	changed := strings.TrimSpace(string(output))
+	if changed == "" {
+		return []string{}, nil
+	}
+
+	return strings.Split(changed, "\n"), nil
 }
 
 // 今のブランチ名の表示
