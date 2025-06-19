@@ -71,3 +71,56 @@ func (info SystemInfo) FormatSystemInfo() string {
 
 	return builder.String()
 }
+
+// FormatDiagnosticResults 診断結果をプレーンテキスト形式でフォーマット（MCP用）
+func FormatDiagnosticResults() string {
+	var builder strings.Builder
+
+	// システム情報
+	systemInfo := GetSystemInfo()
+	builder.WriteString("=== System Diagnostics ===\n")
+	builder.WriteString(systemInfo.FormatSystemInfo())
+	builder.WriteString("\n")
+
+	// 診断結果
+	results := RunAllChecks()
+	builder.WriteString("Diagnostic Results:\n")
+
+	errorCount := 0
+	warningCount := 0
+
+	for _, result := range results {
+		status := "✅"
+		if result.Status == "ERROR" {
+			status = "❌"
+			errorCount++
+		} else if result.Status == "WARNING" {
+			status = "⚠️"
+			warningCount++
+		}
+
+		builder.WriteString(fmt.Sprintf("%s %s: %s\n", status, result.Name, result.Message))
+
+		// 提案がある場合は表示
+		if len(result.Suggestions) > 0 {
+			for _, suggestion := range result.Suggestions {
+				builder.WriteString(fmt.Sprintf("  💡 %s\n", suggestion))
+			}
+		}
+	}
+
+	// 総括
+	builder.WriteString("\nDiagnostic Summary:\n")
+	if errorCount == 0 && warningCount == 0 {
+		builder.WriteString("✅ All checks passed! Your pummit environment is healthy.\n")
+	} else {
+		if errorCount > 0 {
+			builder.WriteString(fmt.Sprintf("❌ Found %d error(s) that need immediate attention.\n", errorCount))
+		}
+		if warningCount > 0 {
+			builder.WriteString(fmt.Sprintf("⚠️ Found %d warning(s) that may affect functionality.\n", warningCount))
+		}
+	}
+
+	return builder.String()
+}
