@@ -1,6 +1,8 @@
 package git
 
 import (
+	"bufio"
+	"bytes"
 	"fmt"
 	"os"
 	"os/exec"
@@ -31,6 +33,20 @@ func Commit(cm CommitMessage) error {
 
 // オフラインモード対応のコミット関数
 func CommitWithOfflineMode(cm CommitMessage, offlineMode bool) error {
+	return commitWithOfflineModeInternal(cm, offlineMode)
+}
+
+// オーバーロード: 文字列パラメータでのコミット関数（MCP用）
+func CommitWithOfflineModeStrings(emoji, message string, offlineMode bool) error {
+	cm := CommitMessage{
+		Emoji:   emoji,
+		Message: message,
+	}
+	return commitWithOfflineModeInternal(cm, offlineMode)
+}
+
+// 内部実装
+func commitWithOfflineModeInternal(cm CommitMessage, offlineMode bool) error {
 	log := logger.New()
 
 	// 変更済みのファイルを取得
@@ -79,6 +95,33 @@ func CommitWithOfflineMode(cm CommitMessage, offlineMode bool) error {
 	return cmd.Run()
 }
 
+// AddFiles 指定されたファイルをステージングする
+func AddFiles(files []string) error {
+	if len(files) == 0 {
+		return nil
+	}
+
+	args := append([]string{"add"}, files...)
+	cmd := exec.Command("git", args...)
+	return cmd.Run()
+}
+
+// GetStagedFiles ステージされたファイル一覧を取得する
+func GetStagedFiles() ([]string, error) {
+	cmd := exec.Command("git", "diff", "--name-only", "--cached")
+	output, err := cmd.Output()
+	if err != nil {
+		return nil, err
+	}
+
+	staged := strings.TrimSpace(string(output))
+	if staged == "" {
+		return []string{}, nil
+	}
+
+	return strings.Split(staged, "\n"), nil
+}
+
 func GetChangedFiles() (string, error) {
 	log := logger.New()
 
@@ -96,6 +139,52 @@ func GetChangedFiles() (string, error) {
 	}
 
 	return strings.ReplaceAll(changed, "\n", ", "), nil
+}
+
+// GetChangedFilesList は `git status --porcelain=v1 -u` の結果を解析して
+// 変更(新規/更新/削除/リネーム) されたファイルパスを返す。
+// 例外時は error を返す。
+func GetChangedFilesList() ([]string, error) {
+	cmd := exec.Command("git", "status", "--porcelain=v1", "-u")
+	rawOut, err := cmd.Output()
+	if err != nil {
+		return nil, err
+	}
+
+	// 改行コードだけを除去（前後の空白は残す）
+	rawOut = bytes.TrimRight(rawOut, "\n\r")
+
+	scanner := bufio.NewScanner(bytes.NewReader(rawOut))
+	files := make([]string, 0)
+
+	for scanner.Scan() {
+		line := scanner.Text()
+		if len(line) < 4 { // "XY␠" で最低 3byte + filepath
+			continue
+		}
+
+		// 3byte 目(インデックス 3) からがパス
+		path := line[3:]
+
+		// リネームの場合: "R  old -> new"
+		if strings.Contains(path, " -> ") {
+			parts := strings.SplitN(path, " -> ", 2)
+			if len(parts) == 2 {
+				path = parts[1]
+			}
+		}
+
+		path = strings.TrimSpace(path)
+		if path != "" {
+			files = append(files, path)
+		}
+	}
+
+	if err := scanner.Err(); err != nil {
+		return nil, err
+	}
+
+	return files, nil
 }
 
 // 今のブランチ名の表示
