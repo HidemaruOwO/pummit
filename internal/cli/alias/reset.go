@@ -10,7 +10,7 @@ import (
 )
 
 var ResetCmd = &cobra.Command{
-	Use:   "alias:reset",
+	Use:   "reset",
 	Short: "Reset all alias settings",
 	// Short: "すべてのエイリアス設定をリセットします",
 	RunE: func(cmd *cobra.Command, args []string) error {
