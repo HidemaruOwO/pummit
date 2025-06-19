@@ -2,6 +2,7 @@ package alias
 
 import (
 	"errors"
+
 	"github.com/HidemaruOwO/pummit/internal/alias"
 	"github.com/HidemaruOwO/pummit/internal/emojis"
 	"github.com/HidemaruOwO/pummit/pkg/logger"
@@ -11,7 +12,7 @@ import (
 var emojiFlag string
 
 var AddCmd = &cobra.Command{
-	Use:   "alias:add [name] [prefix]",
+	Use:   "add [name] [prefix]",
 	Short: "Add a new alias. Optionally specify the exact emoji with --emoji.",
 	Long: `Add a new alias for an emoji prefix.
 If the --emoji flag is provided, the specified emoji will be used directly.

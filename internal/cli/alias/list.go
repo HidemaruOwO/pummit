@@ -12,7 +12,7 @@ import (
 )
 
 var ListCmd = &cobra.Command{
-	Use:   "alias:list",
+	Use:   "list",
 	Short: "Show the list of aliases that have been set",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		log := logger.New()
@@ -21,7 +21,7 @@ var ListCmd = &cobra.Command{
 		if len(aliases) == 0 {
 			fmt.Println()
 			log.Info("🔍 No aliases have been configured yet")
-			fmt.Println("💡 Use 'pummit alias:add <shortcut> <name> <emoji>' to add your first alias")
+			fmt.Println("💡 Use 'pummit alias add <shortcut> <name> <emoji>' to add your first alias")
 			fmt.Println()
 			return nil
 		}

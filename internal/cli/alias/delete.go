@@ -10,9 +10,9 @@ import (
 )
 
 var DeleteCmd = &cobra.Command{
-	Use:   "alias:delete [name]",
+	Use:   "delete [name]",
 	Short: "Delete the specified alias",
-	Args: cobra.ExactArgs(1),
+	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		log := logger.New()
 		name := args[0]

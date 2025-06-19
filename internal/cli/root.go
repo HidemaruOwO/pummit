@@ -75,13 +75,28 @@ func Execute() error {
 	rootCmd.PersistentFlags().BoolVarP(&version, "version", "v", false, "Show the version of pummit")
 	rootCmd.PersistentFlags().BoolVar(&offlineMode, "offline", false, "Run with offline mode（disable calling Gitmoji API）")
 
+	// 管理コマンド
 	rootCmd.AddCommand(versionCmd)
 	rootCmd.AddCommand(migrateCmd)
 	rootCmd.AddCommand(doctorCmd)
-	rootCmd.AddCommand(alias.AddCmd)
-	rootCmd.AddCommand(alias.ListCmd)
-	rootCmd.AddCommand(alias.DeleteCmd)
-	rootCmd.AddCommand(alias.ResetCmd)
+	rootCmd.AddCommand(mcpCmd)
+
+	// aliasコマンド群をサブコマンドとして統合
+	aliasCmd := &cobra.Command{
+		Use:   "alias",
+		Short: "Manage emoji aliases for commit prefixes",
+		Long: `Manage emoji aliases for commit prefixes.
+Aliases allow you to use short names instead of full emoji names or symbols.`,
+	}
+
+	// aliasサブコマンドを追加
+	aliasCmd.AddCommand(alias.AddCmd)
+	aliasCmd.AddCommand(alias.ListCmd)
+	aliasCmd.AddCommand(alias.DeleteCmd)
+	aliasCmd.AddCommand(alias.ResetCmd)
+
+	// 親コマンドに追加
+	rootCmd.AddCommand(aliasCmd)
 
 	return rootCmd.Execute()
 }
