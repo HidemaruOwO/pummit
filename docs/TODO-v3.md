@@ -19,16 +19,25 @@
 }
 </script>
 
-## 📊 進捗サマリー
+## 📊 進捗サマリー（アーキテクチャ見直し後）
 
 | 優先度 | 完了 | 総数 | 進捗率 | 状態 |
 |--------|------|------|--------|------|
-| 🔥 High | 0 | 8 | 0% | ![🔴](https://via.placeholder.com/15/ff0000/000000?text=+) |
-| 🔷 Medium | 0 | 6 | 0% | ![🔴](https://via.placeholder.com/15/ff0000/000000?text=+) |
+| 🔥 High | 4 | 8 | 50% | ![🟡](https://via.placeholder.com/15/ffff00/000000?text=+) |
+| 🔷 Medium | 1 | 6 | 17% | ![🔴](https://via.placeholder.com/15/ff0000/000000?text=+) |
 | 🔵 Low | 0 | 4 | 0% | ![🔴](https://via.placeholder.com/15/ff0000/000000?text=+) |
 | 📋 Maintenance | 0 | 6 | 0% | ![🔴](https://via.placeholder.com/15/ff0000/000000?text=+) |
 
-**全体進捗**: 0/24 (0%)
+**全体進捗**: 5/24 (21%)
+
+### ✅ 実装完了済み（優先度から削除）
+- ~~H03: `pummit doctor` MVP実装~~ → ✅ 包括的診断機能実装済み
+- ~~H04: `--offline`フラグ実装~~ → ✅ 完全なオフライン対応実装済み
+- ~~M01: 設定ファイルマイグレーション機能~~ → ✅ JSON→TOML変換実装済み
+
+### 🆕 新たに追加された最優先タスク
+- **CLI統一**: v3.0.0でのサブコマンド形式完全移行
+- **テスト基盤**: 80%カバレッジ目標での包括的テスト実装
 
 ---
 
@@ -66,37 +75,37 @@
 - **技術要件**: GitHub Actions, Go benchmarking
 - **関連ファイル**: `.github/workflows/`, benchmark tests
 
-### H03: `pummit doctor` MVP実装 `#feature` `#diagnostics` `#debugging`
-- [ ] **概要**: 基本的なシステム診断機能の実装
+### H03: コマンド体系統一実装 `#feature` `#cli` `#breaking-change`
+- [ ] **概要**: v3.0.0でのサブコマンド形式への完全移行実装
 - **詳細**:
-  - Git環境の検証（user.name, user.email等）
-  - 設定ファイルの整合性確認
-  - ターミナル情報の出力
-  - 基本的な問題解決ガイダンス
+  - `alias:add` → `alias add` 形式への変更
+  - `pummit config` 統合エントリーポイント実装
+  - 後方互換性なしの破壊的変更
+  - Cobraサブコマンド構造の再設計
 - **成功基準**:
-  - ✅ Git設定不備の検出
-  - ✅ 設定ファイル破損の検出
-  - ✅ 詳細診断情報の出力
-- **推定工数**: 2-3日
+  - ✅ 全コマンドのサブコマンド形式対応
+  - ✅ `pummit config` 統合機能実装
+  - ✅ 古いコロン形式の完全削除
+- **推定工数**: 3-4日
 - **依存関係**: なし
-- **技術要件**: system information gathering
-- **関連ファイル**: [`internal/cli/doctor.go`](internal/cli/doctor.go), [`internal/doctor/checker.go`](internal/doctor/checker.go)
+- **技術要件**: Cobra framework, CLI design
+- **関連ファイル**: [`internal/cli/`](internal/cli/) 全体の再構成
 
-### H04: `--offline`フラグ実装 `#feature` `#resilience` `#network`
-- [ ] **概要**: Gitmoji API不在時の対応とオフライン機能
+### H04: テストスイート基盤構築 `#testing` `#quality` `#foundation`
+- [ ] **概要**: 80%カバレッジ目標での包括的テスト実装
 - **詳細**:
-  - `--offline`フラグの実装
-  - API タイムアウト短縮（3秒以内）
-  - 埋め込み絵文字データでのフォールバック
-  - オフライン時の動作説明
+  - Go test フレームワークの導入
+  - コアモジュール（git, config, alias）の基本テスト
+  - CI/CDでのテスト自動化
+  - テストカバレッジ測定とレポート
 - **成功基準**:
-  - ✅ オフライン環境での完全動作
-  - ✅ API障害時の自動フォールバック
-  - ✅ 3秒以内のタイムアウト
-- **推定工数**: 2-3日
-- **依存関係**: なし
-- **技術要件**: HTTP client configuration, embedded data
-- **関連ファイル**: [`internal/emojis/emojis.go`](internal/emojis/emojis.go)
+  - ✅ 80%以上のテストカバレッジ達成
+  - ✅ CI/CDでの自動テスト実行
+  - ✅ リファクタリング安全性の確保
+- **推定工数**: 5-7日
+- **依存関係**: H03 (CLI統一後のテスト実装)
+- **技術要件**: Go testing, GitHub Actions, coverage tools
+- **関連ファイル**: 各モジュールの `*_test.go` ファイル
 
 ### H05: サポートOS/ターミナル表の文書化 `#docs` `#compatibility` `#support`
 - [ ] **概要**: READMEにサポート環境の明確化
@@ -166,21 +175,21 @@
 
 ## 🔷 Medium Priority Tasks (中期目標: 1-3ヶ月)
 
-### M01: 設定ファイルマイグレーション機能 `#feature` `#migration` `#config`
-- [ ] **概要**: JSON→TOML形式への安全な設定ファイル移行
+### M01: AI統合機能の拡張 `#feature` `#ai` `#mcp`
+- [ ] **概要**: 既存MCPサーバー機能の発展と新機能追加
 - **詳細**:
-  - 自動バックアップ作成（.bakファイル）
-  - ドライラン機能での事前検証
-  - ロールバック機能の提供
-  - エイリアス配列の正規化処理
+  - ブランチ名からの自動絵文字提案機能
+  - より高度なスマートコミット機能
+  - 自然言語でのより複雑なGit操作対応
+  - MCPツールの追加実装
 - **成功基準**:
-  - ✅ 既存JSON設定の完全な変換
-  - ✅ バックアップ機能の動作確認
-  - ✅ 変換失敗時のロールバック
-- **推定工数**: 5-7日
-- **依存関係**: H01 (TOMLライブラリ選定), H07 (統合設定管理)
-- **技術要件**: TOML library, backup/restore system
-- **関連ファイル**: [`internal/config/migration.go`](internal/config/migration.go), [`internal/cli/migrate.go`](internal/cli/migrate.go)
+  - ✅ ブランチ名解析による絵文字提案
+  - ✅ 複雑なGitワークフローの自動化
+  - ✅ LLMとの連携強化
+- **推定工数**: 4-6日
+- **依存関係**: H03 (CLI統一), H04 (テスト基盤)
+- **技術要件**: MCP protocol, AI integration
+- **関連ファイル**: [`internal/mcp/`](internal/mcp/) モジュール拡張
 
 ### M02: SBOM/脆弱性スキャン導入 `#security` `#compliance` `#automation`
 - [ ] **概要**: セキュリティ監査の自動化とSBOM生成
