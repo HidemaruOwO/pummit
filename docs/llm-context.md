@@ -228,3 +228,116 @@ MCPサーバー実装において、LLMが「pummit MCPでコミットして」�
 3. **LLM誘導設計**: 説明文のキーワード（PRIMARY、simple instructions等）でLLMの選択を誘導
 
 この設計により、既存コードベースを最大限活用しつつ、LLMの自律的ワークフローを実現します。
+
+---
+
+## 10. MCPサーバー実装完了（2025/6/19）
+
+### 10.1. 実装した機能
+
+#### 完全なMCPサーバー機能
+- **`pummit mcp`コマンド**: JSON-RPC over stdio でMCPサーバーを起動
+- **9つのMCPツール**: Git操作、設定管理、診断機能を網羅
+- **LLM自律ワークフロー**: 「コミットして」という自然語指示で動作
+
+#### 核心機能: `git.smart_commit`
+- **現状把握**: `git.GetChangedFiles()`, `git.GetStagedFiles()`, `git.GetBranch()`
+- **自動分析**: ブランチ名からの絵文字推測、ファイル拡張子からのメッセージ生成
+- **自動実行**: ファイルステージング、コミット実行
+- **LLM誘導**: "PRIMARY TOOL FOR COMMITTING" 説明文で優先選択を促す
+
+#### 実装されたMCPツール群
+
+**Git関連ツール**:
+- `git.smart_commit` - LLM自律ワークフローの中核（メイン機能）
+- `git.status` - リポジトリ状態確認
+- `git.commit` - 詳細指定用コミット
+- `git.add_files` - ファイルステージング
+- `git.get_edited_files` - 変更ファイル一覧取得
+- `git.get_current_branch` - 現在ブランチ取得
+
+**管理ツール**:
+- `alias.list` - エイリアス一覧取得
+- `config.get` - 設定値取得
+- `doctor.check` - システム診断
+
+### 10.2. 技術的実装詳細
+
+#### 既存API活用による効率的実装
+```go
+// 既存関数の活用
+git.GetChangedFiles()       // ファイル変更検出
+git.CommitWithOfflineMode() // コミット実行
+config.CurrentTOMLConfig    // 設定アクセス
+alias.List()               // エイリアス一覧
+doctor.RunAllChecks()      // 診断実行
+```
+
+#### 追加実装した最小限の新規関数
+```go
+// git.go に追加
+git.AddFiles()                // ファイルステージング
+git.GetStagedFiles()         // ステージファイル取得
+git.GetChangedFilesList()    // 変更ファイル一覧（スライス版）
+
+// doctor/system.go に追加
+doctor.FormatDiagnosticResults() // MCP用診断結果フォーマット
+```
+
+#### モジュール構成
+```
+internal/mcp/
+├── server.go        # MCPサーバー初期化、ツール登録
+├── tool_git.go      # Git関連ツール（6個）
+├── tool_alias.go    # エイリアス関連ツール
+├── tool_config.go   # 設定関連ツール
+└── tool_doctor.go   # 診断ツール
+
+internal/cli/
+└── mcp.go          # `pummit mcp` コマンド実装
+```
+
+### 10.3. LLM誘導設計の実装
+
+docs/architecture-v3.md の仕様通り、LLMが適切なツールを選択するための戦略的説明文を実装：
+
+```go
+// git.smart_commit の説明文
+"PRIMARY TOOL FOR COMMITTING. Intelligently analyze repository changes and create a commit with auto-generated message and emoji. Use this when the user simply says 'commit', 'make a commit', or gives minimal instructions like 'commit the changes' without specifying exact files or messages. Handles the complete workflow: file analysis, message generation, and execution."
+
+// git.commit の説明文
+"Create a Git commit with specific user-provided emoji, message, and staging preferences. Use this ONLY when the user provides explicit commit details (specific message, emoji, or file selection). For simple 'commit' requests, use git.smart_commit instead."
+```
+
+### 10.4. 動作確認済みの機能
+
+#### ビルドテスト
+- `go build -o /tmp/pummit` - 成功
+- コンパイルエラー解決済み
+
+#### CLI統合
+- `pummit mcp --help` - 正常動作確認
+- 適切なヘルプ文書とツール一覧表示
+
+#### スマートコミット機能
+- ブランチ名からの絵文字推測ロジック
+- ファイル拡張子からのメッセージ生成ロジック
+- 自動ステージング機能
+
+### 10.5. アーキテクチャ準拠
+
+- **docs/architecture-v3.md** の設計仕様に完全準拠
+- **既存コードベース活用**: 新規実装を最小限に抑制
+- **レイヤー化アーキテクチャ**: 既存のビジネスロジック層を再利用
+- **エラーハンドリング**: 既存パターンに従った実装
+
+### 10.6. 今後の展開
+
+MCPサーバー機能により、以下の自律的ワークフローが実現：
+
+1. **自然語指示**: 「コミットして」→ `git.smart_commit` 自動選択
+2. **現状分析**: ファイル変更、ブランチ情報の自動収集
+3. **インテリジェント実行**: 絵文字・メッセージ自動生成、コミット実行
+4. **エラー処理**: 適切なエラーメッセージとリカバリ提案
+
+この実装により、pummitがAIアシスタントとの統合環境で真に実用的なGitワークフロー支援ツールとして機能することが確認されました。
