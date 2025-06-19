@@ -1,6 +1,8 @@
 package git
 
 import (
+	"bufio"
+	"bytes"
 	"fmt"
 	"os"
 	"os/exec"
@@ -139,20 +141,50 @@ func GetChangedFiles() (string, error) {
 	return strings.ReplaceAll(changed, "\n", ", "), nil
 }
 
-// GetChangedFilesList 変更されたファイル一覧をスライスで取得する
+// GetChangedFilesList は `git status --porcelain=v1 -u` の結果を解析して
+// 変更(新規/更新/削除/リネーム) されたファイルパスを返す。
+// 例外時は error を返す。
 func GetChangedFilesList() ([]string, error) {
-	cmd := exec.Command("git", "diff", "--name-only", "--cached")
-	output, err := cmd.Output()
+	cmd := exec.Command("git", "status", "--porcelain=v1", "-u")
+	rawOut, err := cmd.Output()
 	if err != nil {
 		return nil, err
 	}
 
-	changed := strings.TrimSpace(string(output))
-	if changed == "" {
-		return []string{}, nil
+	// 改行コードだけを除去（前後の空白は残す）
+	rawOut = bytes.TrimRight(rawOut, "\n\r")
+
+	scanner := bufio.NewScanner(bytes.NewReader(rawOut))
+	files := make([]string, 0)
+
+	for scanner.Scan() {
+		line := scanner.Text()
+		if len(line) < 4 { // "XY␠" で最低 3byte + filepath
+			continue
+		}
+
+		// 3byte 目(インデックス 3) からがパス
+		path := line[3:]
+
+		// リネームの場合: "R  old -> new"
+		if strings.Contains(path, " -> ") {
+			parts := strings.SplitN(path, " -> ", 2)
+			if len(parts) == 2 {
+				path = parts[1]
+			}
+		}
+
+		path = strings.TrimSpace(path)
+		if path != "" {
+			files = append(files, path)
+		}
 	}
 
-	return strings.Split(changed, "\n"), nil
+	if err := scanner.Err(); err != nil {
+		return nil, err
+	}
+
+	return files, nil
 }
 
 // 今のブランチ名の表示
