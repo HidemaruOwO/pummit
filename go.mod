@@ -8,7 +8,7 @@ require (
 	github.com/charmbracelet/bubbletea v1.3.6
 	github.com/charmbracelet/lipgloss v1.1.0
 	github.com/fatih/color v1.18.0
-	github.com/mark3labs/mcp-go v0.32.0
+	github.com/mark3labs/mcp-go v0.34.0
 	github.com/spf13/cobra v1.9.1
 )
 
