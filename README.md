@@ -9,7 +9,8 @@
 Make your commit messages beautiful, consistent, and meaningful with emoji support and smart automation.
 
 [![Go Version](https://img.shields.io/badge/go-1.20+-blue.svg)](https://golang.org/doc/go1.20)
-[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![License: SUSHI-WARE](https://img.shields.io/badge/License-SUSHI--WARE%20🍣-blue.svg)](https://github.com/MakeNowJust/sushi-ware)
 [![Release](https://img.shields.io/github/v/release/HidemaruOwO/pummit)](https://github.com/HidemaruOwO/pummit/releases)
 [![Go Report Card](https://goreportcard.com/badge/github.com/HidemaruOwO/pummit)](https://goreportcard.com/report/github.com/HidemaruOwO/pummit)
 
@@ -432,6 +433,11 @@ By submitting a pull request, you agree to these terms.
 
 ## 📜 License
 
+This project is dual-licensed. You may choose to use it under either:
+
+- **[Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0)** - A permissive license suitable for commercial use
+- **[SUSHI-WARE License](https://github.com/MakeNowJust/sushi-ware)** - If this software is useful to you, please invite the author to sushi 🍣
+
 <div align="left" style="flex: inline" >
 <a href="https://www.apache.org/licenses/LICENSE-2.0" >
 <img src="https://img.shields.io/badge/License-Apache%20License%202.0-blue.svg" alt="Apache License 2.0"
@@ -439,6 +445,7 @@ By submitting a pull request, you agree to these terms.
 <a href="https://github.com/MakeNowJust/sushi-ware" >
 <img src="https://img.shields.io/badge/License-SUSHI--WARE%20%F0%9F%8D%A3-blue.svg" alt="SUSHI-WARE LICENSE"
 </a>
+</div>
 
 ---
 
