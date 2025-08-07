@@ -81,8 +81,8 @@ func commitWithOfflineModeInternal(cm CommitMessage, offlineMode bool) error {
 
 	// コミットメッセージが長くなりすぎないようにするため
 	filesLength := config.CurrentTOMLConfig.Base.FilesLength
-	if filesLength > 0 && filesLength < len([]rune(changed)) {
-		changed = fmt.Sprintf("%s...", changed[:filesLength])
+	if filesLength > 0 {
+		changed = truncateWithEllipsis(changed, filesLength)
 	}
 
 	// message := cm.Emoji + " " + cm.Message + " " + changed
@@ -93,6 +93,20 @@ func commitWithOfflineModeInternal(cm CommitMessage, offlineMode bool) error {
 	cmd.Stderr = os.Stderr
 
 	return cmd.Run()
+}
+
+// マルチバイト文字を含むファイル名を安全に切り詰める
+func truncateWithEllipsis(s string, limit int) string {
+	if limit <= 0 {
+		return s
+	}
+
+	runes := []rune(s)
+	if limit < len(runes) {
+		return fmt.Sprintf("%s...", string(runes[:limit]))
+	}
+
+	return s
 }
 
 // AddFiles 指定されたファイルをステージングする
