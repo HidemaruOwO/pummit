@@ -409,7 +409,7 @@ pummit doctor
 
 ---
 
-## 🌍 For contributer
+## 🌍 For contributor
 
 By contributing to this project, you agree to the following terms:
 
