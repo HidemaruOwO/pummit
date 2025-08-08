@@ -23,6 +23,9 @@ type GitmojiResponse struct {
 	Gitmojis []Gitmoji `json:"gitmojis"`
 }
 
+// maxGitmojiResponseSize prevents memory exhaustion from large payloads.
+const maxGitmojiResponseSize = 1 << 20
+
 var (
 	// ErrNonOK indicates the server responded with a non-200 status.
 	ErrNonOK = errors.New("non-200 from server")
@@ -57,9 +60,8 @@ func Fetch(ctx context.Context, client *http.Client, url string) (
 	}
 
 	var result GitmojiResponse
-	r := io.LimitReader(resp.Body, 1<<20)
+	r := io.LimitReader(resp.Body, maxGitmojiResponseSize)
 	dec := json.NewDecoder(r)
-	dec.DisallowUnknownFields()
 	if err := dec.Decode(&result); err != nil {
 		return GitmojiResponse{}, fmt.Errorf("%w: %v", ErrDecode, err)
 	}
