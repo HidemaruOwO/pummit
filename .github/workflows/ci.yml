@@ -1,0 +1,68 @@
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint-test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        go-version: ['1.22.x']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: ${{ matrix.go-version }}
+          cache: true
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v6
+        with:
+          version: v1.60.3
+      - name: go vet
+        run: go vet ./...
+      - name: fmt check
+        run: |
+          if [ -n "$(gofmt -l .)" ]; then
+            echo "gofmt needed"
+            gofmt -l .
+            exit 1
+          fi
+      - name: tidy check
+        run: |
+          cp go.mod go.mod.bak
+          cp go.sum go.sum.bak
+          go mod tidy
+          git diff --exit-code go.mod go.sum
+          mv go.mod.bak go.mod
+          mv go.sum.bak go.sum
+      - name: Test with coverage
+        run: |
+          go test ./... -race -covermode=atomic -coverprofile=coverage.out
+      - name: Upload coverage artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: coverage.out
+
+  codecov:
+    needs: lint-test
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: coverage
+      - uses: codecov/codecov-action@v5
+        with:
+          files: coverage.out
