@@ -74,12 +74,16 @@ Before beginning work, locate and update the appropriate task checklist:
 
 ## MCP Guidelines
 
-### ASerena MCP
+### Serena MCP
 
 - When starting a new project and wanting to understand the code structure
 - When you want AI to plan complex refactoring or design
 - When you want to speed up bug fixes for websites or applications
-- When you want to generate or edit code directly from Claude Code/Claude Desktop
+- When you want to understand the overall architecture of the codebase
+- When you want to quickly grasp the purpose of a file or functions
+- When you want to get an overview of the codebase and its components
+- When you want to read the code
+- When you want to generate or edit code directly
 - When you want to check logs and manage processes in a monitoring dashboard
 
 ### Context7 MCP
