@@ -4,7 +4,6 @@ package doctor
 // Do not use t.Parallel() in this file.
 
 import (
-	"context"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -69,11 +68,18 @@ func initRealRepo(t *testing.T) string {
 	if out, err := cmd.CombinedOutput(); err != nil {
 		t.Fatalf("git init failed: %v, %s", err, out)
 	}
-	wd, _ := os.Getwd()
+	wd, err := os.Getwd()
+	if err != nil {
+		t.Fatalf("get working directory: %v", err)
+	}
 	if err := os.Chdir(dir); err != nil {
 		t.Fatal(err)
 	}
-	t.Cleanup(func() { _ = os.Chdir(wd) })
+	t.Cleanup(func() {
+		if err := os.Chdir(wd); err != nil {
+			t.Logf("failed to restore working directory: %v", err)
+		}
+	})
 	return dir
 }
 
@@ -83,12 +89,6 @@ func requireGit(t *testing.T) {
 	if _, err := exec.LookPath("git"); err != nil {
 		t.Skip("git not installed")
 	}
-}
-
-// Simple wrapper: a safety net to prevent runaway commands (protection against long hangs).
-func runCmd(ctx context.Context, name string, args ...string) ([]byte, error) {
-	c := exec.CommandContext(ctx, name, args...)
-	return c.CombinedOutput()
 }
 
 func TestRunAllChecksHealthyEnv(t *testing.T) {
