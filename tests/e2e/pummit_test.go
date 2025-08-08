@@ -35,13 +35,15 @@ func TestMain(m *testing.M) {
     os.Exit(1)
   }
 
-  defer func() {
-    if err := os.Remove(binaryPath); err != nil {
-      fmt.Fprintln(os.Stderr, err)
-    }
+  code := func() int {
+    defer func() {
+      if err := os.Remove(binaryPath); err != nil {
+        fmt.Fprintln(os.Stderr, err)
+      }
+    }()
+    return m.Run()
   }()
 
-  code := m.Run()
   os.Exit(code)
 }
 
