@@ -4,6 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
+	"io"
 	"net"
 	"net/http"
 	"time"
@@ -19,6 +21,52 @@ type Gitmoji struct {
 
 type GitmojiResponse struct {
 	Gitmojis []Gitmoji `json:"gitmojis"`
+}
+
+// maxGitmojiResponseSize prevents memory exhaustion from large payloads.
+const maxGitmojiResponseSize = 1 << 20
+
+var (
+	// ErrNonOK allows callers to detect unexpected HTTP status codes.
+	ErrNonOK = errors.New("non-200 from server")
+
+	// ErrDecode helps distinguish malformed payloads from transport failures.
+	ErrDecode = errors.New("failed to decode response")
+)
+
+// Fetch retrieves gitmojis from the given URL using the provided client.
+func Fetch(ctx context.Context, client *http.Client, url string) (
+	GitmojiResponse, error,
+) {
+	if client == nil {
+		client = &http.Client{}
+	}
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+	if err != nil {
+		return GitmojiResponse{}, err
+	}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return GitmojiResponse{}, err
+	}
+	defer func() { _ = resp.Body.Close() }()
+
+	if resp.StatusCode != http.StatusOK {
+		return GitmojiResponse{}, fmt.Errorf(
+			"%w: status=%d", ErrNonOK, resp.StatusCode,
+		)
+	}
+
+	var result GitmojiResponse
+	r := io.LimitReader(resp.Body, maxGitmojiResponseSize)
+	dec := json.NewDecoder(r)
+	if err := dec.Decode(&result); err != nil {
+		return GitmojiResponse{}, fmt.Errorf("%w: %v", ErrDecode, err)
+	}
+
+	return result, nil
 }
 
 // オフライン対応のGitmoji取得（フォールバック機能付き）
@@ -59,7 +107,7 @@ func GetAllGitmojisWithConfig(offlineMode bool) ([]Gitmoji, error) {
 		}
 		return nil, errors.New("network connection failed")
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
 		return nil, errors.New("failed to fetch gitmojis from API")
@@ -97,7 +145,7 @@ func IsOnline() bool {
 	if err != nil {
 		return false
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	return resp.StatusCode == http.StatusOK
 }
