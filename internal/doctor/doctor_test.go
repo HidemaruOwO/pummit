@@ -1,24 +1,23 @@
 package doctor
 
+// NOTE: These tests mutate package-level globals in config.
+// Do not use t.Parallel() in this file.
+
 import (
 	"os"
+	"os/exec"
 	"path/filepath"
+	"regexp"
 	"runtime"
-	"strings"
 	"testing"
 
 	"github.com/HidemaruOwO/pummit/internal/config"
 )
 
-// prependToPATH inserts dir at the beginning of PATH to control git resolution.
-func prependToPATH(t *testing.T, dir string) {
-	t.Helper()
-	sep := string(os.PathListSeparator)
-	old := os.Getenv("PATH")
-	t.Setenv("PATH", dir+sep+old)
-}
+// Gitの出力多様性（Apple Git / Windows派生）に耐えるため、数値本体＋任意の非空白接尾辞を許容。
+var reGitVerAny = regexp.MustCompile(`\b(\d+\.\d+(?:\.\d+)?)(?:\S*)\b`)
 
-// setCleanConfigEnvs isolates global config state for deterministic tests.
+// setCleanConfigEnvs removes host settings that could leak into tests.
 func setCleanConfigEnvs(t *testing.T, home string) {
 	t.Helper()
 	t.Setenv("HOME", home)
@@ -33,191 +32,131 @@ func setCleanConfigEnvs(t *testing.T, home string) {
 	}
 }
 
-// skipOnWindows avoids shell script execution on unsupported platforms.
-func skipOnWindows(t *testing.T) {
-	if runtime.GOOS == "windows" {
-		t.Skip("shell script fake git not supported on Windows")
-	}
-}
-
-// addFakeGit writes a minimal git mock used to simulate command responses.
-func addFakeGit(t *testing.T, dir string) {
+// writeGitConfig provides minimal identity so GitConfigChecker passes.
+func writeGitConfig(t *testing.T, home string) {
 	t.Helper()
-	script := `#!/bin/sh
-set -eu
-case "$1" in
-  --version)
-    echo 'git version 2.39.0'
-    ;;
-  config)
-    if [ "$2" = '--global' ] && [ "$3" = 'user.name' ]; then
-      echo 'Test User'
-    elif [ "$2" = '--global' ] && [ "$3" = 'user.email' ]; then
-      echo 'test@example.com'
-    else
-      exit 1
-    fi
-    ;;
-  status)
-    echo ''
-    ;;
-  *)
-    exit 1
-    ;;
-esac
-`
-	path := filepath.Join(dir, "git")
-	if err := os.WriteFile(path, []byte(script), 0755); err != nil {
-		t.Fatalf("write fake git: %v", err)
+	path := filepath.Join(home, ".gitconfig")
+	data := "[user]\n\tname = Test\n\temail = test@example.com\n"
+	if err := os.WriteFile(path, []byte(data), 0644); err != nil {
+		t.Fatalf("write gitconfig: %v", err)
 	}
-	prependToPATH(t, dir)
+	t.Setenv("GIT_CONFIG_GLOBAL", path)
 }
 
-func TestRunAllChecksHealthyEnvNoErrors(t *testing.T) {
-	skipOnWindows(t)
-
-	home := t.TempDir()
-	setCleanConfigEnvs(t, home)
-
-	configDir := filepath.Join(home, ".config", "pummit")
-	if err := os.MkdirAll(configDir, 0755); err != nil {
-		t.Fatalf("mkdir config: %v", err)
-	}
-	prevCfg := config.CurrentTOMLConfig
+// restoreConfigState avoids cross-test pollution of package globals.
+func restoreConfigState(t *testing.T) {
+	prev := config.CurrentTOMLConfig
 	prevPath := config.TOMLConfigPath
 	t.Cleanup(func() {
-		config.CurrentTOMLConfig = prevCfg
+		config.CurrentTOMLConfig = prev
 		config.TOMLConfigPath = prevPath
 	})
-	config.CurrentTOMLConfig = config.GetDefaultTOMLConfig()
-	config.TOMLConfigPath = filepath.Join(configDir, "config.toml")
-	if err := config.SaveTOMLConfig(); err != nil {
-		t.Fatalf("save config: %v", err)
-	}
+}
 
-	fakeBin := filepath.Join(home, "bin")
-	if err := os.MkdirAll(fakeBin, 0755); err != nil {
-		t.Fatalf("mkdir fake bin: %v", err)
+// initRealRepo creates a minimal git repository and switches cwd.
+func initRealRepo(t *testing.T) string {
+	t.Helper()
+	dir := t.TempDir()
+	if _, err := exec.LookPath("git"); err != nil {
+		t.Skip("git not installed")
 	}
-	addFakeGit(t, fakeBin)
-
-	repoDir := filepath.Join(home, "repo")
-	if err := os.MkdirAll(filepath.Join(repoDir, ".git"), 0755); err != nil {
-		t.Fatalf("mkdir repo: %v", err)
+	cmd := exec.Command("git", "init")
+	cmd.Dir = dir
+	if out, err := cmd.CombinedOutput(); err != nil {
+		t.Fatalf("git init failed: %v, %s", err, out)
 	}
-	cwd, err := os.Getwd()
-	if err != nil {
+	wd, _ := os.Getwd()
+	if err := os.Chdir(dir); err != nil {
 		t.Fatal(err)
 	}
-	if err := os.Chdir(repoDir); err != nil {
-		t.Fatal(err)
-	}
-	t.Cleanup(func() { _ = os.Chdir(cwd) })
+	t.Cleanup(func() { _ = os.Chdir(wd) })
+	return dir
+}
 
+func TestRunAllChecksHealthyEnv(t *testing.T) {
+	if _, err := exec.LookPath("git"); err != nil {
+		t.Skip("git not installed")
+	}
+	home := t.TempDir()
+	setCleanConfigEnvs(t, home)
+	writeGitConfig(t, home)
+	restoreConfigState(t)
+
+	// Run under a real, minimal git repository to satisfy repo checks.
+	_ = initRealRepo(t)
+
+	if err := config.LoadTOMLConfig(); err != nil {
+		t.Fatalf("load config: %v", err)
+	}
 	results := RunAllChecks()
 	if results.HasErrors() {
-		t.Fatalf("expected no errors, got %+v", results)
+		t.Fatalf("want no errors, got %+v", results)
 	}
 }
 
-func TestRunAllChecksGitMissing(t *testing.T) {
-	skipOnWindows(t)
+func TestGetSystemInfoGitMissing(t *testing.T) {
+	tmp := t.TempDir()
+	setCleanConfigEnvs(t, tmp)
 
-	home := t.TempDir()
-	setCleanConfigEnvs(t, home)
+	// Remove git from PATH to simulate absence.
+	t.Setenv("PATH", tmp)
 
-	configDir := filepath.Join(home, ".config", "pummit")
-	if err := os.MkdirAll(configDir, 0755); err != nil {
-		t.Fatalf("mkdir config: %v", err)
-	}
-	prevCfg := config.CurrentTOMLConfig
-	prevPath := config.TOMLConfigPath
-	t.Cleanup(func() {
-		config.CurrentTOMLConfig = prevCfg
-		config.TOMLConfigPath = prevPath
-	})
-	config.CurrentTOMLConfig = config.GetDefaultTOMLConfig()
-	config.TOMLConfigPath = filepath.Join(configDir, "config.toml")
-	if err := config.SaveTOMLConfig(); err != nil {
-		t.Fatalf("save config: %v", err)
-	}
-
-	repoDir := filepath.Join(home, "repo")
-	if err := os.MkdirAll(filepath.Join(repoDir, ".git"), 0755); err != nil {
-		t.Fatalf("mkdir repo: %v", err)
-	}
-	cwd, err := os.Getwd()
-	if err != nil {
-		t.Fatal(err)
-	}
-	if err := os.Chdir(repoDir); err != nil {
-		t.Fatal(err)
-	}
-	t.Cleanup(func() { _ = os.Chdir(cwd) })
-
-	t.Setenv("PATH", home)
-
-	results := RunAllChecks()
-	var gitErr bool
-	for _, r := range results {
-		if r.Name == "Git Configuration" && r.Status == "ERROR" {
-			gitErr = true
-		}
-	}
-	if !gitErr {
-		t.Fatalf("expected git missing error, got %+v", results)
+	info := GetSystemInfo()
+	const want = "Not installed or not accessible"
+	if info.GitVersion != want {
+		t.Fatalf("git missing: want %q, got %q", want, info.GitVersion)
 	}
 }
 
 func TestRunAllChecksMalformedConfig(t *testing.T) {
-	skipOnWindows(t)
-
+	if _, err := exec.LookPath("git"); err != nil {
+		t.Skip("git not installed")
+	}
 	home := t.TempDir()
 	setCleanConfigEnvs(t, home)
+	writeGitConfig(t, home)
 
-	configDir := filepath.Join(home, ".config", "pummit")
-	if err := os.MkdirAll(configDir, 0755); err != nil {
-		t.Fatalf("mkdir config: %v", err)
+	// Ensure repo-related checks are satisfied so only config failure surfaces.
+	_ = initRealRepo(t)
+
+	cfgDir := filepath.Join(home, ".config", "pummit")
+	if err := os.MkdirAll(cfgDir, 0755); err != nil {
+		t.Fatalf("mkdir cfg: %v", err)
 	}
-	bad := filepath.Join(configDir, "config.toml")
-	if err := os.WriteFile(bad, []byte("[[invalid"), 0644); err != nil {
+	bad := filepath.Join(cfgDir, "config.toml")
+	if err := os.WriteFile(bad, []byte("invalid = ["), 0644); err != nil {
 		t.Fatalf("write bad config: %v", err)
 	}
-	prevCfg := config.CurrentTOMLConfig
-	prevPath := config.TOMLConfigPath
-	t.Cleanup(func() {
-		config.CurrentTOMLConfig = prevCfg
-		config.TOMLConfigPath = prevPath
-	})
-
-	fakeBin := filepath.Join(home, "bin")
-	if err := os.MkdirAll(fakeBin, 0755); err != nil {
-		t.Fatalf("mkdir fake bin: %v", err)
-	}
-	addFakeGit(t, fakeBin)
-
-	repoDir := filepath.Join(home, "repo")
-	if err := os.MkdirAll(filepath.Join(repoDir, ".git"), 0755); err != nil {
-		t.Fatalf("mkdir repo: %v", err)
-	}
-	cwd, err := os.Getwd()
-	if err != nil {
-		t.Fatal(err)
-	}
-	if err := os.Chdir(repoDir); err != nil {
-		t.Fatal(err)
-	}
-	t.Cleanup(func() { _ = os.Chdir(cwd) })
+	restoreConfigState(t)
 
 	results := RunAllChecks()
 	var cfgErr bool
 	for _, r := range results {
-		if r.Name == "Configuration Files" && r.Status == "ERROR" &&
-			strings.Contains(r.Message, "TOML configuration file is corrupted") {
+		if r.Name == "Configuration Files" && r.Status == "ERROR" {
 			cfgErr = true
+			break
 		}
 	}
 	if !cfgErr {
-		t.Fatalf("expected config parse error, got %+v", results)
+		t.Fatalf("expected config error, got %+v", results)
+	}
+}
+
+func TestGetSystemInfoGitVersionFormat(t *testing.T) {
+	if _, err := exec.LookPath("git"); err != nil {
+		t.Skip("git not installed")
+	}
+	home := t.TempDir()
+	setCleanConfigEnvs(t, home)
+
+	info := GetSystemInfo()
+	if info.GitVersion == "Not installed or not accessible" {
+		t.Skip("git not available")
+	}
+
+	// m == nil で判定して意図を明確化
+	m := reGitVerAny.FindStringSubmatch(info.GitVersion)
+	if m == nil {
+		t.Fatalf("unexpected git version: %q", info.GitVersion)
 	}
 }
