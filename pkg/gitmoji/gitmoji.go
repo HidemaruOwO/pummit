@@ -40,7 +40,9 @@ func Fetch(ctx context.Context, client *http.Client, url string) (
 	GitmojiResponse, error,
 ) {
 	if client == nil {
-		client = &http.Client{}
+		client = &http.Client{
+			Timeout: 10 * time.Second,
+		}
 	}
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
