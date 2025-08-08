@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -212,7 +213,11 @@ func SaveTOMLConfig() error {
 	if err != nil {
 		return err
 	}
-	defer file.Close()
+	defer func() {
+		if err := file.Close(); err != nil {
+			fmt.Fprintf(os.Stderr, "failed to close config file: %v\n", err)
+		}
+	}()
 
 	encoder := toml.NewEncoder(file)
 	return encoder.Encode(CurrentTOMLConfig)

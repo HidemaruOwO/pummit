@@ -41,7 +41,9 @@ var rootCmd = &cobra.Command{
 		}
 
 		if len(args) < 2 {
-			cmd.Help()
+			if err := cmd.Help(); err != nil {
+				fmt.Fprintln(os.Stderr, err)
+			}
 			os.Exit(0)
 		}
 
@@ -61,7 +63,9 @@ var rootCmd = &cobra.Command{
 			Message: strings.Join(args[1:], " "),
 		}
 
-		git.CommitWithOfflineMode(cm, offlineMode)
+		if err := git.CommitWithOfflineMode(cm, offlineMode); err != nil {
+			log.Errorf("commit failed: %v", err)
+		}
 	},
 	Args: cobra.ArbitraryArgs,
 }
