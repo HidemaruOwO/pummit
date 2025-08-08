@@ -24,6 +24,7 @@ type GitmojiResponse struct {
 }
 
 // maxGitmojiResponseSize prevents memory exhaustion from large payloads.
+// The value is 1MB (1048576 bytes).
 const maxGitmojiResponseSize = 1 << 20
 
 var (
