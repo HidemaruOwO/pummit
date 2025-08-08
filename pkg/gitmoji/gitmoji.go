@@ -24,7 +24,8 @@ type GitmojiResponse struct {
 }
 
 // maxGitmojiResponseSize prevents memory exhaustion from large payloads.
-const maxGitmojiResponseSize = 1 << 20
+// Limit is set to 1MB (1024 * 1024 bytes), a reasonable upper bound.
+const maxGitmojiResponseSize = 1024 * 1024
 
 var (
 	// ErrNonOK allows callers to detect unexpected HTTP status codes.
