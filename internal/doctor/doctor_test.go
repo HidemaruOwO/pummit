@@ -4,6 +4,7 @@ package doctor
 // Do not use t.Parallel() in this file.
 
 import (
+	"context"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -14,13 +15,18 @@ import (
 	"github.com/HidemaruOwO/pummit/internal/config"
 )
 
-// Gitの出力多様性（Apple Git / Windows派生）に耐えるため、数値本体＋任意の非空白接尾辞を許容。
+// To accommodate variations in Git output (Apple Git / Windows derivatives), allow the numeric core plus any non-whitespace suffix.
 var reGitVerAny = regexp.MustCompile(`\b(\d+\.\d+(?:\.\d+)?)(?:\S*)\b`)
 
 // setCleanConfigEnvs removes host settings that could leak into tests.
 func setCleanConfigEnvs(t *testing.T, home string) {
 	t.Helper()
 	t.Setenv("HOME", home)
+	if runtime.GOOS == "windows" {
+		// Windows Git resolves HOME/USERPROFILE differently depending on environment.
+		// Keep them aligned to avoid accidental leakage from the host.
+		t.Setenv("USERPROFILE", home)
+	}
 	t.Setenv("XDG_CONFIG_HOME", filepath.Join(home, ".config"))
 	t.Setenv("LC_ALL", "C")
 	t.Setenv("GIT_CONFIG_NOSYSTEM", "1")
@@ -37,7 +43,7 @@ func writeGitConfig(t *testing.T, home string) {
 	t.Helper()
 	path := filepath.Join(home, ".gitconfig")
 	data := "[user]\n\tname = Test\n\temail = test@example.com\n"
-	if err := os.WriteFile(path, []byte(data), 0644); err != nil {
+	if err := os.WriteFile(path, []byte(data), 0600); err != nil {
 		t.Fatalf("write gitconfig: %v", err)
 	}
 	t.Setenv("GIT_CONFIG_GLOBAL", path)
@@ -57,10 +63,8 @@ func restoreConfigState(t *testing.T) {
 func initRealRepo(t *testing.T) string {
 	t.Helper()
 	dir := t.TempDir()
-	if _, err := exec.LookPath("git"); err != nil {
-		t.Skip("git not installed")
-	}
-	cmd := exec.Command("git", "init")
+	requireGit(t)
+	cmd := exec.Command("git", "init", "-q")
 	cmd.Dir = dir
 	if out, err := cmd.CombinedOutput(); err != nil {
 		t.Fatalf("git init failed: %v, %s", err, out)
@@ -73,10 +77,22 @@ func initRealRepo(t *testing.T) string {
 	return dir
 }
 
-func TestRunAllChecksHealthyEnv(t *testing.T) {
+// Common prerequisite: check for Git (skip if not found).
+func requireGit(t *testing.T) {
+	t.Helper()
 	if _, err := exec.LookPath("git"); err != nil {
 		t.Skip("git not installed")
 	}
+}
+
+// Simple wrapper: a safety net to prevent runaway commands (protection against long hangs).
+func runCmd(ctx context.Context, name string, args ...string) ([]byte, error) {
+	c := exec.CommandContext(ctx, name, args...)
+	return c.CombinedOutput()
+}
+
+func TestRunAllChecksHealthyEnv(t *testing.T) {
+	requireGit(t)
 	home := t.TempDir()
 	setCleanConfigEnvs(t, home)
 	writeGitConfig(t, home)
@@ -101,17 +117,15 @@ func TestGetSystemInfoGitMissing(t *testing.T) {
 	// Remove git from PATH to simulate absence.
 	t.Setenv("PATH", tmp)
 
+	// Treat failure to detect the version string (numeric part + suffix) as indicating that Git is unavailable. Does not rely on the specifics of the message.
 	info := GetSystemInfo()
-	const want = "Not installed or not accessible"
-	if info.GitVersion != want {
-		t.Fatalf("git missing: want %q, got %q", want, info.GitVersion)
+	if reGitVerAny.MatchString(info.GitVersion) {
+		t.Fatalf("expected no git version when git is missing, got %q", info.GitVersion)
 	}
 }
 
 func TestRunAllChecksMalformedConfig(t *testing.T) {
-	if _, err := exec.LookPath("git"); err != nil {
-		t.Skip("git not installed")
-	}
+	requireGit(t)
 	home := t.TempDir()
 	setCleanConfigEnvs(t, home)
 	writeGitConfig(t, home)
@@ -143,18 +157,13 @@ func TestRunAllChecksMalformedConfig(t *testing.T) {
 }
 
 func TestGetSystemInfoGitVersionFormat(t *testing.T) {
-	if _, err := exec.LookPath("git"); err != nil {
-		t.Skip("git not installed")
-	}
+	requireGit(t)
 	home := t.TempDir()
 	setCleanConfigEnvs(t, home)
 
 	info := GetSystemInfo()
-	if info.GitVersion == "Not installed or not accessible" {
-		t.Skip("git not available")
-	}
 
-	// m == nil で判定して意図を明確化
+	// Check that the Git version string contains a numeric part followed by any non-whitespace suffix.
 	m := reGitVerAny.FindStringSubmatch(info.GitVersion)
 	if m == nil {
 		t.Fatalf("unexpected git version: %q", info.GitVersion)
