@@ -22,6 +22,15 @@ Generate Pull Requests that prioritize **clarity, testability, and minimal diff*
    • `/explain <path#Lx-Ly>` – detailed reasoning for a code slice.
    • `/benchmark` – run provided benchmarks before/after, include table in PR.
 
+## ❖ Linter / Formatter / Build
+
+After completing the work, please execute these and verify that they function correctly and have no issues.
+
+- Linter: `golangci-lint run`
+- Formatter: `gofmt -w .`
+- Build: `go build -o pummit .`
+- Test: `go test -v ./...`
+
 ## ❖ Tone & Comments
 
 - Keep commit messages imperative (“Add”, “Fix”, “Refactor”).
