@@ -4,7 +4,7 @@ import (
 	"os"
 
 	"github.com/HidemaruOwO/pummit/internal/cli"
-	"github.com/HidemaruOwO/pummit/pkg/logger"
+	"github.com/HidemaruOwO/pummit/internal/logger"
 )
 
 func main() {

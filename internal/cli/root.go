@@ -9,9 +9,9 @@ import (
 	"github.com/HidemaruOwO/pummit/internal/cli/alias"
 	"github.com/HidemaruOwO/pummit/internal/config"
 	"github.com/HidemaruOwO/pummit/internal/git"
+	"github.com/HidemaruOwO/pummit/internal/gitmoji"
+	"github.com/HidemaruOwO/pummit/internal/logger"
 	"github.com/HidemaruOwO/pummit/internal/variable"
-	"github.com/HidemaruOwO/pummit/pkg/gitmoji"
-	"github.com/HidemaruOwO/pummit/pkg/logger"
 	"github.com/spf13/cobra"
 )
 

@@ -5,7 +5,7 @@ import (
 
 	"github.com/HidemaruOwO/pummit/internal/alias"
 	"github.com/HidemaruOwO/pummit/internal/emojis"
-	"github.com/HidemaruOwO/pummit/pkg/logger"
+	"github.com/HidemaruOwO/pummit/internal/logger"
 	"github.com/spf13/cobra"
 )
 

@@ -3,8 +3,8 @@ package cli
 import (
 	"github.com/spf13/cobra"
 
+	"github.com/HidemaruOwO/pummit/internal/logger"
 	"github.com/HidemaruOwO/pummit/internal/mcp"
-	"github.com/HidemaruOwO/pummit/pkg/logger"
 )
 
 var mcpCmd = &cobra.Command{

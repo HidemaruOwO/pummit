@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/HidemaruOwO/pummit/internal/config"
-	"github.com/HidemaruOwO/pummit/pkg/logger"
+	"github.com/HidemaruOwO/pummit/internal/logger"
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 )

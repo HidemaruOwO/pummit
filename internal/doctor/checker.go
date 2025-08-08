@@ -9,7 +9,7 @@ import (
 	"strings"
 
 	"github.com/HidemaruOwO/pummit/internal/config"
-	"github.com/HidemaruOwO/pummit/pkg/gitmoji"
+	"github.com/HidemaruOwO/pummit/internal/gitmoji"
 )
 
 // DiagnosticResult 診断結果を表す構造体
