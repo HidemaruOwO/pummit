@@ -4,6 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
+	"io"
 	"net"
 	"net/http"
 	"time"
@@ -19,6 +21,50 @@ type Gitmoji struct {
 
 type GitmojiResponse struct {
 	Gitmojis []Gitmoji `json:"gitmojis"`
+}
+
+var (
+	// ErrNonOK indicates the server responded with a non-200 status.
+	ErrNonOK = errors.New("non-200 from server")
+
+	// ErrDecode indicates the response body could not be decoded.
+	ErrDecode = errors.New("failed to decode response")
+)
+
+// Fetch retrieves gitmojis from the given URL using the provided client.
+func Fetch(ctx context.Context, client *http.Client, url string) (
+	GitmojiResponse, error,
+) {
+	if client == nil {
+		client = &http.Client{}
+	}
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+	if err != nil {
+		return GitmojiResponse{}, err
+	}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return GitmojiResponse{}, err
+	}
+	defer func() { _ = resp.Body.Close() }()
+
+	if resp.StatusCode != http.StatusOK {
+		return GitmojiResponse{}, fmt.Errorf(
+			"%w: status=%d", ErrNonOK, resp.StatusCode,
+		)
+	}
+
+	var result GitmojiResponse
+	r := io.LimitReader(resp.Body, 1<<20)
+	dec := json.NewDecoder(r)
+	dec.DisallowUnknownFields()
+	if err := dec.Decode(&result); err != nil {
+		return GitmojiResponse{}, fmt.Errorf("%w: %v", ErrDecode, err)
+	}
+
+	return result, nil
 }
 
 // オフライン対応のGitmoji取得（フォールバック機能付き）
@@ -59,7 +105,7 @@ func GetAllGitmojisWithConfig(offlineMode bool) ([]Gitmoji, error) {
 		}
 		return nil, errors.New("network connection failed")
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
 		return nil, errors.New("failed to fetch gitmojis from API")
@@ -97,7 +143,7 @@ func IsOnline() bool {
 	if err != nil {
 		return false
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	return resp.StatusCode == http.StatusOK
 }
