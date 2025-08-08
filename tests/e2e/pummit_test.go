@@ -11,11 +11,14 @@ import (
   "time"
 
   "github.com/BurntSushi/toml"
+
   "github.com/HidemaruOwO/pummit/internal/config"
   "github.com/HidemaruOwO/pummit/internal/variable"
 )
 
 var binaryPath string
+
+const testTimeout = 20 * time.Second
 
 func TestMain(m *testing.M) {
   root, err := filepath.Abs("../..")
@@ -32,10 +35,13 @@ func TestMain(m *testing.M) {
     os.Exit(1)
   }
 
+  defer func() {
+    if err := os.Remove(binaryPath); err != nil {
+      fmt.Fprintln(os.Stderr, err)
+    }
+  }()
+
   code := m.Run()
-  if err := os.Remove(binaryPath); err != nil {
-    fmt.Fprintln(os.Stderr, err)
-  }
   os.Exit(code)
 }
 
@@ -76,7 +82,7 @@ func TestCommit(t *testing.T) {
     t.Fatalf("git add: %v\n%s", err, string(out))
   }
 
-  ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
+  ctx, cancel := context.WithTimeout(context.Background(), testTimeout)
   defer cancel()
   cmd := exec.CommandContext(ctx, binaryPath, "sparkles", "test commit")
   cmd.Dir = dir
@@ -101,7 +107,7 @@ func TestCommit(t *testing.T) {
 func TestAliasAdd(t *testing.T) {
   dir := newTestRepo(t)
 
-  ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
+  ctx, cancel := context.WithTimeout(context.Background(), testTimeout)
   defer cancel()
   cmd := exec.CommandContext(
     ctx, binaryPath, "alias", "add", "rs", "rocket", "--emoji", "🚀",
@@ -124,10 +130,12 @@ func TestAliasAdd(t *testing.T) {
   }
 
   found := false
+search:
   for _, a := range cfg.Alias.Entries {
     for _, s := range a.Shortcuts {
       if s == "rs" && a.Name == "rocket" && a.Emoji == "🚀" {
         found = true
+        break search
       }
     }
   }
@@ -139,7 +147,7 @@ func TestAliasAdd(t *testing.T) {
 func TestVersion(t *testing.T) {
   dir := newTestRepo(t)
 
-  ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
+  ctx, cancel := context.WithTimeout(context.Background(), testTimeout)
   defer cancel()
   cmd := exec.CommandContext(ctx, binaryPath, "--version")
   cmd.Dir = dir
