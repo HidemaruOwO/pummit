@@ -267,7 +267,12 @@ func (c *FilePermissionChecker) Check() DiagnosticResult {
 	}
 
 	// テストファイルを削除
-	os.Remove(testFile)
+	if err := os.Remove(testFile); err != nil {
+		result.Status = "ERROR"
+		result.Message = fmt.Sprintf("Failed to remove test file: %v", err)
+		result.Suggestions = append(result.Suggestions, "Check directory permissions")
+		return result
+	}
 
 	return result
 }

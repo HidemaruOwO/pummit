@@ -83,4 +83,4 @@ func Run(question string) (Result, error) {
 	}
 
 	return Result{Confirmed: finalModel.Confirmed}, nil
-} 
+}
