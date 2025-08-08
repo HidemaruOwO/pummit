@@ -90,13 +90,16 @@ func FormatDiagnosticResults() string {
 	warningCount := 0
 
 	for _, result := range results {
-		status := "✅"
-		if result.Status == "ERROR" {
+		var status string
+		switch result.Status {
+		case "ERROR":
 			status = "❌"
 			errorCount++
-		} else if result.Status == "WARNING" {
+		case "WARNING":
 			status = "⚠️"
 			warningCount++
+		default:
+			status = "✅"
 		}
 
 		builder.WriteString(fmt.Sprintf("%s %s: %s\n", status, result.Name, result.Message))
