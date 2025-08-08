@@ -8,6 +8,7 @@ import (
 	"io"
 	"net"
 	"net/http"
+	"os"
 	"time"
 )
 
@@ -110,7 +111,12 @@ func GetAllGitmojisWithConfig(offlineMode bool) ([]Gitmoji, error) {
 		}
 		return nil, errors.New("network connection failed")
 	}
-	defer func() { _ = resp.Body.Close() }()
+
+	defer func() {
+		if err := resp.Body.Close(); err != nil {
+			fmt.Fprintf(os.Stderr, "failed to close response body: %v\n", err)
+		}
+	}()
 
 	if resp.StatusCode != http.StatusOK {
 		return nil, errors.New("failed to fetch gitmojis from API")
@@ -148,7 +154,12 @@ func IsOnline() bool {
 	if err != nil {
 		return false
 	}
-	defer func() { _ = resp.Body.Close() }()
+
+	defer func() {
+		if err := resp.Body.Close(); err != nil {
+			fmt.Fprintf(os.Stderr, "failed to close response body: %v\n", err)
+		}
+	}()
 
 	return resp.StatusCode == http.StatusOK
 }
