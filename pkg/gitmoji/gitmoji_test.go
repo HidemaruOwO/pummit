@@ -11,7 +11,6 @@ import (
 
 func TestFetch(t *testing.T) {
 	t.Parallel()
-
 	mustWrite := func(t *testing.T, w http.ResponseWriter, b []byte) {
 		t.Helper()
 		if _, err := w.Write(b); err != nil {
