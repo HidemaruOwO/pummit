@@ -131,7 +131,9 @@ func TestAliasLifecycle(t *testing.T) {
 	}
 
 	aliascli.AddCmd.SetArgs([]string{"fs", "sparkles"})
-	_ = aliascli.AddCmd.Execute()
+	if err := aliascli.AddCmd.Execute(); err != nil {
+		t.Fatalf("add command (second time) failed: %v", err)
+	}
 
 	aliascli.ResetCmd.SetArgs([]string{"--confirm"})
 	if err := aliascli.ResetCmd.Execute(); err != nil {
