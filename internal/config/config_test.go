@@ -198,7 +198,7 @@ func TestLoadTOMLConfigPartial(t *testing.T) {
 // TestSaveTOMLConfigPermissionError checks write permission failures.
 func TestSaveTOMLConfigPermissionError(t *testing.T) {
 	if !isUnixNonRoot() {
-		t.Skip("skipping permission test: requires non-root on Unix-like OS")
+		t.Skip("skipping permission test: requires non-root Unix-like system")
 	}
 	isolateEnv(t)
 	dir, err := GetConfigDir()
