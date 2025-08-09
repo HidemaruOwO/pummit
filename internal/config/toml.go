@@ -175,7 +175,9 @@ func LoadTOMLConfig() error {
 		return err
 	}
 
-	TOMLConfigPath = filepath.Join(configDir, "config.toml")
+	if TOMLConfigPath == "" {
+		TOMLConfigPath = filepath.Join(configDir, "config.toml")
+	}
 
 	if _, err := os.Stat(TOMLConfigPath); os.IsNotExist(err) {
 		// ファイルが存在しない場合はデフォルト設定で作成
@@ -212,7 +214,11 @@ func SaveTOMLConfig() error {
 	if err != nil {
 		return err
 	}
-	defer file.Close()
+
+	// Close error is ignored because write errors are handled above.
+	defer func() {
+		_ = file.Close()
+	}()
 
 	encoder := toml.NewEncoder(file)
 	return encoder.Encode(CurrentTOMLConfig)
