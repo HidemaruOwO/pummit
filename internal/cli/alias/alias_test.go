@@ -20,7 +20,7 @@ import (
 )
 
 // setupConfig prepares an isolated config for each test to avoid side effects.
-func setupConfig(t *testing.T) {
+func setupConfig(t *testing.T) string {
 	t.Helper()
 	tmp := t.TempDir()
 	t.Setenv("HOME", tmp)
@@ -30,16 +30,21 @@ func setupConfig(t *testing.T) {
 	color.NoColor = true
 
 	config.CurrentTOMLConfig = config.GetDefaultTOMLConfig()
-	config.TOMLConfigPath = ""
+	configPath := filepath.Join(tmp, "config.toml")
+	if err := os.WriteFile(configPath, []byte{}, 0644); err != nil {
+		t.Fatalf("failed to create temp config file: %v", err)
+	}
+	config.TOMLConfigPath = configPath
 	if err := config.SaveTOMLConfig(); err != nil {
 		t.Fatalf("failed to save temp config: %v", err)
 	}
+	return configPath
 }
 
-// loadConfig reads the current config file for assertions.
-func loadConfig(t *testing.T) config.TOMLConfig {
+// loadConfig reads the config file at the given path for assertions.
+func loadConfig(t *testing.T, configPath string) config.TOMLConfig {
 	t.Helper()
-	data, err := os.ReadFile(config.TOMLConfigPath)
+	data, err := os.ReadFile(configPath)
 	if err != nil {
 		t.Fatalf("failed to read config: %v", err)
 	}
@@ -97,14 +102,14 @@ func hasShortcut(cfg config.TOMLConfig, sc string) bool {
 }
 
 func TestAliasLifecycle(t *testing.T) {
-	setupConfig(t)
+	configPath := setupConfig(t)
 
 	aliascli.AddCmd.SetArgs([]string{"fs", "sparkles"})
 	if err := aliascli.AddCmd.Execute(); err != nil {
 		t.Fatalf("add command failed: %v", err)
 	}
 
-	cfg := loadConfig(t)
+	cfg := loadConfig(t, configPath)
 	if !hasShortcut(cfg, "fs") {
 		t.Fatalf("alias not added: %+v", cfg.Alias.Entries)
 	}
@@ -125,7 +130,7 @@ func TestAliasLifecycle(t *testing.T) {
 		t.Fatalf("delete command failed: %v", err)
 	}
 
-	cfg = loadConfig(t)
+	cfg = loadConfig(t, configPath)
 	if hasShortcut(cfg, "fs") {
 		t.Fatalf("alias not deleted: %+v", cfg.Alias.Entries)
 	}
@@ -140,7 +145,7 @@ func TestAliasLifecycle(t *testing.T) {
 		t.Fatalf("reset command failed: %v", err)
 	}
 
-	cfg = loadConfig(t)
+	cfg = loadConfig(t, configPath)
 	if hasShortcut(cfg, "fs") {
 		t.Fatalf("alias not reset: %+v", cfg.Alias.Entries)
 	}
@@ -150,7 +155,7 @@ func TestAliasLifecycle(t *testing.T) {
 }
 
 func TestAliasAddDuplicate(t *testing.T) {
-	setupConfig(t)
+	configPath := setupConfig(t)
 
 	aliascli.AddCmd.SetArgs([]string{"fs", "sparkles"})
 	if err := aliascli.AddCmd.Execute(); err != nil {
@@ -168,7 +173,7 @@ func TestAliasAddDuplicate(t *testing.T) {
 		t.Fatalf("expected error output")
 	}
 
-	cfg := loadConfig(t)
+	cfg := loadConfig(t, configPath)
 	count := 0
 	for _, e := range cfg.Alias.Entries {
 		for _, sc := range e.Shortcuts {
@@ -183,7 +188,7 @@ func TestAliasAddDuplicate(t *testing.T) {
 }
 
 func TestAliasDeleteNonExistent(t *testing.T) {
-	setupConfig(t)
+	configPath := setupConfig(t)
 
 	out, err := captureOutput(t, func() error {
 		aliascli.DeleteCmd.SetArgs([]string{"unknown", "--confirm"})
@@ -196,7 +201,7 @@ func TestAliasDeleteNonExistent(t *testing.T) {
 		t.Fatalf("expected error output")
 	}
 
-	cfg := loadConfig(t)
+	cfg := loadConfig(t, configPath)
 	if !reflect.DeepEqual(cfg.Alias, config.GetDefaultTOMLConfig().Alias) {
 		t.Fatalf("config changed after failed delete")
 	}
