@@ -21,6 +21,7 @@ func TestFetch(t *testing.T) {
 	cases := []struct {
 		name    string
 		handler func(t *testing.T) http.HandlerFunc
+
 		ctxFn   func() (context.Context, context.CancelFunc)
 		assert  func(t *testing.T, res GitmojiResponse, err error)
 	}{

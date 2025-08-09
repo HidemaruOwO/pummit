@@ -38,7 +38,7 @@ var DeleteCmd = &cobra.Command{
 		if err := alias.Delete(name); err != nil {
 			if err == alias.ErrAliasNotFound {
 				log.Errorf("The alias '%s' does not exist", name)
-				return nil
+				return err
 			}
 			return err
 		}
