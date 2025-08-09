@@ -25,7 +25,11 @@ type GitmojiResponse struct {
 }
 
 // maxGitmojiResponseSize prevents memory exhaustion from large payloads.
-// Limit is set to 1MB (1024 * 1024 bytes), a reasonable upper bound.
+
+// Limit is set to 1MB (1024 * 1024 bytes), which is much larger than typical gitmoji API responses
+// (usually under 50KB as of 2024). This conservative upper bound allows for reasonable growth
+// in response size while protecting against accidental or maliciously large payloads.
+
 const maxGitmojiResponseSize = 1024 * 1024
 
 var (

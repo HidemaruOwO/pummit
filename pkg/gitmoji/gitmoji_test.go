@@ -11,19 +11,28 @@ import (
 
 func TestFetch(t *testing.T) {
 	t.Parallel()
+	mustWrite := func(t *testing.T, w http.ResponseWriter, b []byte) {
+		t.Helper()
+		if _, err := w.Write(b); err != nil {
+			t.Fatalf("failed to write response: %v", err)
+		}
+	}
 
 	cases := []struct {
 		name    string
-		handler http.HandlerFunc
-		ctxFn   func() (context.Context, context.CancelFunc)
-		assert  func(t *testing.T, res GitmojiResponse, err error)
+		handler func(t *testing.T) http.HandlerFunc
+
+		ctxFn  func() (context.Context, context.CancelFunc)
+		assert func(t *testing.T, res GitmojiResponse, err error)
 	}{
 		{
 			name: "success",
-			handler: func(w http.ResponseWriter, r *http.Request) {
-				_, _ = w.Write([]byte(
-					`{"gitmojis":[{"emoji":"🎉","code":":tada:","name":"tada"}]}`,
-				))
+			handler: func(t *testing.T) http.HandlerFunc {
+				return func(w http.ResponseWriter, r *http.Request) {
+					mustWrite(t, w, []byte(
+						`{"gitmojis":[{"emoji":"🎉","code":":tada:","name":"tada"}]}`,
+					))
+				}
 			},
 			ctxFn: func() (context.Context, context.CancelFunc) {
 				return context.Background(), func() {}
@@ -39,8 +48,10 @@ func TestFetch(t *testing.T) {
 		},
 		{
 			name: "server error",
-			handler: func(w http.ResponseWriter, r *http.Request) {
-				w.WriteHeader(http.StatusInternalServerError)
+			handler: func(t *testing.T) http.HandlerFunc {
+				return func(w http.ResponseWriter, r *http.Request) {
+					w.WriteHeader(http.StatusInternalServerError)
+				}
 			},
 			ctxFn: func() (context.Context, context.CancelFunc) {
 				return context.Background(), func() {}
@@ -53,9 +64,11 @@ func TestFetch(t *testing.T) {
 		},
 		{
 			name: "timeout",
-			handler: func(w http.ResponseWriter, r *http.Request) {
-				time.Sleep(200 * time.Millisecond)
-				_, _ = w.Write([]byte(`{"gitmojis":[]}`))
+			handler: func(t *testing.T) http.HandlerFunc {
+				return func(w http.ResponseWriter, r *http.Request) {
+					time.Sleep(200 * time.Millisecond)
+					mustWrite(t, w, []byte(`{"gitmojis":[]}`))
+				}
 			},
 			ctxFn: func() (context.Context, context.CancelFunc) {
 				return context.WithTimeout(context.Background(), 50*time.Millisecond)
@@ -71,8 +84,10 @@ func TestFetch(t *testing.T) {
 		},
 		{
 			name: "invalid json",
-			handler: func(w http.ResponseWriter, r *http.Request) {
-				_, _ = w.Write([]byte(`{"gitmojis":[`))
+			handler: func(t *testing.T) http.HandlerFunc {
+				return func(w http.ResponseWriter, r *http.Request) {
+					mustWrite(t, w, []byte(`{"gitmojis":[`))
+				}
 			},
 			ctxFn: func() (context.Context, context.CancelFunc) {
 				return context.Background(), func() {}
@@ -89,7 +104,7 @@ func TestFetch(t *testing.T) {
 		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
-			server := httptest.NewServer(tc.handler)
+			server := httptest.NewServer(tc.handler(t))
 			defer server.Close()
 
 			ctx, cancel := tc.ctxFn()
