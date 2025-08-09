@@ -21,12 +21,16 @@ func New() *Logger {
 
 // Info は情報メッセージを出力します
 func (l *Logger) Info(msg string) {
-	fmt.Fprintln(os.Stdout, msg)
+	if _, err := fmt.Fprintln(os.Stdout, msg); err != nil {
+		color.Red("log output error: %v", err)
+	}
 }
 
 // Infof はフォーマット付きの情報メッセージを出力します
 func (l *Logger) Infof(format string, args ...interface{}) {
-	fmt.Fprintf(os.Stdout, format+"\n", args...)
+	if _, err := fmt.Fprintf(os.Stdout, format+"\n", args...); err != nil {
+		color.Red("log output error: %v", err)
+	}
 }
 
 // Error はエラーメッセージを出力します

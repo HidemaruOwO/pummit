@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -91,6 +92,13 @@ var (
 	CurrentTOMLConfig TOMLConfig
 )
 
+// ensureTOMLConfigPath sets TOMLConfigPath to the default location if unset.
+func ensureTOMLConfigPath(configDir string) {
+	if TOMLConfigPath == "" {
+		TOMLConfigPath = filepath.Join(configDir, "config.toml")
+	}
+}
+
 // デフォルトTOML設定を生成
 func GetDefaultTOMLConfig() TOMLConfig {
 	return TOMLConfig{
@@ -175,9 +183,7 @@ func LoadTOMLConfig() error {
 		return err
 	}
 
-	if TOMLConfigPath == "" {
-		TOMLConfigPath = filepath.Join(configDir, "config.toml")
-	}
+	ensureTOMLConfigPath(configDir)
 
 	if _, err := os.Stat(TOMLConfigPath); os.IsNotExist(err) {
 		// ファイルが存在しない場合はデフォルト設定で作成
@@ -206,18 +212,16 @@ func SaveTOMLConfig() error {
 	}
 
 	// TOMLConfigPathが設定されていない場合は設定
-	if TOMLConfigPath == "" {
-		TOMLConfigPath = filepath.Join(configDir, "config.toml")
-	}
+	ensureTOMLConfigPath(configDir)
 
 	file, err := os.Create(TOMLConfigPath)
 	if err != nil {
 		return err
 	}
-
-	// Close error is ignored because write errors are handled above.
 	defer func() {
-		_ = file.Close()
+		if err := file.Close(); err != nil {
+			fmt.Fprintf(os.Stderr, "failed to close config file: %v\n", err)
+		}
 	}()
 
 	encoder := toml.NewEncoder(file)
