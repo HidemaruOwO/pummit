@@ -32,7 +32,7 @@ Otherwise, the emoji will be inferred from the [prefix] argument.`,
 			inferredEmoji, err := emojis.GetEmojiByName(prefix)
 			if err != nil {
 				log.Errorf("Failed to find emoji for prefix '%s': %v. Use --emoji flag to specify it directly.", prefix, err)
-				return nil
+				return err
 			}
 			actualEmoji = inferredEmoji
 			log.Debugf("Inferred emoji: %s", actualEmoji)
@@ -41,10 +41,10 @@ Otherwise, the emoji will be inferred from the [prefix] argument.`,
 		if err := alias.Add(name, prefix, actualEmoji); err != nil {
 			if errors.Is(err, alias.ErrAliasExists) {
 				log.Errorf("Failed to add alias: %v. The alias '%s' might already exist, or the emoji '%s' might be associated with a different prefix.", err, name, actualEmoji)
-				return nil
+				return err
 			}
 			log.Errorf("Failed to add alias: %v", err)
-			return nil
+			return err
 		}
 
 		log.Infof("Added alias '%s' for prefix '%s' with emoji '%s'", name, prefix, actualEmoji)

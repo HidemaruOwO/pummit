@@ -22,16 +22,18 @@ var (
 	ErrAliasNotFound = errors.New("alias not found")
 )
 
-// findAlias searches for an alias by shortcut and returns its index and the entry.
+// findAlias searches for an alias by shortcut and returns its index and entry.
+// Returning the actual slice element avoids modifying a copy during updates.
 func findAlias(shortcut string) (int, *config.AliasEntry) {
-	for i, entry := range config.CurrentTOMLConfig.Alias.Entries {
-		for _, s := range entry.Shortcuts {
-			if s == shortcut {
-				return i, &entry
-			}
-		}
-	}
-	return -1, nil
+  for i := range config.CurrentTOMLConfig.Alias.Entries {
+    entry := &config.CurrentTOMLConfig.Alias.Entries[i]
+    for _, s := range entry.Shortcuts {
+      if s == shortcut {
+        return i, entry
+      }
+    }
+  }
+  return -1, nil
 }
 
 // findEmojiIndex searches for an alias by emoji and returns its index.
