@@ -218,6 +218,10 @@ func TestSaveTOMLConfigPermissionError(t *testing.T) {
 	if err := os.Chmod(dir, 0o555); err != nil {
 		t.Fatalf("Chmod(dir): %v", err)
 	}
+	t.Cleanup(func() {
+		_ = os.Chmod(path, 0o644)
+		_ = os.Chmod(dir, 0o755)
+	})
 	CurrentTOMLConfig = GetDefaultTOMLConfig()
 	if err := SaveTOMLConfig(); err == nil {
 		t.Fatalf("expected permission error")
