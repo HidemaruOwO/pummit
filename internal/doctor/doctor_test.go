@@ -2,6 +2,9 @@ package doctor
 
 // NOTE: These tests mutate package-level globals in config.
 // Do not use t.Parallel() in this file.
+// Parallel execution is problematic because package-level global mutation can cause
+// race conditions and unpredictable test failures if tests run concurrently.
+// All tests in this file must run serially to avoid cross-test interference.
 
 import (
 	"os"

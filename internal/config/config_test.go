@@ -1,5 +1,7 @@
 // NOTE: These tests mutate package-level globals.
-// Do NOT use t.Parallel() in this file.
+// Do NOT use t.Parallel() in this file, as doing so may cause tests to interfere with
+// each other and produce unreliable results. t.Parallel() is only safe if tests do not
+// mutate shared state (such as package-level variables).
 package config
 
 import (
@@ -7,10 +9,10 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
+	"reflect"
 	"testing"
 
 	"github.com/BurntSushi/toml"
-	"github.com/google/go-cmp/cmp"
 )
 
 // isolateEnv prepares HOME for an isolated test and resets globals.
@@ -66,12 +68,12 @@ func TestTOMLConfigRoundTrip(t *testing.T) {
 		t.Fatalf("LoadTOMLConfig: %v", err)
 	}
 	want := GetDefaultTOMLConfig()
-	if diff := cmp.Diff(want, CurrentTOMLConfig); diff != "" {
-		t.Fatalf("memory mismatch (-want +got):\n%s", diff)
+	if !reflect.DeepEqual(want, CurrentTOMLConfig) {
+		t.Fatalf("CurrentTOMLConfig = %#v want %#v", CurrentTOMLConfig, want)
 	}
 	fileCfg := readConfigFile(t)
-	if diff := cmp.Diff(want, fileCfg); diff != "" {
-		t.Fatalf("file mismatch (-want +got):\n%s", diff)
+	if !reflect.DeepEqual(want, fileCfg) {
+		t.Fatalf("fileCfg = %#v want %#v", fileCfg, want)
 	}
 }
 
@@ -82,8 +84,8 @@ func TestLoadTOMLConfigCreatesDefault(t *testing.T) {
 		t.Fatalf("LoadTOMLConfig: %v", err)
 	}
 	want := GetDefaultTOMLConfig()
-	if diff := cmp.Diff(want, CurrentTOMLConfig); diff != "" {
-		t.Fatalf("memory mismatch (-want +got):\n%s", diff)
+	if !reflect.DeepEqual(want, CurrentTOMLConfig) {
+		t.Fatalf("CurrentTOMLConfig = %#v want %#v", CurrentTOMLConfig, want)
 	}
 	_ = readConfigFile(t)
 }
@@ -160,8 +162,8 @@ func TestLoadTOMLConfigUnknownKeys(t *testing.T) {
 		t.Fatalf("LoadTOMLConfig: %v", err)
 	}
 	want := GetDefaultTOMLConfig()
-	if diff := cmp.Diff(want, CurrentTOMLConfig); diff != "" {
-		t.Fatalf("config mismatch (-want +got):\n%s", diff)
+	if !reflect.DeepEqual(want, CurrentTOMLConfig) {
+		t.Fatalf("CurrentTOMLConfig = %#v want %#v", CurrentTOMLConfig, want)
 	}
 }
 
@@ -196,7 +198,7 @@ func TestLoadTOMLConfigPartial(t *testing.T) {
 // TestSaveTOMLConfigPermissionError checks write permission failures.
 func TestSaveTOMLConfigPermissionError(t *testing.T) {
 	if !isUnixNonRoot() {
-		t.Skip("permission test requires non-root on Unix-like OS")
+		t.Skip("skipping permission test: requires non-root on Unix-like OS")
 	}
 	isolateEnv(t)
 	dir, err := GetConfigDir()
