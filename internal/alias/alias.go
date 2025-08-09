@@ -22,8 +22,8 @@ var (
 	ErrAliasNotFound = errors.New("alias not found")
 )
 
-// findAlias searches for an alias by shortcut and returns its index and entry.
-// Returning the actual slice element avoids modifying a copy during updates.
+// findAlias searches for an alias by shortcut and returns its index and a
+// pointer to the entry to enable in-place modifications.
 func findAlias(shortcut string) (int, *config.AliasEntry) {
 	// Iterate by index to avoid copying the slice value when taking its address.
 	for i := 0; i < len(config.CurrentTOMLConfig.Alias.Entries); i++ {

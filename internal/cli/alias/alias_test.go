@@ -67,11 +67,6 @@ func captureOutput(t *testing.T, f func() error) (string, error) {
 	if err != nil {
 		t.Fatalf("pipe error: %v", err)
 	}
-	defer func() {
-		if err := w.Close(); err != nil && !errors.Is(err, os.ErrClosed) {
-			t.Fatalf("failed to close writer: %v", err)
-		}
-	}()
 
 	oldStdout, oldStderr := os.Stdout, os.Stderr
 	oldColorOut, oldColorErr := color.Output, color.Error
