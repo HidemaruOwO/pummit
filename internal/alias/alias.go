@@ -25,15 +25,16 @@ var (
 // findAlias searches for an alias by shortcut and returns its index and entry.
 // Returning the actual slice element avoids modifying a copy during updates.
 func findAlias(shortcut string) (int, *config.AliasEntry) {
-  for i := range config.CurrentTOMLConfig.Alias.Entries {
-    entry := &config.CurrentTOMLConfig.Alias.Entries[i]
-    for _, s := range entry.Shortcuts {
-      if s == shortcut {
-        return i, entry
-      }
-    }
-  }
-  return -1, nil
+	// Iterate by index to avoid copying the slice value when taking its address.
+	for i := 0; i < len(config.CurrentTOMLConfig.Alias.Entries); i++ {
+		entry := &config.CurrentTOMLConfig.Alias.Entries[i]
+		for _, s := range entry.Shortcuts {
+			if s == shortcut {
+				return i, entry
+			}
+		}
+	}
+	return -1, nil
 }
 
 // findEmojiIndex searches for an alias by emoji and returns its index.
