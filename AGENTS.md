@@ -1,137 +1,69 @@
-# AGENTS.md
+## ❖ Mission
 
-## Build / Lint / Test / Run Commands
+Generate Pull Requests that prioritize **clarity, testability, and minimal diff** so reviewers stay in control.
 
-- Build : `go build -o pummit .`
-- Lint: `golangci-lint run`
-- Test: `go test`
+## ❖ Workflow Directives
 
-## Code Style Guidelines
+1. **Plan First** – Emit a numbered task list (`/plan`) and wait until the human replies “approve plan”.
+2. **PR Granularity**
+   • One feature or bug-fix per PR.
+   • Diff limit: ≤ 400 LOC (hard); warn when exceeding.
+3. **Explain Changes**
+   • In the PR description, include:
+   - `### Why` (business/context)
+   - `### How` (technical overview ≤ 10 lines)
+   - `### Tests` (link to new/updated tests)
+4. **Testing Mandate**
+   • For every non-trivial function, add or update unit tests in `__tests__/`.
+   • Reject your own PR if tests fail (`/abort`).
+5. **Style & Lint**
+   • Run project linters/formatters; commit resulting fixes.
+6. **Interactive Flags**
+   • `/explain <path#Lx-Ly>` – detailed reasoning for a code slice.
+   • `/benchmark` – run provided benchmarks before/after, include table in PR.
 
-- Indentation: 2 spaces, max line length 80 characters
-- Imports: external modules first, then internal paths; alphabetize each group
-- **Import Paths (TypeScript)**: ALWAYS use @/ alias for all internal imports; NO relative paths (../or ./) allowed
-- Naming: camelCase for variables/functions, PascalCase for types/classes, UPPER_SNAKE_CASE for constants
-- Types: annotate all public interfaces and function signatures; avoid `any`
-- Error Handling: handle errors immediately; wrap external errors with context
-- Comments: see Comment Writing Rules
-- Cursor rules: none
-- Copilot instructions: none
+## ❖ Linter / Formatter / Build
 
-### TypeScript Import Path Rules
+After completing the work, please execute these and verify that they function correctly and have no issues.
 
-**MANDATORY**: All TypeScript files must use @/ alias for internal imports
+- Linter: `golangci-lint run`
+- Formatter: `gofmt -w .`
+- Build: `go build -o pummit .`
+- Test: `go test -v ./...`
 
-```typescript
-// ✅ Correct
-import { AppConfig } from "@/core/config.schema";
-import { ILogger } from "@/services/interfaces";
-import { TOKENS } from "@/core/tokens";
+## ❖ Tone & Comments
 
-// ❌ Forbidden
-import { AppConfig } from "../core/config.schema";
-import { ILogger } from "./interfaces";
-import { TOKENS } from "../core/tokens";
-```
+- Keep commit messages imperative (“Add”, “Fix”, “Refactor”).
+- Use inline GitHub review comments to highlight non-obvious lines.
 
-- **Never use relative paths** (../ or ./) for internal imports
-- **Always use @/ alias** pointing to src/ directory
-- When creating new files: use @/ alias from the start
-- When modifying existing files: convert any relative paths to @/ alias
-- tsconfig.json is configured with baseUrl: "./src" and paths: {"@/_": ["_"]}
+## ❖ Safeguards
 
----
+- Never modify CI config or secrets unless plan explicitly includes it.
+- If ambiguity in requirements, open an Issue (`/ask`) instead of coding.
 
-## Language & Communication
+## ❖ Review Checklist (auto-appended)
 
-- All responses must be in Japanese
+- [ ] Tests added/updated
+- [ ] Lint passes
+- [ ] Documentation updated
+- [ ] Performance <= baseline
 
-## Workflow Efficiency
+## ❖ MCP Tasks
 
-- After receiving tool output, assess quality and plan next steps before acting
-- For independent tasks, invoke tools concurrently rather than sequentially
-- If you encounter an error during implementation that you cannot resolve, use o3-search mcp to investigate.
+| MCP Name      | Trigger Syntax                                | Typical Use Case                                                                                                             | Decision Criteria                                                                                    | Expected Behavior                                                                                                                                           |
+| ------------- | --------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| serena mcp    | `@serena edit <scope> "<instruction>"`        | Large-scale refactoring, API compatibility changes, or bulk pattern replacements within the existing codebase                | • Use serena if 3+ files or 100+ LOC are affected<br>• Prefer serena if no external info needed      | 1. Ask for confirmation of scope.<br>2. Apply edits via Serena MCP.<br>3. Post diff summary + Serena dashboard link.<br>4. Mark checklist item `Serena ✔`. |
+| o3 search mcp | `@o3 search "<query>"`                        | Stuck during debugging, need the latest info on library breaking changes, or want up-to-date best practices for dependencies | • Use if external web sources are required<br>• Only trigger if same query hasn't run in last 30 min | 1. Call o3‐search MCP.<br>2. Attach top-5 results table (title, gist, url).<br>3. Cache query for 30 min to avoid spam.                                     |
+| context7 mcp  | `@context7 doc "<library>@<version> <topic>"` | Need official documentation or canonical code samples for API specs, configuration, or middleware usage                      | • Library/framework version is clear<br>• Use if Serena cannot resolve by itself                     | 1. Fetch latest docs via Context7 MCP.<br>2. Insert a 7-sentence summary + canonical code snippet.<br>3. Reference doc URL in PR comment.                   |
 
-## Branch Management and Task Tracking
+> **Selection Logic**
+>
+> 1. If the task involves internal code edits only, use `serena mcp`.
+> 2. If external information is required:
+>    　　A. For official docs or samples, use `context7 mcp`.
+>    　　B. For general search needs, use `o3 search mcp`.
+> 3. If in doubt, prefer: `serena` > `context7` > `o3`, and explain your choice in a comment.
 
-### Branch Naming Convention
+## ❖ Sources & Inspiration
 
-Before starting any work, create an appropriately named branch:
-
-- `feature/working-name` - for new features
-- `bug/working-name` - for bug fixes
-- `fix/working-name` - for general fixes
-- `refactor/working-name` - for refactoring work
-
-### Task Checklist Management
-
-Before beginning work, locate and update the appropriate task checklist:
-
-1. Navigate to `docs/` directory
-2. Find the appropriate version specifications
-3. Open `tasks.md` in the relevant version folder
-4. Check off completed items in the task checklist as work progresses
-
-## MCP Guidelines
-
-### ASerena MCP
-
-- When starting a new project and wanting to understand the code structure
-- When you want AI to plan complex refactoring or design
-- When you want to speed up bug fixes for websites or applications
-- When you want to generate or edit code directly from Claude Code/Claude Desktop
-- When you want to check logs and manage processes in a monitoring dashboard
-
-### Context7 MCP
-
-- When you want to reference the latest API documentation for libraries or frameworks in use
-- When you want to prevent errors from outdated training data suggesting "non-existent APIs" or "deprecated methods"
-- When you want to get the latest code examples immediately by instructing "use context7" in natural language in your prompt
-- When dealing with rapidly evolving libraries such as Next.js, Tailwind CSS, React Query, etc.
-
-## Comment Writing Rules
-
-### Format
-
-- Write all comments in English
-
-### Content
-
-#### Required
-
-- Why the code was written (background, rationale)
-- Business logic and rule explanations
-- External dependencies and constraints
-- Important notes for future developers
-- Performance and security considerations
-- Intent and purpose of complex algorithms
-
-#### Prohibited
-
-- Comments that only describe what the code does
-- Details that mirror implementation
-- Unnecessary or outdated explanations
-- Information obvious from names
-
-### Quality Standards
-
-- Provide information understandable without reading the code
-- Focus on “why” rather than “what”
-- Include only details that remain valid when implementation changes
-- Be concise and specific
-
-### Layout
-
-- Surround comments with blank lines
-- Match indentation to code level
-- Use consistent multi-line notation
-
-## Response Structure (CoT + Answer)
-
-1. Include reasoning in every response
-2. Structure as CoT (Chain of Thoughts) followed by the final answer
-3. Present CoT in a plain-text code block and close it; do not wrap the final answer
-4. To preserve Markdown rendering, use `"""` for internal code snippets in CoT
-5. Follow CoT with a conversational final answer
-6. Do not use emojis or `**` for emphasis in the final answer
-7. If corrected by the user, analyze the cause, reflect on appropriateness, and consider alternatives
+Guidelines derived from Anthropic Claude Code best practices and OpenCode OSS docs.

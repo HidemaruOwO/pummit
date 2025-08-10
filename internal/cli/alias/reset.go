@@ -12,16 +12,26 @@ import (
 var ResetCmd = &cobra.Command{
 	Use:   "reset",
 	Short: "Reset all alias settings",
-	// Short: "すべてのエイリアス設定をリセットします",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		log := logger.New()
 
-		result, err := prompt.Run("Are you sure you want to reset all alias settings?")
+		confirmFlag, err := cmd.Flags().GetBool("confirm")
 		if err != nil {
-			return fmt.Errorf("failed to show confirmation prompt: %w", err)
+			return fmt.Errorf("failed to get confirm flag: %w", err)
 		}
 
-		if !result.Confirmed {
+		confirmed := confirmFlag
+		if !confirmed {
+			result, err := prompt.Run(
+				"Are you sure you want to reset all alias settings?",
+			)
+			if err != nil {
+				return fmt.Errorf("failed to show confirmation prompt: %w", err)
+			}
+			confirmed = result.Confirmed
+		}
+
+		if !confirmed {
 			log.Info("Reset canceled")
 			return nil
 		}
@@ -33,4 +43,8 @@ var ResetCmd = &cobra.Command{
 		log.Info("All alias settings have been reset")
 		return nil
 	},
+}
+
+func init() {
+	ResetCmd.Flags().Bool("confirm", false, "Skip confirmation prompt")
 }
