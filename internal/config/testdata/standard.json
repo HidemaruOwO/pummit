@@ -1,0 +1,10 @@
+{
+  "writeEmoji": true,
+  "useAlias": true,
+  "useLimitPathesLength": true,
+  "limitPathesLength": 10,
+  "alias": [
+    ["s,feat,feature", "sparkles", "✨"],
+    ["c,wip", "construction", "🚧"]
+  ]
+}
