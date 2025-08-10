@@ -247,6 +247,12 @@ func fileExists(path string) bool {
 	return err == nil
 }
 
+// CreateDefaultTOMLConfig writes the default TOML configuration to disk.
+func CreateDefaultTOMLConfig() error {
+	CurrentTOMLConfig = GetDefaultTOMLConfig()
+	return SaveTOMLConfig()
+}
+
 // 自動マイグレーション（設定読み込み時に実行）
 func AutoMigrate() error {
 	status, err := CheckConfigStatus()
@@ -276,6 +282,6 @@ func AutoMigrate() error {
 		return nil
 	}
 
-	// 設定ファイルが存在しない場合は何もしない
-	return nil
+	// 設定ファイルが存在しない場合はデフォルトTOML設定を作成
+	return CreateDefaultTOMLConfig()
 }

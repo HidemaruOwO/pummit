@@ -28,6 +28,7 @@ func isolateEnv(t *testing.T) string {
 	home := t.TempDir()
 	t.Setenv("HOME", home)
 	t.Setenv("XDG_CONFIG_HOME", filepath.Join(home, ".config"))
+	t.Setenv("LC_ALL", "C")
 	return home
 }
 
@@ -35,6 +36,40 @@ func isolateEnv(t *testing.T) string {
 func resetGlobals() {
 	TOMLConfigPath = ""
 	CurrentTOMLConfig = TOMLConfig{}
+}
+
+func TestAutoMigrateCreatesDefaultConfig(t *testing.T) {
+	isolateEnv(t)
+	resetGlobals()
+
+	if err := AutoMigrate(); err != nil {
+		t.Fatalf("AutoMigrate: %v", err)
+	}
+
+	dir, err := GetConfigDir()
+	if err != nil {
+		t.Fatalf("GetConfigDir: %v", err)
+	}
+
+	tomlPath := filepath.Join(dir, "config.toml")
+	data, err := os.ReadFile(tomlPath)
+	if err != nil {
+		t.Fatalf("read toml: %v", err)
+	}
+
+	var got TOMLConfig
+	md, err := toml.Decode(string(data), &got)
+	if err != nil {
+		t.Fatalf("decode toml: %v", err)
+	}
+	if undec := md.Undecoded(); len(undec) != 0 {
+		t.Fatalf("undecoded fields: %v", undec)
+	}
+
+	expect := GetDefaultTOMLConfig()
+	if diff := cmp.Diff(expect, got); diff != "" {
+		t.Fatalf("default config mismatch (-want +got):\n%s", diff)
+	}
 }
 
 func TestAutoMigrate(t *testing.T) {
