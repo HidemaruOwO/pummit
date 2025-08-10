@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"time"
 )
 
 // マイグレーション関連のエラー
@@ -18,7 +17,10 @@ type MigrationError struct {
 
 func (e *MigrationError) Error() string {
 	if e.Err != nil {
-		return fmt.Sprintf("migration %s failed for %s: %s (%v)", e.Op, e.Path, e.Message, e.Err)
+		return fmt.Sprintf(
+			"migration %s failed for %s: %s (%v)",
+			e.Op, e.Path, e.Message, e.Err,
+		)
 	}
 	return fmt.Sprintf("migration %s failed for %s: %s", e.Op, e.Path, e.Message)
 }
@@ -65,7 +67,8 @@ func MigrateConfig(force bool, dryRun bool) (*MigrationResult, error) {
 	if _, err := os.Stat(jsonPath); os.IsNotExist(err) {
 		// JSONファイルが存在しない場合、デフォルトTOMLを作成
 		if dryRun {
-			result.Message = "[DRY-RUN] Would create default TOML config (no JSON config found)."
+			result.Message = "[DRY-RUN] Would create default TOML config " +
+				"(no JSON config found)."
 			return result, nil
 		}
 
@@ -126,14 +129,20 @@ func MigrateConfig(force bool, dryRun bool) (*MigrationResult, error) {
 		}
 	}
 
-	// JSON設定ファイルをバックアップ
+	// back up JSON config
 	backupPath, err := createBackup(jsonPath)
 	if err != nil {
 		// バックアップ失敗は警告として扱い、処理は継続
-		result.Message = fmt.Sprintf("Migration completed, but backup failed: %v", err)
+		result.Message = fmt.Sprintf(
+			"Migration completed, but backup failed: %v",
+			err,
+		)
 	} else {
 		result.BackupPath = backupPath
-		result.Message = fmt.Sprintf("Migration completed. JSON config backed up to: %s", backupPath)
+		result.Message = fmt.Sprintf(
+			"Migration completed. JSON config backed up to: %s",
+			backupPath,
+		)
 	}
 
 	result.Success = true
@@ -166,31 +175,16 @@ func CheckConfigStatus() (string, error) {
 	}
 }
 
-// バックアップファイルを作成
+// createBackup renames the original JSON to a .bak file so it can be recovered
 func createBackup(originalPath string) (string, error) {
-	// タイムスタンプ付きのバックアップファイル名を生成
-	timestamp := time.Now().Format("20060102_150405")
-	dir := filepath.Dir(originalPath)
-	ext := filepath.Ext(originalPath)
-	base := filepath.Base(originalPath)
-	nameWithoutExt := base[:len(base)-len(ext)]
-
-	backupPath := filepath.Join(dir, fmt.Sprintf("%s.%s.bak", nameWithoutExt, timestamp))
-
-	// ファイルをコピー
-	data, err := os.ReadFile(originalPath)
-	if err != nil {
+	backupPath := originalPath + ".bak"
+	if err := os.Rename(originalPath, backupPath); err != nil {
 		return "", err
 	}
-
-	if err := os.WriteFile(backupPath, data, 0644); err != nil {
-		return "", err
-	}
-
 	return backupPath, nil
 }
 
-// ロールバック機能
+// rollback configuration from backup
 func RollbackConfig(backupPath string) error {
 	if !fileExists(backupPath) {
 		return &MigrationError{
@@ -282,7 +276,6 @@ func AutoMigrate() error {
 		return nil
 	}
 
-	// 設定ファイルが存在しない場合、TOML形式でデフォルト設定を作成
-	CurrentTOMLConfig = GetDefaultTOMLConfig()
-	return SaveTOMLConfig()
+	// 設定ファイルが存在しない場合は何もしない
+	return nil
 }

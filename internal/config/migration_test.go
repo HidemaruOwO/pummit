@@ -1,0 +1,132 @@
+package config
+
+import (
+	_ "embed"
+	"os"
+	"path/filepath"
+	"testing"
+
+	"github.com/BurntSushi/toml"
+	"github.com/google/go-cmp/cmp"
+)
+
+// NOTE: These tests mutate package-level state and the filesystem under a
+// temporary directory. Do not run them in parallel.
+
+//go:embed testdata/standard.json
+var standardJSON []byte
+
+//go:embed testdata/empty_alias.json
+var emptyAliasJSON []byte
+
+//go:embed testdata/missing_fields.json
+var missingFieldsJSON []byte
+
+// isolateEnv resets HOME and related variables to a temp directory.
+func isolateEnv(t *testing.T) string {
+	t.Helper()
+	home := t.TempDir()
+	t.Setenv("HOME", home)
+	t.Setenv("XDG_CONFIG_HOME", filepath.Join(home, ".config"))
+	return home
+}
+
+// resetGlobals clears package-level state for tests.
+func resetGlobals() {
+	TOMLConfigPath = ""
+	CurrentTOMLConfig = TOMLConfig{}
+}
+
+func TestAutoMigrate(t *testing.T) {
+	tests := []struct {
+		name        string
+		jsonContent []byte
+		expect      TOMLConfig
+	}{
+		{
+			name:        "standard configuration",
+			jsonContent: standardJSON,
+			expect: TOMLConfig{
+				Base: BaseConfig{Emoji: true, FilesLength: 10},
+				Alias: AliasConfig{
+					Enabled: true,
+					Entries: []AliasEntry{
+						{Shortcuts: []string{"s", "feat", "feature"}, Name: "sparkles", Emoji: "✨"},
+						{Shortcuts: []string{"c", "wip"}, Name: "construction", Emoji: "🚧"},
+					},
+				},
+			},
+		},
+		{
+			name:        "empty alias list",
+			jsonContent: emptyAliasJSON,
+			expect: TOMLConfig{
+				Base:  BaseConfig{Emoji: true, FilesLength: 0},
+				Alias: AliasConfig{Enabled: true, Entries: []AliasEntry{}},
+			},
+		},
+		{
+			name:        "missing fields",
+			jsonContent: missingFieldsJSON,
+			expect: TOMLConfig{
+				Base: BaseConfig{Emoji: false, FilesLength: 0},
+				Alias: AliasConfig{
+					Enabled: false,
+					Entries: []AliasEntry{{Shortcuts: []string{"b"}, Name: "bug", Emoji: "🐛"}},
+				},
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			isolateEnv(t)
+			resetGlobals()
+
+			dir, err := GetConfigDir()
+			if err != nil {
+				t.Fatalf("GetConfigDir: %v", err)
+			}
+			if err := os.MkdirAll(dir, 0755); err != nil {
+				t.Fatalf("MkdirAll: %v", err)
+			}
+			jsonPath := filepath.Join(dir, "config.json")
+			if err := os.WriteFile(jsonPath, tt.jsonContent, 0644); err != nil {
+				t.Fatalf("write json: %v", err)
+			}
+
+			if err := AutoMigrate(); err != nil {
+				t.Fatalf("AutoMigrate: %v", err)
+			}
+
+			tomlPath := filepath.Join(dir, "config.toml")
+			data, err := os.ReadFile(tomlPath)
+			if err != nil {
+				t.Fatalf("read toml: %v", err)
+			}
+			var got TOMLConfig
+			if _, err := toml.Decode(string(data), &got); err != nil {
+				t.Fatalf("decode toml: %v", err)
+			}
+
+			if diff := cmp.Diff(tt.expect.Base, got.Base); diff != "" {
+				t.Fatalf("Base mismatch (-want +got):\n%s", diff)
+			}
+			if diff := cmp.Diff(tt.expect.Alias, got.Alias); diff != "" {
+				t.Fatalf("Alias mismatch (-want +got):\n%s", diff)
+			}
+
+			bakPath := filepath.Join(dir, "config.json.bak")
+			bak, err := os.ReadFile(bakPath)
+			if err != nil {
+				t.Fatalf("backup not found: %v", err)
+			}
+			if diff := cmp.Diff(tt.jsonContent, bak); diff != "" {
+				t.Fatalf("backup content mismatch (-want +got):\n%s", diff)
+			}
+			if _, err := os.Stat(jsonPath); err == nil {
+				t.Fatalf("config.json should be renamed")
+			}
+		})
+	}
+}
