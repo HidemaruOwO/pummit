@@ -23,12 +23,12 @@
 
 | 優先度 | 完了 | 総数 | 進捗率 | 状態 |
 |--------|------|------|--------|------|
-| 🔥 High | 2 | 8 | 25% | ![🟡](https://via.placeholder.com/15/ffff00/000000?text=+) |
+| 🔥 High | 3 | 8 | 38% | ![🟡](https://via.placeholder.com/15/ffff00/000000?text=+) |
 | 🔷 Medium | 0 | 6 | 0% | ![🔴](https://via.placeholder.com/15/ff0000/000000?text=+) |
 | 🔵 Low | 0 | 4 | 0% | ![🔴](https://via.placeholder.com/15/ff0000/000000?text=+) |
 | 📋 Maintenance | 0 | 6 | 0% | ![🔴](https://via.placeholder.com/15/ff0000/000000?text=+) |
 
-**全体進捗**: 2/24 (8%)
+**全体進捗**: 3/24 (13%)
 
 ### ✅ 実装完了済み（優先度から削除 - 総数に含まず）
 - ~~H03: `pummit doctor` MVP実装~~ → ✅ 包括的診断機能実装済み
@@ -76,7 +76,7 @@
 - **関連ファイル**: `.github/workflows/`, benchmark tests
 
 ### H03: コマンド体系統一実装 `#feature` `#cli` `#breaking-change`
-- [ ] **概要**: v3.0.0でのサブコマンド形式への完全移行実装
+- [x] **概要**: v3.0.0でのサブコマンド形式への完全移行実装
 - **詳細**:
   - `alias:add` → `alias add` 形式への変更
   - `pummit config` 統合エントリーポイント実装
