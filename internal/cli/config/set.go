@@ -23,6 +23,10 @@ var SetCmd = &cobra.Command{
 			return err
 		}
 
+		if err := ValidateRequiredFields(cfg.CurrentTOMLConfig); err != nil {
+			return fmt.Errorf("validation failed: %w", err)
+		}
+
 		if err := cfg.SaveTOMLConfig(); err != nil {
 			return err
 		}

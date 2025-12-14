@@ -23,7 +23,7 @@ var ValidateCmd = &cobra.Command{
 			return fmt.Errorf("failed to parse config: %w", err)
 		}
 
-		if err := validateRequiredFields(parsed); err != nil {
+		if err := ValidateRequiredFields(parsed); err != nil {
 			return err
 		}
 
@@ -32,14 +32,15 @@ var ValidateCmd = &cobra.Command{
 	},
 }
 
-func validateRequiredFields(c cfg.TOMLConfig) error {
+// ValidateRequiredFields validates the configuration for required fields and constraints.
+func ValidateRequiredFields(c cfg.TOMLConfig) error {
 	if c.Meta.Version == "" {
 		return fmt.Errorf("meta.version is required")
 	}
-	if c.Templates.Enabled && c.Templates.DefaultTemplate == "" {
-		return fmt.Errorf("templates.defaultTemplate is required when templates.enabled is true")
-	}
 	if c.Templates.Enabled {
+		if c.Templates.DefaultTemplate == "" {
+			return fmt.Errorf("templates.defaultTemplate is required when templates.enabled is true")
+		}
 		if _, ok := c.Templates.Definitions[c.Templates.DefaultTemplate]; !ok {
 			return fmt.Errorf("templates.defaultTemplate '%s' is not defined", c.Templates.DefaultTemplate)
 		}

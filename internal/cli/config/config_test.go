@@ -174,7 +174,7 @@ func TestConfigDefaultShowsHelp(t *testing.T) {
 	setupConfig(t)
 
 	out, err := captureOutput(t, func() error {
-		cli.Cmd.SetArgs(nil)
+		cli.Cmd.SetArgs([]string{})
 		return cli.Cmd.Execute()
 	})
 	if err != nil {
