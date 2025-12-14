@@ -23,14 +23,14 @@
 
 | 優先度 | 完了 | 総数 | 進捗率 | 状態 |
 |--------|------|------|--------|------|
-| 🔥 High | 4 | 8 | 50% | ![🟡](https://via.placeholder.com/15/ffff00/000000?text=+) |
-| 🔷 Medium | 1 | 6 | 17% | ![🔴](https://via.placeholder.com/15/ff0000/000000?text=+) |
+| 🔥 High | 2 | 8 | 25% | ![🟡](https://via.placeholder.com/15/ffff00/000000?text=+) |
+| 🔷 Medium | 0 | 6 | 0% | ![🔴](https://via.placeholder.com/15/ff0000/000000?text=+) |
 | 🔵 Low | 0 | 4 | 0% | ![🔴](https://via.placeholder.com/15/ff0000/000000?text=+) |
 | 📋 Maintenance | 0 | 6 | 0% | ![🔴](https://via.placeholder.com/15/ff0000/000000?text=+) |
 
-**全体進捗**: 5/24 (21%)
+**全体進捗**: 2/24 (8%)
 
-### ✅ 実装完了済み（優先度から削除）
+### ✅ 実装完了済み（優先度から削除 - 総数に含まず）
 - ~~H03: `pummit doctor` MVP実装~~ → ✅ 包括的診断機能実装済み
 - ~~H04: `--offline`フラグ実装~~ → ✅ 完全なオフライン対応実装済み
 - ~~M01: 設定ファイルマイグレーション機能~~ → ✅ JSON→TOML変換実装済み
@@ -124,7 +124,7 @@
 - **関連ファイル**: [`README.md`](README.md)
 
 ### H06: CI でのrace detector追加 `#testing` `#quality` `#concurrency`
-- [ ] **概要**: `go test ./... -race`をCIに統合
+- [x] **概要**: `go test ./... -race`をCIに統合
 - **詳細**:
   - GitHub Actionsでのrace detector実行
   - 並行処理バグの早期検出
@@ -140,7 +140,7 @@
 - **関連ファイル**: `.github/workflows/test.yml`
 
 ### H07: 統合設定管理コマンド設計 `#feature` `#config` `#ux`
-- [ ] **概要**: `pummit config`単一エントリーポイントの設計
+- [x] **概要**: `pummit config`単一エントリーポイントの設計
 - **詳細**:
   - 複数サブコマンドの統合設計
   - デフォルト動作（エディター起動）の決定

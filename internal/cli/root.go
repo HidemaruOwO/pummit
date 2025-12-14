@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/HidemaruOwO/pummit/internal/cli/alias"
+	configCmd "github.com/HidemaruOwO/pummit/internal/cli/config"
 	"github.com/HidemaruOwO/pummit/internal/config"
 	"github.com/HidemaruOwO/pummit/internal/git"
 	"github.com/HidemaruOwO/pummit/internal/variable"
@@ -84,6 +85,7 @@ func Execute() error {
 	rootCmd.AddCommand(migrateCmd)
 	rootCmd.AddCommand(doctorCmd)
 	rootCmd.AddCommand(mcpCmd)
+	rootCmd.AddCommand(configCmd.Cmd)
 
 	// aliasコマンド群をサブコマンドとして統合
 	aliasCmd := &cobra.Command{
