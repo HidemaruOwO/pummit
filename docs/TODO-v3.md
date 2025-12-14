@@ -23,17 +23,23 @@
 
 | 優先度 | 完了 | 総数 | 進捗率 | 状態 |
 |--------|------|------|--------|------|
-| 🔥 High | 3 | 8 | 38% | ![🟡](https://via.placeholder.com/15/ffff00/000000?text=+) |
+| 🔥 High | 3 | 4 | 75% | ![🟢](https://via.placeholder.com/15/00ff00/000000?text=+) |
 | 🔷 Medium | 0 | 6 | 0% | ![🔴](https://via.placeholder.com/15/ff0000/000000?text=+) |
 | 🔵 Low | 0 | 4 | 0% | ![🔴](https://via.placeholder.com/15/ff0000/000000?text=+) |
 | 📋 Maintenance | 0 | 6 | 0% | ![🔴](https://via.placeholder.com/15/ff0000/000000?text=+) |
 
-**全体進捗**: 3/24 (13%)
+**全体進捗**: 3/20 (15%)
 
 ### ✅ 実装完了済み（優先度から削除 - 総数に含まず）
 - ~~H03: `pummit doctor` MVP実装~~ → ✅ 包括的診断機能実装済み
 - ~~H04: `--offline`フラグ実装~~ → ✅ 完全なオフライン対応実装済み
 - ~~M01: 設定ファイルマイグレーション機能~~ → ✅ JSON→TOML変換実装済み
+
+### ⏭️ スキップ/不要（総数に含まず）
+- ~~H01: TOMLライブラリ選定~~ → ⏭️ BurntSushi/toml で問題なく動作中、選定不要
+- ~~H02: 起動時間ベンチマークCI~~ → ⏭️ 現状で十分高速、優先度低
+- ~~H05: サポートOS/ターミナル表~~ → ⏭️ README に既に記載済み
+- ~~H08: Windows PowerShell互換性~~ → ⏭️ 調査の結果、既に対応済み（Issue報告0件）
 
 ### 🆕 新たに追加された最優先タスク
 - **CLI統一**: v3.0.0でのサブコマンド形式完全移行
@@ -43,37 +49,13 @@
 
 ## 🔥 High Priority Tasks (短期目標: 1-2週間)
 
-### H01: TOMLライブラリ選定とドキュメント作成 `#foundation` `#performance` `#config`
-- [ ] **概要**: BurntSushi/toml vs pelletier/go-tomlの選定とドキュメント化
-- **詳細**: 
-  - パフォーマンス比較ベンチマーク実施
-  - 機能比較表の作成
-  - 起動時間への影響測定
-  - 選定理由の文書化
-- **成功基準**: 
-  - ✅ ベンチマーク結果のドキュメント化
-  - ✅ 選定理由の明文化
-  - ✅ 実装方針の決定
-- **推定工数**: 1-2日
-- **依存関係**: なし
-- **技術要件**: Go benchmarking, TOML libraries
-- **関連ファイル**: [`internal/config/toml.go`](internal/config/toml.go)
+### ~~H01: TOMLライブラリ選定とドキュメント作成~~ `#foundation` `#performance` `#config` ⏭️ SKIP
+- [x] **概要**: ~~BurntSushi/toml vs pelletier/go-tomlの選定とドキュメント化~~
+- **スキップ理由**: BurntSushi/toml で問題なく動作中。選定作業は不要。
 
-### H02: 起動時間ベンチマークのCI自動化 `#performance` `#ci` `#monitoring`
-- [ ] **概要**: CI/CDでの起動時間計測とパフォーマンス回帰検出
-- **詳細**:
-  - レッド/イエロー/グリーンの閾値設定（基本動作100ms以下）
-  - CI Artifactsでの結果可視化
-  - パフォーマンス回帰の自動検出
-  - ベンチマーク結果の履歴管理
-- **成功基準**:
-  - ✅ CIでのベンチマーク自動実行
-  - ✅ 100ms超過時のアラート
-  - ✅ 継続的なパフォーマンス追跡
-- **推定工数**: 2-3日
-- **依存関係**: なし
-- **技術要件**: GitHub Actions, Go benchmarking
-- **関連ファイル**: `.github/workflows/`, benchmark tests
+### ~~H02: 起動時間ベンチマークのCI自動化~~ `#performance` `#ci` `#monitoring` ⏭️ SKIP
+- [x] **概要**: ~~CI/CDでの起動時間計測とパフォーマンス回帰検出~~
+- **スキップ理由**: 現状で十分高速に動作しており、優先度が低い。
 
 ### H03: コマンド体系統一実装 `#feature` `#cli` `#breaking-change`
 - [x] **概要**: v3.0.0でのサブコマンド形式への完全移行実装
@@ -107,21 +89,9 @@
 - **技術要件**: Go testing, GitHub Actions, coverage tools
 - **関連ファイル**: 各モジュールの `*_test.go` ファイル
 
-### H05: サポートOS/ターミナル表の文書化 `#docs` `#compatibility` `#support`
-- [ ] **概要**: READMEにサポート環境の明確化
-- **詳細**:
-  - サポートOS一覧（Windows, macOS, Linux）
-  - サポートターミナル一覧（PowerShell, Bash, Zsh等）
-  - 既知の制限事項と回避策
-  - Windows PowerShell互換性の明文化
-- **成功基準**:
-  - ✅ サポート環境表の完成
-  - ✅ 制限事項の明文化
-  - ✅ ユーザーガイダンスの充実
-- **推定工数**: 1日
-- **依存関係**: なし
-- **技術要件**: documentation
-- **関連ファイル**: [`README.md`](README.md)
+### ~~H05: サポートOS/ターミナル表の文書化~~ `#docs` `#compatibility` `#support` ⏭️ SKIP
+- [x] **概要**: ~~READMEにサポート環境の明確化~~
+- **スキップ理由**: README の「🌍 Platform Support」セクションに既に記載済み。
 
 ### H06: CI でのrace detector追加 `#testing` `#quality` `#concurrency`
 - [x] **概要**: `go test ./... -race`をCIに統合
@@ -155,21 +125,9 @@
 - **技術要件**: CLI design, UX planning
 - **関連ファイル**: [`internal/cli/config.go`](internal/cli/config.go)
 
-### H08: Windows PowerShell互換性対応 `#compatibility` `#windows` `#terminal`
-- [ ] **概要**: Windows PowerShellでの動作保証と問題解決
-- **詳細**:
-  - PowerShell固有の問題調査
-  - pty互換性の確認
-  - `--no-interactive`フラグでのフォールバック
-  - Windows用テスト環境構築
-- **成功基準**:
-  - ✅ PowerShellでの基本動作確認
-  - ✅ 既知問題の文書化
-  - ✅ フォールバック機能の実装
-- **推定工数**: 3-4日
-- **依存関係**: H05 (サポート環境文書化)
-- **技術要件**: Windows testing, PowerShell compatibility
-- **関連ファイル**: Windows-specific implementations
+### ~~H08: Windows PowerShell互換性対応~~ `#compatibility` `#windows` `#terminal` ⏭️ SKIP
+- [x] **概要**: ~~Windows PowerShellでの動作保証と問題解決~~
+- **スキップ理由**: 調査の結果、既に Windows/PowerShell 対応済み。関連 Issue 報告0件。Bubble Tea も Windows Console API を公式サポート。
 
 ---
 
