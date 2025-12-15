@@ -22,7 +22,7 @@ Usage with Claude Desktop:
 
 Available MCP tools:
 - git.smart_commit: Intelligent commit workflow with auto-analysis
-- git.status: Repository status information  
+- git.status: Repository status information
 - git.commit: Direct commit with specified parameters
 - git.add_files: Stage files for commit
 - git.get_edited_files: List modified files
@@ -44,9 +44,4 @@ func runMcpCommand(cmd *cobra.Command, args []string) {
 		log.Error("Failed to start MCP server: " + err.Error())
 		return
 	}
-}
-
-func init() {
-	// ルートコマンドにmcpサブコマンドを追加
-	rootCmd.AddCommand(mcpCmd)
 }
