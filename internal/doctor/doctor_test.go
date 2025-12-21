@@ -13,6 +13,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"runtime"
+	"strings"
 	"testing"
 
 	"github.com/HidemaruOwO/pummit/internal/config"
@@ -171,5 +172,339 @@ func TestGetSystemInfoGitVersionFormat(t *testing.T) {
 	m := reGitVerAny.FindStringSubmatch(info.GitVersion)
 	if m == nil {
 		t.Fatalf("unexpected git version: %q", info.GitVersion)
+	}
+}
+
+func TestDiagnosticResultsHasErrors(t *testing.T) {
+	tests := []struct {
+		name    string
+		results DiagnosticResults
+		want    bool
+	}{
+		{"no errors", DiagnosticResults{{Status: "OK"}, {Status: "WARNING"}}, false},
+		{"has error", DiagnosticResults{{Status: "OK"}, {Status: "ERROR"}}, true},
+		{"empty", DiagnosticResults{}, false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.results.HasErrors(); got != tt.want {
+				t.Fatalf("got %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestDiagnosticResultsHasWarnings(t *testing.T) {
+	tests := []struct {
+		name    string
+		results DiagnosticResults
+		want    bool
+	}{
+		{"no warnings", DiagnosticResults{{Status: "OK"}, {Status: "ERROR"}}, false},
+		{"has warning", DiagnosticResults{{Status: "OK"}, {Status: "WARNING"}}, true},
+		{"empty", DiagnosticResults{}, false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.results.HasWarnings(); got != tt.want {
+				t.Fatalf("got %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestGitConfigCheckerName(t *testing.T) {
+	c := &GitConfigChecker{}
+	if got := c.Name(); got != "Git Configuration" {
+		t.Fatalf("got %q, want %q", got, "Git Configuration")
+	}
+}
+
+func TestGitRepositoryCheckerName(t *testing.T) {
+	c := &GitRepositoryChecker{}
+	if got := c.Name(); got != "Git Repository Status" {
+		t.Fatalf("got %q, want %q", got, "Git Repository Status")
+	}
+}
+
+func TestGitRepositoryCheckerNotARepo(t *testing.T) {
+	tmp := t.TempDir()
+	wd, err := os.Getwd()
+	if err != nil {
+		t.Fatalf("getwd: %v", err)
+	}
+	if err := os.Chdir(tmp); err != nil {
+		t.Fatalf("chdir temp dir: %v", err)
+	}
+	t.Cleanup(func() {
+		if err := os.Chdir(wd); err != nil {
+			t.Fatalf("restore working directory: %v", err)
+		}
+	})
+
+	c := &GitRepositoryChecker{}
+	result := c.Check()
+	if result.Status != "WARNING" {
+		t.Fatalf("expected WARNING, got %s", result.Status)
+	}
+}
+
+func TestConfigFileCheckerName(t *testing.T) {
+	c := &ConfigFileChecker{}
+	if got := c.Name(); got != "Configuration Files" {
+		t.Fatalf("got %q, want %q", got, "Configuration Files")
+	}
+}
+
+func TestNetworkCheckerName(t *testing.T) {
+	c := &NetworkChecker{}
+	if got := c.Name(); got != "Network Connectivity" {
+		t.Fatalf("got %q, want %q", got, "Network Connectivity")
+	}
+}
+
+func TestFilePermissionCheckerName(t *testing.T) {
+	c := &FilePermissionChecker{}
+	if got := c.Name(); got != "File Permissions" {
+		t.Fatalf("got %q, want %q", got, "File Permissions")
+	}
+}
+
+func TestGetGoVersion(t *testing.T) {
+	got := getGoVersion()
+	if strings.HasPrefix(got, "go") {
+		t.Fatalf("expected version without 'go' prefix, got %q", got)
+	}
+	matched, err := regexp.MatchString(`^\d+\.\d+`, got)
+	if err != nil {
+		t.Fatalf("match version: %v", err)
+	}
+	if !matched {
+		t.Fatalf("unexpected version format: %q", got)
+	}
+}
+
+func TestSystemInfoFormatSystemInfo(t *testing.T) {
+	info := SystemInfo{
+		OS:            "linux",
+		Architecture:  "amd64",
+		GoVersion:     "1.21.0",
+		PummitVersion: "3.0.0",
+		GitVersion:    "2.40.0",
+	}
+
+	got := info.FormatSystemInfo()
+
+	if !strings.Contains(got, "linux") {
+		t.Error("missing OS")
+	}
+	if !strings.Contains(got, "amd64") {
+		t.Error("missing architecture")
+	}
+	if !strings.Contains(got, "1.21.0") {
+		t.Error("missing Go version")
+	}
+	if !strings.Contains(got, "3.0.0") {
+		t.Error("missing Pummit version")
+	}
+	if !strings.Contains(got, "2.40.0") {
+		t.Error("missing Git version")
+	}
+}
+
+func TestConfigFileCheckerNoConfigDir(t *testing.T) {
+	home := t.TempDir()
+	setCleanConfigEnvs(t, home)
+	restoreConfigState(t)
+
+	c := &ConfigFileChecker{}
+	result := c.Check()
+
+	if result.Status != "WARNING" {
+		t.Fatalf("expected WARNING, got %s", result.Status)
+	}
+}
+
+func TestConfigFileCheckerNoConfigFiles(t *testing.T) {
+	home := t.TempDir()
+	setCleanConfigEnvs(t, home)
+	restoreConfigState(t)
+
+	cfgDir := filepath.Join(home, ".config", "pummit")
+	if err := os.MkdirAll(cfgDir, 0755); err != nil {
+		t.Fatalf("mkdir cfg: %v", err)
+	}
+
+	c := &ConfigFileChecker{}
+	result := c.Check()
+
+	if result.Status != "WARNING" {
+		t.Fatalf("expected WARNING, got %s", result.Status)
+	}
+}
+
+func TestConfigFileCheckerValidJSONConfig(t *testing.T) {
+	home := t.TempDir()
+	setCleanConfigEnvs(t, home)
+	restoreConfigState(t)
+
+	cfgDir := filepath.Join(home, ".config", "pummit")
+	if err := os.MkdirAll(cfgDir, 0755); err != nil {
+		t.Fatalf("mkdir cfg: %v", err)
+	}
+
+	jsonPath := filepath.Join(cfgDir, "config.json")
+	if err := os.WriteFile(jsonPath, []byte(`{"writeEmoji": true}`), 0644); err != nil {
+		t.Fatalf("write json: %v", err)
+	}
+
+	c := &ConfigFileChecker{}
+	result := c.Check()
+
+	if result.Status != "OK" {
+		t.Fatalf("expected OK, got %s: %s", result.Status, result.Message)
+	}
+}
+
+func TestConfigFileCheckerInvalidJSONConfig(t *testing.T) {
+	home := t.TempDir()
+	setCleanConfigEnvs(t, home)
+	restoreConfigState(t)
+
+	cfgDir := filepath.Join(home, ".config", "pummit")
+	if err := os.MkdirAll(cfgDir, 0755); err != nil {
+		t.Fatalf("mkdir cfg: %v", err)
+	}
+
+	jsonPath := filepath.Join(cfgDir, "config.json")
+	if err := os.WriteFile(jsonPath, []byte(`{invalid`), 0644); err != nil {
+		t.Fatalf("write json: %v", err)
+	}
+
+	c := &ConfigFileChecker{}
+	result := c.Check()
+
+	if result.Status != "ERROR" {
+		t.Fatalf("expected ERROR, got %s", result.Status)
+	}
+}
+
+func TestGitConfigCheckerCheckMissing(t *testing.T) {
+	requireGit(t)
+	home := t.TempDir()
+	setCleanConfigEnvs(t, home)
+	restoreConfigState(t)
+
+	emptyCfg := filepath.Join(home, ".gitconfig")
+	if err := os.WriteFile(emptyCfg, nil, 0600); err != nil {
+		t.Fatalf("write empty gitconfig: %v", err)
+	}
+	t.Setenv("GIT_CONFIG_GLOBAL", emptyCfg)
+
+	c := &GitConfigChecker{}
+	result := c.Check()
+
+	if result.Status != "ERROR" {
+		t.Fatalf("expected ERROR, got %s", result.Status)
+	}
+	if len(result.Suggestions) == 0 {
+		t.Fatalf("expected suggestions for missing config")
+	}
+}
+
+func TestGitConfigCheckerCheckOK(t *testing.T) {
+	requireGit(t)
+	home := t.TempDir()
+	setCleanConfigEnvs(t, home)
+	writeGitConfig(t, home)
+	restoreConfigState(t)
+
+	c := &GitConfigChecker{}
+	result := c.Check()
+
+	if result.Status != "OK" {
+		t.Fatalf("expected OK, got %s", result.Status)
+	}
+	if len(result.Suggestions) != 0 {
+		t.Fatalf("expected no suggestions, got %v", result.Suggestions)
+	}
+}
+
+func TestGitRepositoryCheckerStatusError(t *testing.T) {
+	requireGit(t)
+	tmp := t.TempDir()
+
+	gitDir := filepath.Join(tmp, ".git")
+	if err := os.MkdirAll(gitDir, 0755); err != nil {
+		t.Fatalf("mkdir .git: %v", err)
+	}
+
+	wd, err := os.Getwd()
+	if err != nil {
+		t.Fatalf("getwd: %v", err)
+	}
+	if err := os.Chdir(tmp); err != nil {
+		t.Fatalf("chdir temp dir: %v", err)
+	}
+	t.Cleanup(func() {
+		if err := os.Chdir(wd); err != nil {
+			t.Fatalf("restore working directory: %v", err)
+		}
+	})
+
+	// Remove git from PATH to force status command failure.
+	t.Setenv("PATH", tmp)
+
+	c := &GitRepositoryChecker{}
+	result := c.Check()
+
+	if result.Status != "ERROR" {
+		t.Fatalf("expected ERROR, got %s", result.Status)
+	}
+}
+
+func TestFilePermissionCheckerCheck(t *testing.T) {
+	home := t.TempDir()
+	setCleanConfigEnvs(t, home)
+	restoreConfigState(t)
+
+	c := &FilePermissionChecker{}
+	result := c.Check()
+
+	if result.Status != "OK" {
+		t.Fatalf("expected OK, got %s", result.Status)
+	}
+}
+
+func TestFormatDiagnosticResults(t *testing.T) {
+	requireGit(t)
+	home := t.TempDir()
+	setCleanConfigEnvs(t, home)
+	writeGitConfig(t, home)
+	restoreConfigState(t)
+
+	repo := initRealRepo(t)
+
+	cfgDir := filepath.Join(home, ".config", "pummit")
+	if err := os.MkdirAll(cfgDir, 0755); err != nil {
+		t.Fatalf("mkdir cfg: %v", err)
+	}
+	jsonPath := filepath.Join(cfgDir, "config.json")
+	if err := os.WriteFile(jsonPath, []byte(`{"writeEmoji": true}`), 0644); err != nil {
+		t.Fatalf("write json: %v", err)
+	}
+
+	_ = repo
+
+	output := FormatDiagnosticResults()
+
+	if !strings.Contains(output, "System Diagnostics") {
+		t.Fatalf("missing system diagnostics section: %s", output)
+	}
+	if !strings.Contains(output, "Diagnostic Results:") {
+		t.Fatalf("missing diagnostic results section: %s", output)
+	}
+	if !strings.Contains(output, "Diagnostic Summary:") {
+		t.Fatalf("missing diagnostic summary section: %s", output)
 	}
 }

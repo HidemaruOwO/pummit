@@ -15,6 +15,287 @@ import (
 
 // Tests in this file modify the working directory; do not run in parallel.
 
+func TestIsGitRepository(t *testing.T) {
+	if _, err := exec.LookPath("git"); err != nil {
+		t.Skip("git not installed")
+	}
+
+	t.Run("in repo", func(t *testing.T) {
+		setCleanGitEnv(t)
+		dir := initTempRepo(t)
+
+		cwd, err := os.Getwd()
+		if err != nil {
+			t.Fatalf("getwd: %v", err)
+		}
+		if err := os.Chdir(dir); err != nil {
+			t.Fatalf("chdir: %v", err)
+		}
+		t.Cleanup(func() { _ = os.Chdir(cwd) })
+
+		if !IsGitRepository() {
+			t.Fatal("expected true in git repo")
+		}
+	})
+
+	t.Run("not in repo", func(t *testing.T) {
+		setCleanGitEnv(t)
+		dir := t.TempDir()
+
+		cwd, err := os.Getwd()
+		if err != nil {
+			t.Fatalf("getwd: %v", err)
+		}
+		if err := os.Chdir(dir); err != nil {
+			t.Fatalf("chdir: %v", err)
+		}
+		t.Cleanup(func() { _ = os.Chdir(cwd) })
+
+		if IsGitRepository() {
+			t.Fatal("expected false outside git repo")
+		}
+	})
+}
+
+func TestAddFiles(t *testing.T) {
+	if _, err := exec.LookPath("git"); err != nil {
+		t.Skip("git not installed")
+	}
+
+	t.Run("add single file", func(t *testing.T) {
+		setCleanGitEnv(t)
+		dir := initTempRepo(t)
+
+		filePath := filepath.Join(dir, "test.txt")
+		if err := os.WriteFile(filePath, []byte("content"), 0o644); err != nil {
+			t.Fatalf("write file: %v", err)
+		}
+
+		cwd, err := os.Getwd()
+		if err != nil {
+			t.Fatalf("getwd: %v", err)
+		}
+		if err := os.Chdir(dir); err != nil {
+			t.Fatalf("chdir: %v", err)
+		}
+		t.Cleanup(func() { _ = os.Chdir(cwd) })
+
+		if err := AddFiles([]string{"test.txt"}); err != nil {
+			t.Fatalf("AddFiles failed: %v", err)
+		}
+
+		staged, err := GetStagedFiles()
+		if err != nil {
+			t.Fatalf("GetStagedFiles failed: %v", err)
+		}
+		if len(staged) != 1 || staged[0] != "test.txt" {
+			t.Fatalf("expected test.txt to be staged, got %v", staged)
+		}
+	})
+
+	t.Run("add multiple files", func(t *testing.T) {
+		setCleanGitEnv(t)
+		dir := initTempRepo(t)
+
+		if err := os.WriteFile(filepath.Join(dir, "a.txt"), []byte("a"), 0o644); err != nil {
+			t.Fatalf("write file a: %v", err)
+		}
+		if err := os.WriteFile(filepath.Join(dir, "b.txt"), []byte("b"), 0o644); err != nil {
+			t.Fatalf("write file b: %v", err)
+		}
+
+		cwd, err := os.Getwd()
+		if err != nil {
+			t.Fatalf("getwd: %v", err)
+		}
+		if err := os.Chdir(dir); err != nil {
+			t.Fatalf("chdir: %v", err)
+		}
+		t.Cleanup(func() { _ = os.Chdir(cwd) })
+
+		if err := AddFiles([]string{"a.txt", "b.txt"}); err != nil {
+			t.Fatalf("AddFiles failed: %v", err)
+		}
+
+		staged, err := GetStagedFiles()
+		if err != nil {
+			t.Fatalf("GetStagedFiles failed: %v", err)
+		}
+		if len(staged) != 2 {
+			t.Fatalf("expected 2 staged files, got %d", len(staged))
+		}
+	})
+
+	t.Run("empty list", func(t *testing.T) {
+		if err := AddFiles([]string{}); err != nil {
+			t.Fatalf("AddFiles with empty list should not error: %v", err)
+		}
+	})
+}
+
+func TestGetStagedFiles(t *testing.T) {
+	if _, err := exec.LookPath("git"); err != nil {
+		t.Skip("git not installed")
+	}
+
+	t.Run("no staged files", func(t *testing.T) {
+		setCleanGitEnv(t)
+		dir := initTempRepo(t)
+
+		cwd, err := os.Getwd()
+		if err != nil {
+			t.Fatalf("getwd: %v", err)
+		}
+		if err := os.Chdir(dir); err != nil {
+			t.Fatalf("chdir: %v", err)
+		}
+		t.Cleanup(func() { _ = os.Chdir(cwd) })
+
+		staged, err := GetStagedFiles()
+		if err != nil {
+			t.Fatalf("GetStagedFiles failed: %v", err)
+		}
+		if len(staged) != 0 {
+			t.Fatalf("expected empty, got %v", staged)
+		}
+	})
+
+	t.Run("with staged files", func(t *testing.T) {
+		setCleanGitEnv(t)
+		dir := initTempRepo(t)
+
+		filePath := filepath.Join(dir, "staged.txt")
+		if err := os.WriteFile(filePath, []byte("content"), 0o644); err != nil {
+			t.Fatalf("write file: %v", err)
+		}
+		runGit(t, dir, "add", "staged.txt")
+
+		cwd, err := os.Getwd()
+		if err != nil {
+			t.Fatalf("getwd: %v", err)
+		}
+		if err := os.Chdir(dir); err != nil {
+			t.Fatalf("chdir: %v", err)
+		}
+		t.Cleanup(func() { _ = os.Chdir(cwd) })
+
+		staged, err := GetStagedFiles()
+		if err != nil {
+			t.Fatalf("GetStagedFiles failed: %v", err)
+		}
+		if len(staged) != 1 || staged[0] != "staged.txt" {
+			t.Fatalf("expected [staged.txt], got %v", staged)
+		}
+	})
+}
+
+func TestGetBranch(t *testing.T) {
+	if _, err := exec.LookPath("git"); err != nil {
+		t.Skip("git not installed")
+	}
+
+	t.Run("main branch", func(t *testing.T) {
+		setCleanGitEnv(t)
+		dir := initTempRepo(t)
+
+		cwd, err := os.Getwd()
+		if err != nil {
+			t.Fatalf("getwd: %v", err)
+		}
+		if err := os.Chdir(dir); err != nil {
+			t.Fatalf("chdir: %v", err)
+		}
+		t.Cleanup(func() { _ = os.Chdir(cwd) })
+
+		branch, err := GetBranch()
+		if err != nil {
+			t.Fatalf("GetBranch failed: %v", err)
+		}
+		if branch != "main" {
+			t.Fatalf("expected 'main', got %q", branch)
+		}
+	})
+
+	t.Run("feature branch", func(t *testing.T) {
+		setCleanGitEnv(t)
+		dir := initTempRepo(t)
+
+		if err := os.WriteFile(filepath.Join(dir, "init.txt"), []byte("init"), 0o644); err != nil {
+			t.Fatalf("write file: %v", err)
+		}
+		runGit(t, dir, "add", "init.txt")
+		runGit(t, dir, "commit", "-m", "init")
+		runGit(t, dir, "checkout", "-b", "feature/test")
+
+		cwd, err := os.Getwd()
+		if err != nil {
+			t.Fatalf("getwd: %v", err)
+		}
+		if err := os.Chdir(dir); err != nil {
+			t.Fatalf("chdir: %v", err)
+		}
+		t.Cleanup(func() { _ = os.Chdir(cwd) })
+
+		branch, err := GetBranch()
+		if err != nil {
+			t.Fatalf("GetBranch failed: %v", err)
+		}
+		if branch != "feature/test" {
+			t.Fatalf("expected 'feature/test', got %q", branch)
+		}
+	})
+}
+
+func TestConvertToEmoji(t *testing.T) {
+	t.Run("known emoji", func(t *testing.T) {
+		if got := ConvertToEmoji("sparkles"); got != "✨" {
+			t.Fatalf("expected ✨, got %q", got)
+		}
+	})
+
+	t.Run("unknown emoji", func(t *testing.T) {
+		if got := ConvertToEmoji("unknown_emoji_name"); got != ":unknown_emoji_name:" {
+			t.Fatalf("expected :unknown_emoji_name:, got %q", got)
+		}
+	})
+}
+
+func TestCommitWithOfflineModeStrings(t *testing.T) {
+	if _, err := exec.LookPath("git"); err != nil {
+		t.Skip("git not installed")
+	}
+
+	setCleanGitEnv(t)
+	dir := initTempRepo(t)
+
+	if err := os.WriteFile(filepath.Join(dir, "file.txt"), []byte("content"), 0o644); err != nil {
+		t.Fatalf("write file: %v", err)
+	}
+	runGit(t, dir, "add", "file.txt")
+
+	cwd, err := os.Getwd()
+	if err != nil {
+		t.Fatalf("getwd: %v", err)
+	}
+	if err := os.Chdir(dir); err != nil {
+		t.Fatalf("chdir: %v", err)
+	}
+	t.Cleanup(func() { _ = os.Chdir(cwd) })
+
+	orig := config.CurrentTOMLConfig
+	t.Cleanup(func() { config.CurrentTOMLConfig = orig })
+	config.CurrentTOMLConfig = config.GetDefaultTOMLConfig()
+
+	if err := CommitWithOfflineModeStrings("sparkles", "test message", true); err != nil {
+		t.Fatalf("CommitWithOfflineModeStrings failed: %v", err)
+	}
+
+	msg := strings.TrimSpace(runGitOutput(t, dir, "log", "-1", "--pretty=%B"))
+	if !strings.Contains(msg, "✨") || !strings.Contains(msg, "test message") {
+		t.Fatalf("unexpected commit message: %q", msg)
+	}
+}
+
 // Verify rune-safe truncation logic.
 func TestTruncateWithEllipsis(t *testing.T) {
 	t.Run("ascii", func(t *testing.T) {
