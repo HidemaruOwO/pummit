@@ -9,5 +9,5 @@ var DEFAULT_CONFIG string
 var EMOJIS_JSON string
 
 const (
-	VERSION = "2.0.0"
+	VERSION = "1.3.0"
 )
