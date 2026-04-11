@@ -17,7 +17,7 @@
 1. `docs/rebuild-spec.md`
 2. `docs/config.schema.cue`
 3. `docs/spec.md`
-4. 対象ディレクトリ配下の既存コード
+4. `legacy/` 配下の既存コード
 
 ## 3. 非交渉ルール
 
@@ -27,6 +27,7 @@
 - 既存コマンド互換を壊す変更は、互換レイヤーなしでは入れない
 - ライブラリ層で `os.Exit` を使わない
 - 不明点は README ではなく `docs/rebuild-spec.md` を優先する
+- `legacy/` は参照用であり、新規実装の追加先にしない
 - 1 PR で 1 マイルストーン、または 1 マイルストーン内の 1 サブ機能だけを扱う
 - すべての非自明ロジックにユニットテストを追加する
 - CLI 契約変更には受け入れテストを追加する
@@ -37,7 +38,7 @@
 
 作るもの:
 
-- `cmd/pummit/main.go`
+- `main.go`
 - `internal/app/app.go`
 - `internal/cli/root.go`
 - 終了コード定義

@@ -187,9 +187,7 @@ pummit <emoji-or-alias> <message...>
 次の構成を推奨する。
 
 ```text
-cmd/
-  pummit/
-    main.go
+main.go
 
 internal/
   app/
@@ -260,6 +258,19 @@ tests/
   integration/
   acceptance/
 
+legacy/
+  cli/
+  config/
+  git/
+  alias/
+  emojis/
+  doctor/
+  mcp/
+  prompt/
+  utils/
+  gitmoji/
+  logger/
+
 docs/
   spec.md
   rebuild-spec.md
@@ -269,6 +280,8 @@ docs/
 
 ### 6.1 構成方針
 
+- ルート `main.go` は当面維持し、`go install github.com/HidemaruOwO/pummit@latest` の導線を壊さない
+- `legacy/` は旧実装の退避場所であり、新機能の実装先ではない
 - `domain` には副作用のない型とルールだけを置く
 - `usecase` でユースケース単位の処理をまとめる
 - `infra` で Git、設定ファイル、外部 API を吸収する
@@ -304,7 +317,7 @@ docs/
 
 ### M1. 基盤
 
-- `cmd/pummit/main.go`
+- `main.go`
 - `internal/app`
 - `internal/cli/root.go`
 - 終了コードの統一

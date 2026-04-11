@@ -2,6 +2,7 @@
 
 > 注記:
 > この文書は現行実装の挙動を記録するための `Current Behavior Spec` です。
+> 再実装の移行期間中、ここでいう現行実装のコードは主に `legacy/` 配下に退避されています。
 > 一から再実装する際の正規仕様は `docs/rebuild-spec.md`、エージェント向け実装契約は `docs/agent-handoff.md`、設定スキーマの機械可読定義は `docs/config.schema.cue` を参照してください。
 
 ## 1. この文書の目的

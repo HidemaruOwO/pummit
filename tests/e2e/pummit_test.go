@@ -12,7 +12,7 @@ import (
 
 	"github.com/BurntSushi/toml"
 
-	"github.com/HidemaruOwO/pummit/internal/config"
+	"github.com/HidemaruOwO/pummit/legacy/config"
 	"github.com/HidemaruOwO/pummit/internal/variable"
 )
 

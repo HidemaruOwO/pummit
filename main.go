@@ -3,8 +3,8 @@ package main
 import (
 	"os"
 
-	"github.com/HidemaruOwO/pummit/internal/cli"
-	"github.com/HidemaruOwO/pummit/pkg/logger"
+	"github.com/HidemaruOwO/pummit/legacy/cli"
+	"github.com/HidemaruOwO/pummit/legacy/logger"
 )
 
 func main() {
