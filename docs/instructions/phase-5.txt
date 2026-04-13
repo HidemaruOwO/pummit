@@ -1,0 +1,80 @@
+Read first:
+1. docs/rebuild-spec.md
+2. docs/config.schema.cue
+3. docs/agent-handoff.md
+4. docs/spec.md
+5. legacy/README.md
+
+Task:
+Phase 5 の MCP サーバーとツール群を実装してください。
+
+Goal:
+通常 CLI と同じルールを使う MCP サーバーを新実装で提供してください。
+この Phase では、Git、Config、Alias、Doctor の各ツールを MCP から呼べるようにします。
+
+Scope:
+- `internal/infra/mcp/` にサーバーを実装する
+- `mcp` コマンドを実装する
+- `git.status` を実装する
+- `git.commit` を実装する
+- `git.smart_commit` を実装する
+- `config.get` を実装する
+- `alias.list` を実装する
+- `doctor.check` を実装する
+- 通常 CLI と共通の usecase を呼ぶ構成にする
+
+Do not:
+- MCP 側で別の emoji 解決ルールを持たない
+- CLI と別の設定モデルを持たない
+- `legacy/` の MCP 実装をそのまま延命しない
+- 仕様にない MCP ツールを増やさない
+
+Requirements:
+- `github.com/mark3labs/mcp-go` を使うこと
+- MCP 側も通常 CLI と同じ emoji 解決ルールを使うこと
+- `config.get` は正規仕様のキーだけ返すこと
+- `git.smart_commit` は staged / unstaged を扱えること
+- エラーは MCP の結果として返し、内部で `os.Exit` しないこと
+
+Acceptance criteria:
+1. `mcp` コマンドでサーバーを起動できる
+2. `git.status` がリポジトリ状態を返す
+3. `git.commit` が明示引数でコミットできる
+4. `git.smart_commit` が staged / unstaged を扱える
+5. `config.get` が正規仕様のキーだけ返す
+6. `alias.list` が alias 一覧を返す
+7. `doctor.check` が診断結果を返す
+
+Suggested implementation direction:
+- `internal/infra/mcp/server.go`:
+  - server bootstrap
+  - tool registration
+- `internal/infra/mcp/tool_git.go`:
+  - status
+  - commit
+  - smart_commit
+- `internal/infra/mcp/tool_config.go`:
+  - config.get
+- `internal/infra/mcp/tool_alias.go`:
+  - alias.list
+- `internal/infra/mcp/tool_doctor.go`:
+  - doctor.check
+
+Tests:
+- MCP ツールごとの unit test を追加する
+- 可能なら tool handler の integration test を追加する
+- CLI と MCP で emoji 解決結果が一致することを確認するテストを追加する
+
+Verification:
+- gofmt -w .
+- go test -v ./...
+- go build . -o pummit
+
+Output format:
+- まず実装計画を出してください
+- 私が `approve plan` と返すまで実装しないでください
+- 実装後は以下を報告してください
+  - 変更したファイル
+  - 実装内容
+  - テスト結果
+  - 残課題

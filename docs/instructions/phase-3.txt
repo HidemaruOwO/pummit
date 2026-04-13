@@ -1,0 +1,83 @@
+Read first:
+1. docs/rebuild-spec.md
+2. docs/config.schema.cue
+3. docs/agent-handoff.md
+4. docs/spec.md
+5. legacy/README.md
+
+Task:
+Phase 3 の commit フローを実装してください。
+
+Goal:
+通常 CLI からの commit を新実装で成立させてください。
+この Phase では、Git client、emoji 解決、alias 解決、`branchMapping`、コミットメッセージ組み立てを実装します。
+
+Scope:
+- `internal/infra/git/` に Git client を実装する
+- `internal/domain/commit/` にコミットメッセージ整形ルールを実装する
+- `internal/domain/emoji/` と `internal/usecase/` に emoji resolver を実装する
+- alias 解決を実装する
+- `branchMapping` による `--auto-emoji` を実装する
+- `pummit commit --emoji <emoji> <message...>` を実装する
+- 互換呼び出し `pummit <emoji> <message...>` を実装する
+- 変更がないときは終了コード `0` で終了する仕様を実装する
+
+Do not:
+- interactive UI を実装しない
+- doctor, migrate, mcp の本実装はまだ行わない
+- `templates` の複雑な DSL を実装しない
+- `legacy/` の commit 実装を流用するために直接貼り付けない
+- `go-git` を導入しない
+
+Requirements:
+- emoji 解決順は `docs/rebuild-spec.md` に従うこと
+- `--auto-emoji` は `branchMapping.rules` → `fallback` の順で解決すること
+- コミットメッセージ形式は `<prefix> <message> (<files>)` に従うこと
+- `base.filesLength` の切り詰めルールを守ること
+- Git エラーは CLI 層で終了コード変換すること
+- 内部層で `os.Exit` を使わないこと
+
+Acceptance criteria:
+1. `pummit commit --emoji sparkles "Add x"` が成功する
+2. `pummit sparkles "Add x"` が互換動作する
+3. `pummit commit --auto-emoji "Add x"` が `branchMapping` を使う
+4. alias shortcut が emoji 解決に使われる
+5. ステージ済み変更が無ければ終了コード `0` で終了する
+6. Git 実行エラー時に正しい終了コードへ変換される
+7. `git commit` 失敗時に内部層から `os.Exit` しない
+
+Suggested implementation direction:
+- `internal/infra/git/client.go`:
+  - staged files
+  - branch name
+  - commit execution
+- `internal/usecase/commit_service.go`:
+  - emoji resolution
+  - alias resolution
+  - branch mapping resolution
+  - message formatting
+- `internal/cli/commit.go`:
+  - `--emoji`
+  - `--auto-emoji`
+  - 互換引数処理
+
+Tests:
+- alias 解決の unit test を追加する
+- branchMapping 解決の unit test を追加する
+- コミットメッセージ整形の unit test を追加する
+- staged files 取得の integration test を追加する
+- `commit --emoji` と互換呼び出しの受け入れテストを追加する
+
+Verification:
+- gofmt -w .
+- go test -v ./...
+- go build . -o pummit
+
+Output format:
+- まず実装計画を出してください
+- 私が `approve plan` と返すまで実装しないでください
+- 実装後は以下を報告してください
+  - 変更したファイル
+  - 実装内容
+  - テスト結果
+  - 残課題

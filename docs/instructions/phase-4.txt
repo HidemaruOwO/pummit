@@ -1,0 +1,71 @@
+Read first:
+1. docs/rebuild-spec.md
+2. docs/config.schema.cue
+3. docs/agent-handoff.md
+4. docs/spec.md
+5. legacy/README.md
+
+Task:
+Phase 4 の管理コマンドを実装してください。
+
+Goal:
+設定操作、alias 管理、doctor、migrate を新実装で提供してください。
+この Phase では、日常運用に必要な管理コマンドを新構成へ載せ替えます。
+
+Scope:
+- `config` サブコマンド群を実装する
+- `alias` サブコマンド群を実装する
+- `doctor` を実装する
+- `migrate` と `migrate status` と `migrate rollback` を実装する
+- 破壊的操作に確認または `--force` / `--confirm` を実装する
+- コマンドヘルプを整備する
+
+Do not:
+- MCP はまだ実装しない
+- interactive の高度な UI は実装しない
+- README 全体を作り直さない
+- `legacy/` に新機能を足さない
+
+Requirements:
+- `config` は正規仕様のキーだけを扱うこと
+- `alias` は設定レイヤーの正規モデルを使うこと
+- `doctor` は少なくとも設定、Git、ネットワーク、環境の基本診断を返すこと
+- `migrate rollback` は `config.toml` を削除し `config.json` を戻すこと
+- 破壊的操作に無確認実行を入れるなら明示フラグを必須にすること
+
+Acceptance criteria:
+1. `config list/get/set/validate/reset` が使える
+2. `alias add/list/delete/reset` が使える
+3. `doctor` が診断結果を返す
+4. `migrate` が JSON から TOML へ移行できる
+5. `migrate status` が設定状態を返す
+6. `migrate rollback` がロールバックできる
+7. 主要サブコマンドに help がある
+
+Suggested implementation direction:
+- `internal/usecase/config_service.go` を `config` CLI に接続する
+- `internal/usecase/alias_service.go` を `alias` CLI に接続する
+- `internal/usecase/doctor_service.go` を作る
+- `internal/usecase/migrate_service.go` を作る
+- `internal/cli/config/` と `internal/cli/alias/` を新構成で埋める
+
+Tests:
+- `config` の CLI テストを追加する
+- `alias` の CLI テストを追加する
+- `doctor` の integration test を追加する
+- `migrate` と `rollback` の integration test を追加する
+- 破壊的操作の確認フローに対する受け入れテストを追加する
+
+Verification:
+- gofmt -w .
+- go test -v ./...
+- go build . -o pummit
+
+Output format:
+- まず実装計画を出してください
+- 私が `approve plan` と返すまで実装しないでください
+- 実装後は以下を報告してください
+  - 変更したファイル
+  - 実装内容
+  - テスト結果
+  - 残課題

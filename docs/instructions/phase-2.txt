@@ -1,0 +1,84 @@
+Read first:
+1. docs/rebuild-spec.md
+2. docs/config.schema.cue
+3. docs/agent-handoff.md
+4. docs/spec.md
+5. legacy/README.md
+
+Task:
+Phase 2 の設定レイヤーを実装してください。
+
+Goal:
+正規仕様に従って、`config.toml` 読み込み、既定値マージ、厳格バリデーション、JSON から TOML への移行を実装してください。
+この Phase では、commit や MCP には進まず、設定の読み書きと検証に集中してください。
+
+Scope:
+- `internal/domain/config/` に設定モデルと制約を実装する
+- `internal/infra/config/` に TOML codec と保存処理を実装する
+- `internal/infra/config/` に JSON migrator を実装する
+- 既定値構築と上書きマージを実装する
+- 未知キー検出を実装する
+- `config validate` に必要な土台を実装する
+- `os.UserConfigDir()` ベースの設定保存先解決を実装する
+
+Do not:
+- commit コマンドを実装しない
+- Git client はまだ実装しない
+- alias CLI や doctor CLI はまだ実装しない
+- MCP は触らない
+- `legacy/` 側に新しいロジックを追加しない
+- 暗黙的な設定探索のために `viper` を入れない
+
+Requirements:
+- `docs/config.schema.cue` と矛盾しないこと
+- 読み込み順は `docs/rebuild-spec.md` に従うこと
+- 既定値を先に構築してから TOML を上書きすること
+- `config.toml` の未知キーはエラーにすること
+- `config.json` は移行入力専用にすること
+- `meta.version` は設定スキーマ識別子として扱うこと
+- ライブラリ層で `os.Exit` を使わないこと
+
+Acceptance criteria:
+1. 設定の部分指定で不足項目が既定値で補完される
+2. 未知キーを含む `config.toml` はエラーになる
+3. `base.filesLength < 0` などの制約違反を検出できる
+4. `config.toml` が無ければ既定設定を生成できる
+5. `config.json` があれば TOML に移行できる
+6. 設定ディレクトリの解決が OS ごとの仕様と一致する
+7. `config validate` の基礎機能が動く
+
+Suggested implementation direction:
+- `internal/domain/config`:
+  - 設定構造体
+  - defaults
+  - validate
+- `internal/infra/config`:
+  - store
+  - toml codec
+  - json migrator
+- `internal/usecase/config_service.go`:
+  - load
+  - save
+  - validate
+  - migrate
+
+Tests:
+- 設定マージの unit test を追加する
+- 未知キー検出の unit test を追加する
+- 設定制約違反の unit test を追加する
+- JSON から TOML 移行の integration test を追加する
+- CLI 契約が露出するなら `tests/` の受け入れテストを更新する
+
+Verification:
+- gofmt -w .
+- go test -v ./...
+- go build . -o pummit
+
+Output format:
+- まず実装計画を出してください
+- 私が `approve plan` と返すまで実装しないでください
+- 実装後は以下を報告してください
+  - 変更したファイル
+  - 実装内容
+  - テスト結果
+  - 残課題
