@@ -1,0 +1,81 @@
+Read first:
+1. docs/rebuild-spec.md
+2. docs/config.schema.cue
+3. docs/agent-handoff.md
+4. docs/spec.md
+5. legacy/README.md
+
+Task:
+Phase 1 の基盤を実装してください。
+
+Goal:
+旧実装は `legacy/` に残したまま、新実装の起動基盤を `internal/` 側に作ってください。
+ただし、まだ commit や config の本実装は移植しません。
+この Phase では「新実装の入口と終了コード設計」を作ることが目的です。
+
+Scope:
+- `internal/app/app.go` を作る
+- `internal/cli/root.go` を作る
+- 新実装側の最小 `version` コマンドを作る
+- 終了コード定義を作る
+- ルート `main.go` から新実装を呼ぶ形へ切り替えるか、もしくは切り替え準備だけを行う
+- 互換導線として `pummit --version` と `pummit version` を新実装側で動かす
+
+Do not:
+- `legacy/` 配下の既存ロジックを大きく書き換えない
+- commit 機能はまだ実装しない
+- config, alias, doctor, migrate, mcp の本機能はまだ実装しない
+- interactive を実装しない
+- README を広く書き換えない
+- 勝手に新しい外部依存を増やしすぎない
+
+Requirements:
+- `docs/rebuild-spec.md` を正規仕様として扱うこと
+- `docs/agent-handoff.md` の非交渉ルールを守ること
+- 新規実装は `internal/` 配下に作ること
+- `legacy/` は参照用・互換用として扱い、新機能実装先にしないこと
+- CLI 層で終了コードを決めること
+- ライブラリ層で `os.Exit` を使わないこと
+- `go install github.com/HidemaruOwO/pummit@latest` の導線を壊さないこと
+- ルート `main.go` は残すこと
+
+Acceptance criteria:
+1. `pummit --version` が成功する
+2. `pummit version` が成功する
+3. バージョン文字列は `internal/variable.VERSION` を使う
+4. 終了コードの型または定数が導入されている
+5. 新実装の `root` と `app` の責務が分かれている
+6. Phase 1 の範囲外の機能は stub か help 表示でとどめる
+7. 既存の `legacy/` 参照構造を壊さない
+
+Suggested implementation direction:
+- `internal/app`:
+  - アプリ全体の起動入口
+  - `Run(args []string) error` のような形でよい
+- `internal/cli`:
+  - Cobra の root command
+  - `version` サブコマンド
+  - 終了コードへ変換するためのエラー定義
+- `main.go`:
+  - できるだけ薄くする
+  - 新実装を呼び、終了コードを適用する
+- まだ未実装のコマンド群は、この Phase では無理に繋がなくてよい
+
+Tests:
+- Phase 1 の非自明ロジックに unit test を追加する
+- `tests/` に CLI の version 挙動を確認するテストを追加または更新する
+- stdout / stderr / exit code を確認できるなら確認する
+
+Verification:
+- gofmt -w .
+- go test -v ./...
+- go build . -o pummit
+
+Output format:
+- まず実装計画を出してください
+- 私が `approve plan` と返すまで実装しないでください
+- 実装後は以下を報告してください
+  - 変更したファイル
+  - 実装内容
+  - テスト結果
+  - 残課題

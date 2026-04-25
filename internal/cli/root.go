@@ -2,70 +2,59 @@ package cli
 
 import (
 	"fmt"
-	"os"
+	"io"
 	"runtime"
-	"strings"
 
-	"github.com/HidemaruOwO/pummit/internal/cli/alias"
-	"github.com/HidemaruOwO/pummit/internal/config"
-	// "github.com/HidemaruOwO/pummit/internal/emojis"
-	"github.com/HidemaruOwO/pummit/internal/git"
+	aliascmd "github.com/HidemaruOwO/pummit/internal/cli/alias"
+	configcmd "github.com/HidemaruOwO/pummit/internal/cli/config"
 	"github.com/HidemaruOwO/pummit/internal/variable"
 	"github.com/spf13/cobra"
 )
 
-var (
-	version bool
-)
+func Execute(args []string, stdout, stderr io.Writer) error {
+	cmd := NewRootCommand()
+	cmd.SetArgs(args)
+	cmd.SetOut(stdout)
+	cmd.SetErr(stderr)
+	cmd.SilenceErrors = true
+	cmd.SilenceUsage = true
 
-var rootCmd = &cobra.Command{
-	Use:   "pummit [emoji] [message...]",
-	Short: "Make the commit message more beautiful in CLI 🎨",
-	// Long: `pummit is a tool that helps create consistent git commit messages using emojis and formatters. For detailed documentation, please refer to:
-	// https://github.com/HidemaruOwO/pummit`,
-	Long: fmt.Sprintf(`pummit v%s %s
-  Make the commit message more beautiful in CLI 🎨`, variable.VERSION, runtime.GOARCH),
-	Run: func(cmd *cobra.Command, args []string) {
-		// emoji, err := emojis.GetEmojiByName(args[0])
-		// if err != nil {
-		// 	fmt.Println("Error:", err)
-		// 	os.Exit(1)
-		// }
-		// fmt.Println("Emoji:", emoji)
-
-		if version {
-			versionCmd.Run(cmd, args)
-			os.Exit(0)
-		}
-
-		if len(args) < 2 {
-			cmd.Help()
-			os.Exit(0)
-		}
-
-		cm := git.CommitMessage{
-			Emoji:   args[0],
-			Message: strings.Join(args[1:], " "),
-		}
-
-		git.Commit(cm)
-	},
-	Args: cobra.ArbitraryArgs,
+	return cmd.Execute()
 }
 
-func Execute() error {
-	// 初期化
-	if err := config.Init(); err != nil {
-		return err
+func NewRootCommand() *cobra.Command {
+	var versionFlag bool
+
+	cmd := &cobra.Command{
+		Use:   "pummit",
+		Short: "Create consistent git commits with emoji support",
+		Long: fmt.Sprintf(
+			"pummit v%s %s\n  Rewrite bootstrap for the next implementation phases.",
+			variable.VERSION,
+			runtime.GOARCH,
+		),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if versionFlag {
+				return runVersion(cmd, args)
+			}
+
+			if len(args) >= 2 {
+				return runCompatCommit(cmd, args)
+			}
+
+			return cmd.Help()
+		},
+		Args: cobra.ArbitraryArgs,
 	}
 
-	rootCmd.PersistentFlags().BoolVarP(&version, "version", "v", false, "Show the version of pummit")
+	cmd.Flags().BoolVarP(&versionFlag, "version", "v", false, "Show the version of pummit")
+	cmd.AddCommand(newVersionCommand())
+	cmd.AddCommand(newCommitCommand())
+	cmd.AddCommand(configcmd.NewCommand())
+	cmd.AddCommand(aliascmd.NewCommand())
+	cmd.AddCommand(newDoctorCommand())
+	cmd.AddCommand(newMigrateCommand())
+	cmd.AddCommand(newMCPCommand())
 
-	rootCmd.AddCommand(versionCmd)
-	rootCmd.AddCommand(alias.AddCmd)
-	rootCmd.AddCommand(alias.ListCmd)
-	rootCmd.AddCommand(alias.DeleteCmd)
-	rootCmd.AddCommand(alias.ResetCmd)
-
-	return rootCmd.Execute()
+	return cmd
 }

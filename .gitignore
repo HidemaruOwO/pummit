@@ -15,3 +15,7 @@
 # vendor/
 
 .DS_Store
+
+pummit
+
+.serena/cache
