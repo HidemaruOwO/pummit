@@ -6,19 +6,20 @@ import (
 	"runtime"
 	"strings"
 
+	"github.com/HidemaruOwO/pummit/internal/variable"
 	"github.com/HidemaruOwO/pummit/legacy/cli/alias"
 	configCmd "github.com/HidemaruOwO/pummit/legacy/cli/config"
 	"github.com/HidemaruOwO/pummit/legacy/config"
 	"github.com/HidemaruOwO/pummit/legacy/git"
 	"github.com/HidemaruOwO/pummit/legacy/gitmoji"
 	"github.com/HidemaruOwO/pummit/legacy/logger"
-	"github.com/HidemaruOwO/pummit/internal/variable"
 	"github.com/spf13/cobra"
 )
 
 var (
-	version     bool
-	offlineMode bool
+	version            bool
+	offlineMode        bool
+	commandsRegistered bool
 )
 
 var rootCmd = &cobra.Command{
@@ -72,37 +73,48 @@ var rootCmd = &cobra.Command{
 }
 
 func Execute() error {
+	return ExecuteArgs(nil)
+}
+
+func ExecuteArgs(args []string) error {
 	// 初期化
 	if err := config.Init(); err != nil {
 		return err
 	}
 
-	rootCmd.PersistentFlags().BoolVarP(&version, "version", "v", false, "Show the version of pummit")
-	rootCmd.PersistentFlags().BoolVar(&offlineMode, "offline", false, "Run with offline mode（disable calling Gitmoji API）")
+	if !commandsRegistered {
+		rootCmd.PersistentFlags().BoolVarP(&version, "version", "v", false, "Show the version of pummit")
+		rootCmd.PersistentFlags().BoolVar(&offlineMode, "offline", false, "Run with offline mode（disable calling Gitmoji API）")
 
-	// 管理コマンド
-	rootCmd.AddCommand(versionCmd)
-	rootCmd.AddCommand(migrateCmd)
-	rootCmd.AddCommand(doctorCmd)
-	rootCmd.AddCommand(mcpCmd)
-	rootCmd.AddCommand(configCmd.Cmd)
+		// 管理コマンド
+		rootCmd.AddCommand(versionCmd)
+		rootCmd.AddCommand(migrateCmd)
+		rootCmd.AddCommand(doctorCmd)
+		rootCmd.AddCommand(mcpCmd)
+		rootCmd.AddCommand(configCmd.Cmd)
 
-	// aliasコマンド群をサブコマンドとして統合
-	aliasCmd := &cobra.Command{
-		Use:   "alias",
-		Short: "Manage emoji aliases for commit prefixes",
-		Long: `Manage emoji aliases for commit prefixes.
+		// aliasコマンド群をサブコマンドとして統合
+		aliasCmd := &cobra.Command{
+			Use:   "alias",
+			Short: "Manage emoji aliases for commit prefixes",
+			Long: `Manage emoji aliases for commit prefixes.
 Aliases allow you to use short names instead of full emoji names or symbols.`,
+		}
+
+		// aliasサブコマンドを追加
+		aliasCmd.AddCommand(alias.AddCmd)
+		aliasCmd.AddCommand(alias.ListCmd)
+		aliasCmd.AddCommand(alias.DeleteCmd)
+		aliasCmd.AddCommand(alias.ResetCmd)
+
+		// 親コマンドに追加
+		rootCmd.AddCommand(aliasCmd)
+		commandsRegistered = true
 	}
 
-	// aliasサブコマンドを追加
-	aliasCmd.AddCommand(alias.AddCmd)
-	aliasCmd.AddCommand(alias.ListCmd)
-	aliasCmd.AddCommand(alias.DeleteCmd)
-	aliasCmd.AddCommand(alias.ResetCmd)
-
-	// 親コマンドに追加
-	rootCmd.AddCommand(aliasCmd)
+	version = false
+	offlineMode = false
+	rootCmd.SetArgs(args)
 
 	return rootCmd.Execute()
 }

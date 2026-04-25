@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/HidemaruOwO/pummit/legacy/gitmoji"
 	"github.com/HidemaruOwO/pummit/internal/variable"
+	"github.com/HidemaruOwO/pummit/legacy/gitmoji"
 )
 
 type Emoji struct {

@@ -24,16 +24,29 @@ func isolateEnv(t *testing.T) {
 	t.Helper()
 	tmp := t.TempDir()
 	t.Setenv("HOME", tmp)
+	t.Setenv("USERPROFILE", tmp)
 	t.Setenv("XDG_CONFIG_HOME", filepath.Join(tmp, ".config"))
+	if runtime.GOOS == "windows" {
+		t.Setenv("APPDATA", filepath.Join(tmp, ".config"))
+	}
 
 	prevCfg := CurrentTOMLConfig
+	prevJSONCfg := CurrentConfig
+	prevDefaultJSON := DefaultConfig
 	prevPath := TOMLConfigPath
+	prevJSONPath := ConfigPath
 	CurrentTOMLConfig = TOMLConfig{}
 	TOMLConfigPath = ""
+	CurrentConfig = Config{}
+	DefaultConfig = Config{}
+	ConfigPath = ""
 
 	t.Cleanup(func() {
 		CurrentTOMLConfig = prevCfg
+		CurrentConfig = prevJSONCfg
+		DefaultConfig = prevDefaultJSON
 		TOMLConfigPath = prevPath
+		ConfigPath = prevJSONPath
 	})
 }
 
@@ -274,6 +287,7 @@ func TestGetConfigDir(t *testing.T) {
 			setup: func(t *testing.T) {
 				home := t.TempDir()
 				t.Setenv("HOME", home)
+				t.Setenv("USERPROFILE", home)
 				appData := filepath.Join(home, "AppData", "Roaming")
 				if err := os.MkdirAll(appData, 0o755); err != nil {
 					t.Fatalf("MkdirAll: %v", err)
@@ -288,6 +302,7 @@ func TestGetConfigDir(t *testing.T) {
 			setup: func(t *testing.T) {
 				home := t.TempDir()
 				t.Setenv("HOME", home)
+				t.Setenv("USERPROFILE", home)
 				t.Setenv("APPDATA", "")
 			},
 			wantSuffix: filepath.Join(".pummit"),

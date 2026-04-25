@@ -4,6 +4,7 @@ import (
 	_ "embed"
 	"os"
 	"path/filepath"
+	"runtime"
 	"testing"
 
 	"github.com/BurntSushi/toml"
@@ -71,7 +72,11 @@ func testIsolateEnv(t *testing.T) string {
 	home := t.TempDir()
 	// Set environment variables
 	t.Setenv("HOME", home)
+	t.Setenv("USERPROFILE", home)
 	t.Setenv("XDG_CONFIG_HOME", filepath.Join(home, ".config"))
+	if runtime.GOOS == "windows" {
+		t.Setenv("APPDATA", filepath.Join(home, ".config"))
+	}
 	t.Setenv("LC_ALL", "C")
 	// return path
 	return home

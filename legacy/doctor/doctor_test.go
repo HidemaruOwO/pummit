@@ -30,6 +30,7 @@ func setCleanConfigEnvs(t *testing.T, home string) {
 		// Windows Git resolves HOME/USERPROFILE differently depending on environment.
 		// Keep them aligned to avoid accidental leakage from the host.
 		t.Setenv("USERPROFILE", home)
+		t.Setenv("APPDATA", filepath.Join(home, ".config"))
 	}
 	t.Setenv("XDG_CONFIG_HOME", filepath.Join(home, ".config"))
 	t.Setenv("LC_ALL", "C")
@@ -56,10 +57,16 @@ func writeGitConfig(t *testing.T, home string) {
 // restoreConfigState avoids cross-test pollution of package globals.
 func restoreConfigState(t *testing.T) {
 	prev := config.CurrentTOMLConfig
+	prevJSON := config.CurrentConfig
+	prevDefaultJSON := config.DefaultConfig
 	prevPath := config.TOMLConfigPath
+	prevJSONPath := config.ConfigPath
 	t.Cleanup(func() {
 		config.CurrentTOMLConfig = prev
+		config.CurrentConfig = prevJSON
+		config.DefaultConfig = prevDefaultJSON
 		config.TOMLConfigPath = prevPath
+		config.ConfigPath = prevJSONPath
 	})
 }
 
